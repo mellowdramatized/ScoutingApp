@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WOBOT 141 - Command Center</title>
-    
+    <title>WOBOT 141 - Scouting Dashboard</title>
+
     <link href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_midnight.min.css" rel="stylesheet">
-    
+
     <style>
         /* ==========================================================================
            WOBOT 141 DESIGN SYSTEM & RESPONSIVE ENGINE
@@ -18,19 +19,19 @@
             --wobot-red: #e62020;
             --wobot-red-hover: #ff4d4d;
             --wobot-red-active: #cc0000;
-            
+
             /* NEUTRAL & BACKGROUND PALETTE */
             --bg-black: #080808;
             --card-grey: #141414;
             --field-bg: #1c1c1c;
             --border-grey: #2a2a2a;
             --border-light: #444444;
-            
+
             /* TYPOGRAPHY COLORS */
             --text-white: #ffffff;
             --text-muted: #9e9e9e;
             --text-dark: #111111;
-            
+
             /* UTILITY & STATE COLORS */
             --owner-purple: #9d4edd;
             --owner-purple-hover: #b26bf0;
@@ -53,7 +54,7 @@
             --border-radius-lg: 18px;
             --border-radius-xl: 24px;
             --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --shadow-float: 0 15px 35px rgba(0,0,0,0.5);
+            --shadow-float: 0 15px 35px rgba(0, 0, 0, 0.5);
             --shadow-glow: 0 0 20px rgba(230, 32, 32, 0.3);
         }
 
@@ -79,7 +80,9 @@
             overflow-x: hidden;
         }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
 
         /* ==========================================================================
            2. MAIN CONTAINERS & LAYOUT
@@ -122,7 +125,7 @@
             font-size: var(--font-h1);
             font-weight: 900;
             margin-bottom: 40px;
-            text-shadow: 0 4px 10px rgba(230,32,32,0.2);
+            text-shadow: 0 4px 10px rgba(230, 32, 32, 0.2);
         }
 
         h2 {
@@ -154,7 +157,7 @@
             padding: 18px 40px;
             border-radius: var(--border-radius-md);
             border: 1px solid var(--border-grey);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             flex-wrap: wrap;
             gap: 20px;
         }
@@ -166,11 +169,20 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        .online { background: #0a2918; color: #4ade80; border: 1px solid #166534; }
-        .offline { background: #3f0f14; color: #f87171; border: 1px solid #991b1b; }
+        .online {
+            background: #0a2918;
+            color: #4ade80;
+            border: 1px solid #166534;
+        }
+
+        .offline {
+            background: #3f0f14;
+            color: #f87171;
+            border: 1px solid #991b1b;
+        }
 
         .nav-tabs {
             display: flex;
@@ -179,10 +191,13 @@
             border-bottom: 2px solid var(--border-grey);
             padding-bottom: 20px;
             overflow-x: auto;
-            scrollbar-width: none; 
+            scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .nav-tabs::-webkit-scrollbar { display: none; }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
 
         .nav-btn {
             background: #111;
@@ -199,8 +214,19 @@
             letter-spacing: 1.5px;
         }
 
-        .nav-btn:hover { background: #1f1f1f; color: var(--text-white); border-color: var(--border-light); }
-        .nav-btn.active { background: var(--wobot-red); color: white; border-color: var(--wobot-red-hover); box-shadow: var(--shadow-glow); transform: translateY(-2px); }
+        .nav-btn:hover {
+            background: #1f1f1f;
+            color: var(--text-white);
+            border-color: var(--border-light);
+        }
+
+        .nav-btn.active {
+            background: var(--wobot-red);
+            color: white;
+            border-color: var(--wobot-red-hover);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
 
         /* ==========================================================================
            5. FORMS & INPUTS (TACTICAL SCOUTING)
@@ -215,7 +241,7 @@
             padding: 50px;
             border-radius: var(--border-radius-xl);
             border: 1px solid var(--border-grey);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
         }
 
         .form-section-header {
@@ -227,7 +253,7 @@
             border-bottom: 2px solid var(--border-grey);
             padding-bottom: 12px;
             margin-bottom: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .scout-form label {
@@ -240,7 +266,9 @@
             display: block;
         }
 
-        .scout-form input, .scout-form select, .scout-form textarea {
+        .scout-form input,
+        .scout-form select,
+        .scout-form textarea {
             padding: 20px;
             border-radius: var(--border-radius-md);
             border: 2px solid var(--border-grey);
@@ -250,7 +278,7 @@
             font-family: inherit;
             transition: var(--transition-smooth);
             width: 100%;
-            appearance: none; 
+            appearance: none;
         }
 
         .scout-form select {
@@ -260,17 +288,22 @@
             background-size: 20px;
         }
 
-        .scout-form input:focus, .scout-form select:focus, .scout-form textarea:focus { 
-            border-color: var(--wobot-red); 
-            outline: none; 
+        .scout-form input:focus,
+        .scout-form select:focus,
+        .scout-form textarea:focus {
+            border-color: var(--wobot-red);
+            outline: none;
             background: #000;
-            box-shadow: 0 0 0 4px rgba(230, 32, 32, 0.15); 
+            box-shadow: 0 0 0 4px rgba(230, 32, 32, 0.15);
         }
 
         /* ==========================================================================
            6. COMPONENTS: BUTTONS & MEDIA
            ========================================================================== */
-        .submit-btn, .owner-btn, .sync-btn, .register-btn {
+        .submit-btn,
+        .owner-btn,
+        .sync-btn,
+        .register-btn {
             font-family: inherit;
             padding: 22px 35px;
             border: none;
@@ -287,19 +320,65 @@
             align-items: center;
         }
 
-        .submit-btn { background: var(--wobot-red); color: var(--text-white); box-shadow: 0 5px 15px rgba(230, 32, 32, 0.3); }
-        .submit-btn:hover:not(:disabled) { background: var(--wobot-red-hover); transform: translateY(-4px); box-shadow: 0 12px 25px rgba(230, 32, 32, 0.5); }
-        .submit-btn:active:not(:disabled) { transform: translateY(0); }
-        .submit-btn:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; }
+        .submit-btn {
+            background: var(--wobot-red);
+            color: var(--text-white);
+            box-shadow: 0 5px 15px rgba(230, 32, 32, 0.3);
+        }
 
-        .register-btn { background: #1a1a1a; color: var(--text-muted); border: 2px solid var(--border-light); margin-top: 15px; }
-        .register-btn:hover { background: #2a2a2a; color: white; border-color: #666; transform: translateY(-2px); }
+        .submit-btn:hover:not(:disabled) {
+            background: var(--wobot-red-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(230, 32, 32, 0.5);
+        }
 
-        .owner-btn { background: var(--owner-purple); margin-top: 30px; }
-        .owner-btn:hover { background: var(--owner-purple-hover); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(157, 78, 221, 0.4); }
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
 
-        .sync-btn { background: var(--warning-gold); color: var(--text-dark); width: auto; padding: 12px 25px; }
-        .sync-btn:hover { background: var(--warning-gold-hover); transform: scale(1.05); }
+        .submit-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .register-btn {
+            background: #1a1a1a;
+            color: var(--text-muted);
+            border: 2px solid var(--border-light);
+            margin-top: 15px;
+        }
+
+        .register-btn:hover {
+            background: #2a2a2a;
+            color: white;
+            border-color: #666;
+            transform: translateY(-2px);
+        }
+
+        .owner-btn {
+            background: var(--owner-purple);
+            margin-top: 30px;
+        }
+
+        .owner-btn:hover {
+            background: var(--owner-purple-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .sync-btn {
+            background: var(--warning-gold);
+            color: var(--text-dark);
+            width: auto;
+            padding: 12px 25px;
+        }
+
+        .sync-btn:hover {
+            background: var(--warning-gold-hover);
+            transform: scale(1.05);
+        }
 
         .toggle-auth-link {
             color: var(--wobot-red);
@@ -313,7 +392,11 @@
             padding: 10px;
             transition: color 0.2s;
         }
-        .toggle-auth-link:hover { color: var(--text-white); text-decoration: underline; }
+
+        .toggle-auth-link:hover {
+            color: var(--text-white);
+            text-decoration: underline;
+        }
 
         /* Media Box (Stagnant layout) */
         .image-container {
@@ -327,12 +410,22 @@
             justify-content: center;
             overflow: hidden;
             border: 4px solid var(--wobot-red);
-            box-shadow: inset 0 0 50px rgba(0,0,0,1);
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 1);
             position: relative;
         }
 
-        .robot-photo { width: 100%; height: 100%; object-fit: contain; z-index: 2;}
-        #img-placeholder { z-index: 1; text-align: center; padding: 20px;}
+        .robot-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        #img-placeholder {
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+        }
 
         /* Admin Dashboard Scrollable Areas */
         .admin-scroll-box {
@@ -350,40 +443,383 @@
             padding: 50px;
             border-radius: var(--border-radius-xl);
             margin-top: 60px;
-            background: linear-gradient(145deg, rgba(157, 78, 221, 0.05) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(145deg, rgba(157, 78, 221, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
             position: relative;
         }
 
         /* ==========================================================================
            7. TOAST NOTIFICATIONS (Haptic visual feedback)
            ========================================================================== */
-        #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 100000; width: 90%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; pointer-events: none; }
-        .toast { background: #111; color: var(--text-white); padding: 25px 35px; border-radius: var(--border-radius-md); border-left: 12px solid var(--wobot-red); box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 20px rgba(230,32,32,0.2); display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; animation: toastSlideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; pointer-events: auto; }
-        @keyframes toastSlideUp { from { transform: translateY(100px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        #toast-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100000;
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #111;
+            color: var(--text-white);
+            padding: 25px 35px;
+            border-radius: var(--border-radius-md);
+            border-left: 12px solid var(--wobot-red);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 20px rgba(230, 32, 32, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            animation: toastSlideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            pointer-events: auto;
+        }
+
+        @keyframes toastSlideUp {
+            from {
+                transform: translateY(100px) scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
 
         /* ==========================================================================
            8. MASSIVE RESPONSIVE ENGINE (20 MEDIA QUERIES)
            ========================================================================== */
-        @media (min-width: 2560px) { #app-container { max-width: 2000px; padding: 50px 100px; } .dashboard-grid { grid-template-columns: 600px 1fr; gap: 80px; } .scout-form { max-width: 1200px; padding: 60px; } }
-        @media (min-width: 1600px) and (max-width: 2559px) { .dashboard-grid { grid-template-columns: 500px 1fr; gap: 60px; } }
-        @media (max-width: 1400px) { #app-container { padding: 25px 30px; } .dashboard-grid { grid-template-columns: 400px 1fr; gap: 30px; } }
-        @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr; } .image-container { height: 500px; } .scout-form { padding: 40px; } }
-        @media (max-width: 1024px) { h1 { font-size: 2.2rem; } .user-info-bar { flex-direction: column; align-items: flex-start; gap: 20px; } .nav-tabs { gap: 10px; } .nav-btn { padding: 14px 20px; font-size: 0.85rem; } .owner-section { padding: 30px; } }
-        @media (max-width: 900px) { .scout-form { padding: 30px 20px; } }
-        @media (max-width: 768px) { #app-container { padding: 15px; } h1 { font-size: 1.9rem; letter-spacing: 2px; } .image-container { height: 350px; } .card { padding: 20px; border-radius: 12px; } }
-        @media (max-width: 600px) { .nav-tabs { margin-bottom: 25px; border-bottom: none; } .nav-btn { flex: 1; text-align: center; padding: 12px 10px; font-size: 0.75rem; letter-spacing: 0.5px; } .submit-btn { padding: 18px; font-size: 0.9rem; letter-spacing: 1px; } .scout-form label { font-size: 0.75rem; } .form-section-header { font-size: 0.9rem; } }
-        @media (max-width: 480px) { h1 { font-size: 1.6rem; border-bottom-width: 2px; margin-bottom: 20px; } .user-info-bar { padding: 15px; border-radius: 8px; } #user-display { font-size: 0.8rem; margin-left: 10px; } .scout-form input, .scout-form select, .scout-form textarea { padding: 14px; font-size: 1rem; } .image-container { height: 280px; } }
-        @media (max-width: 400px) { #app-container { padding: 10px; } .scout-form { padding: 20px 15px; border-radius: 12px; } .card { padding: 15px; } h2 { font-size: 1.3rem; } }
-        @media (max-width: 360px) { h1 { font-size: 1.4rem; } .nav-tabs { flex-direction: column; } .nav-btn { width: 100%; border-radius: 6px; } .status-pill { padding: 5px 10px; font-size: 0.6rem; } }
-        @media (min-height: 1000px) and (min-width: 768px) { .image-container { height: 500px; } }
-        @media (max-height: 700px) { .scout-form { gap: 15px; } .submit-btn { padding: 15px; } }
-        @media (max-height: 500px) { h1 { margin-bottom: 15px; font-size: 1.5rem; } .user-info-bar { margin-bottom: 15px; padding: 10px; flex-direction: row; } .image-container { height: 200px; } }
-        @media (orientation: landscape) and (max-width: 900px) { .nav-tabs { flex-wrap: wrap; justify-content: center; } .nav-btn { flex: 1 1 40%; } .scout-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .form-section-header { grid-column: 1 / -1; margin-top: 10px; } .submit-btn { grid-column: 1 / -1; } }
-        @media (min-width: 1024px) and (max-width: 1024px) and (orientation: portrait) { .dashboard-grid { grid-template-columns: 1fr; } .image-container { height: 60vh; } }
-        @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
-        @media (pointer: coarse) { input[type="number"], input[type="text"], select, textarea { min-height: 55px; } .submit-btn { min-height: 65px; } input, select, textarea { font-size: 16px !important; } }
-        @media (pointer: fine) { ::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-track { background: var(--bg-black); } ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 5px; } ::-webkit-scrollbar-thumb:hover { background: var(--wobot-red); } }
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { .card, .scout-form, .user-info-bar { border-width: 0.5px; } }
+        @media (min-width: 2560px) {
+            #app-container {
+                max-width: 2000px;
+                padding: 50px 100px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 600px 1fr;
+                gap: 80px;
+            }
+
+            .scout-form {
+                max-width: 1200px;
+                padding: 60px;
+            }
+        }
+
+        @media (min-width: 1600px) and (max-width: 2559px) {
+            .dashboard-grid {
+                grid-template-columns: 500px 1fr;
+                gap: 60px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            #app-container {
+                padding: 25px 30px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 400px 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-container {
+                height: 500px;
+            }
+
+            .scout-form {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .user-info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .nav-tabs {
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 14px 20px;
+                font-size: 0.85rem;
+            }
+
+            .owner-section {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .scout-form {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #app-container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.9rem;
+                letter-spacing: 2px;
+            }
+
+            .image-container {
+                height: 350px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .nav-tabs {
+                margin-bottom: 25px;
+                border-bottom: none;
+            }
+
+            .nav-btn {
+                flex: 1;
+                text-align: center;
+                padding: 12px 10px;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+            }
+
+            .submit-btn {
+                padding: 18px;
+                font-size: 0.9rem;
+                letter-spacing: 1px;
+            }
+
+            .scout-form label {
+                font-size: 0.75rem;
+            }
+
+            .form-section-header {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.6rem;
+                border-bottom-width: 2px;
+                margin-bottom: 20px;
+            }
+
+            .user-info-bar {
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            #user-display {
+                font-size: 0.8rem;
+                margin-left: 10px;
+            }
+
+            .scout-form input,
+            .scout-form select,
+            .scout-form textarea {
+                padding: 14px;
+                font-size: 1rem;
+            }
+
+            .image-container {
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            #app-container {
+                padding: 10px;
+            }
+
+            .scout-form {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                border-radius: 6px;
+            }
+
+            .status-pill {
+                padding: 5px 10px;
+                font-size: 0.6rem;
+            }
+        }
+
+        @media (min-height: 1000px) and (min-width: 768px) {
+            .image-container {
+                height: 500px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .scout-form {
+                gap: 15px;
+            }
+
+            .submit-btn {
+                padding: 15px;
+            }
+        }
+
+        @media (max-height: 500px) {
+            h1 {
+                margin-bottom: 15px;
+                font-size: 1.5rem;
+            }
+
+            .user-info-bar {
+                margin-bottom: 15px;
+                padding: 10px;
+                flex-direction: row;
+            }
+
+            .image-container {
+                height: 200px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-width: 900px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-btn {
+                flex: 1 1 40%;
+            }
+
+            .scout-form {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .form-section-header {
+                grid-column: 1 / -1;
+                margin-top: 10px;
+            }
+
+            .submit-btn {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1024px) and (orientation: portrait) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-container {
+                height: 60vh;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        @media (pointer: coarse) {
+
+            input[type="number"],
+            input[type="text"],
+            select,
+            textarea {
+                min-height: 55px;
+            }
+
+            .submit-btn {
+                min-height: 65px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        @media (pointer: fine) {
+            ::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--bg-black);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--border-light);
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--wobot-red);
+            }
+        }
+
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .card,
+            .scout-form,
+            .user-info-bar {
+                border-width: 0.5px;
+            }
+        }
     </style>
 </head>
 
@@ -394,90 +830,110 @@
     <div id="auth-screen">
         <div style="text-align:center; margin-top:80px; padding: 30px;">
             <h1 style="border:none; font-size: 4rem; margin-bottom: 0;">WOBOT 141</h1>
-            <p style="letter-spacing: 10px; color: var(--text-muted); margin-bottom: 50px; font-weight: 900; font-size: 1.2rem;">COMMAND CENTER DASHBOARD</p>
-            
+            <p
+                style="letter-spacing: 10px; color: var(--text-muted); margin-bottom: 50px; font-weight: 900; font-size: 1.2rem;">
+                SCOUTING DASHBOARD</p>
+
             <div class="scout-form" style="max-width:500px;" id="auth-form-container">
-                
+
                 <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
-                    <label>ACCESS EMAIL</label>
+                    <label>EMAIL ADDRESS</label>
                     <input type="email" id="email" placeholder="email@wobot141.com" autocomplete="email">
                 </div>
-                
+
                 <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
-                    <label>SYSTEM PASSKEY</label>
+                    <label>PASSWORD</label>
                     <div style="position:relative; width:100%;">
-                        <input type="password" id="password" placeholder="••••••••" style="padding-right: 60px; width:100%; box-sizing: border-box;">
-                        <span id="toggle-pass" onclick="togglePasswordVisibility()" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.8rem;">👁️</span>
+                        <input type="password" id="password" placeholder="••••••••"
+                            style="padding-right: 60px; width:100%; box-sizing: border-box;">
+                        <span id="toggle-pass" onclick="togglePasswordVisibility()"
+                            style="position:absolute; right:20px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.8rem;">👁️</span>
                     </div>
                 </div>
 
-                <div id="registration-fields" class="hidden" style="display:flex; flex-direction:column; gap:12px; text-align:left; margin-top: 10px; padding-top: 20px; border-top: 1px solid #333;">
-                    <label style="color: var(--warning-gold);">TEAM AUTHORIZATION CODE (NEW ACCOUNTS ONLY)</label>
+                <div id="registration-fields" class="hidden"
+                    style="display:flex; flex-direction:column; gap:12px; text-align:left; margin-top: 10px; padding-top: 20px; border-top: 1px solid #333;">
+                    <label style="color: var(--warning-gold);">TEAM CODE (NEW ACCOUNTS ONLY)</label>
                     <input type="password" id="team-code" placeholder="Ask your Scouting Lead for the code">
                 </div>
 
                 <div id="login-controls" style="margin-top: 25px;">
-                    <button onclick="handleLogin()" class="submit-btn" id="login-trigger-btn">INITIALIZE SESSION</button>
-                    <span class="toggle-auth-link" onclick="toggleAuthMode('register')">NO ACCOUNT? REQUEST ACCESS</span>
+                    <button onclick="handleLogin()" class="submit-btn" id="login-trigger-btn">LOG IN</button>
+                    <span class="toggle-auth-link" onclick="toggleAuthMode('register')">NEED AN ACCOUNT? SIGN UP</span>
                 </div>
 
                 <div id="register-controls" class="hidden" style="margin-top: 25px;">
-                    <button onclick="handleRegistration()" class="register-btn" id="register-trigger-btn" style="color:white;">PROVISION NEW SCOUTER</button>
-                    <span class="toggle-auth-link" onclick="toggleAuthMode('login')" style="color: var(--text-muted);">← RETURN TO LOGIN</span>
+                    <button onclick="handleRegistration()" class="register-btn" id="register-trigger-btn"
+                        style="color:white;">CREATE ACCOUNT</button>
+                    <span class="toggle-auth-link" onclick="toggleAuthMode('login')" style="color: var(--text-muted);">←
+                        RETURN TO LOGIN</span>
                 </div>
-                
-                <div id="auth-error" style="color:var(--wobot-red); margin-top:25px; font-weight: 950; font-size: 1rem; min-height: 28px;"></div>
+
+                <div id="auth-error"
+                    style="color:var(--wobot-red); margin-top:25px; font-weight: 950; font-size: 1rem; min-height: 28px;">
+                </div>
             </div>
         </div>
     </div>
 
     <div id="app-container" class="hidden">
-        
+
         <div class="user-info-bar">
             <div style="display:flex; align-items:center; flex-wrap:wrap; gap:15px;">
-                <span id="conn-pill" class="status-pill online">LINK ACTIVE</span>
-                <span id="global-event-display" style="color:var(--warning-gold); font-weight:900; letter-spacing:2px; font-size:0.9rem; padding: 5px 12px; border: 1px dashed var(--warning-gold); border-radius: 5px;">EVENT: SYNCING...</span>
+                <span id="conn-pill" class="status-pill online">ONLINE</span>
+                <span id="global-event-display"
+                    style="color:var(--warning-gold); font-weight:900; letter-spacing:2px; font-size:0.9rem; padding: 5px 12px; border: 1px dashed var(--warning-gold); border-radius: 5px;">EVENT:
+                    LOADING...</span>
                 <span id="user-display" style="font-weight:950; color: var(--wobot-red); letter-spacing: 1.5px;"></span>
             </div>
-            
+
             <div style="display:flex; gap:15px; align-items: center; margin-top: 5px;">
                 <div id="sync-area" class="hidden">
-                    <button onclick="uploadOfflineData()" class="sync-btn" style="background:var(--warning-gold); color:black; font-weight:900; padding:10px 20px; border-radius:8px; border:none;">🚀 UPLOAD BUFFER (<span id="queue-count">0</span>)</button>
+                    <button onclick="uploadOfflineData()" class="sync-btn"
+                        style="background:var(--warning-gold); color:black; font-weight:900; padding:10px 20px; border-radius:8px; border:none;">🚀
+                        UPLOAD SAVED DATA (<span id="queue-count">0</span>)</button>
                 </div>
-                <button onclick="handleLogout()" style="background:transparent; border:2px solid #555; color:white; padding:12px 28px; cursor:pointer; border-radius:10px; font-weight:950; text-transform: uppercase; font-size: 0.85rem;">SIGN OUT</button>
+                <button onclick="handleLogout()"
+                    style="background:transparent; border:2px solid #555; color:white; padding:12px 28px; cursor:pointer; border-radius:10px; font-weight:950; text-transform: uppercase; font-size: 0.85rem;">LOG
+                    OUT</button>
             </div>
         </div>
 
         <div class="nav-tabs">
-            <button id="btn-tasks" class="nav-btn active" onclick="switchView('view-tasks')">My Assignments</button>
-            <button id="btn-scout" class="nav-btn" onclick="switchView('view-scout')">Robot Pit Entry</button>
-            <button id="btn-roster" class="nav-btn hidden" onclick="switchView('view-roster')">Global Data Roster</button>
-            <button id="btn-admin" class="nav-btn hidden" onclick="switchView('view-admin')">Admin Hub</button>
+            <button id="btn-tasks" class="nav-btn active" onclick="switchView('view-tasks')">My Teams</button>
+            <button id="btn-scout" class="nav-btn" onclick="switchView('view-scout')">Pit Scouting Form</button>
+            <button id="btn-roster" class="nav-btn hidden" onclick="switchView('view-roster')">Team Data</button>
+            <button id="btn-admin" class="nav-btn hidden" onclick="switchView('view-admin')">Admin Dashboard</button>
         </div>
 
         <div id="view-tasks" class="view-section">
-            <h1>Active Tasks</h1>
-            <p style="color:var(--text-muted); font-weight: 900; margin-bottom: 30px; font-size: 1.1rem;">Assigned team blocks for the current active event.</p>
-            <div id="tasks-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap:30px;"></div>
+            <h1>My Assigned Teams</h1>
+            <p style="color:var(--text-muted); font-weight: 900; margin-bottom: 30px; font-size: 1.1rem;">Teams you need
+                to scout at this event.</p>
+            <div id="tasks-list"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap:30px;"></div>
         </div>
 
         <div id="view-scout" class="view-section hidden">
-            <h1>2026 Tactical Pit Form</h1>
+            <h1>2026 Pit Scouting Form</h1>
             <div class="dashboard-grid">
-                
+
                 <div class="card" style="height: fit-content;">
-                    <h3>Media Evidence</h3>
+                    <h3>Robot Photo</h3>
                     <div class="image-container" id="robot-image-container">
-                        <span id="img-placeholder" style="color:#444; font-weight:950; letter-spacing:2px;">AWAITING PHOTO...</span>
+                        <span id="img-placeholder" style="color:#444; font-weight:950; letter-spacing:2px;">NO PHOTO
+                            SELECTED</span>
                         <img id="robot-photo-preview" class="robot-photo hidden">
                     </div>
-                    <input type="file" id="f-photo" accept="image/*" capture="environment" onchange="previewRobotImage(this)" style="display:none;">
-                    <button onclick="document.getElementById('f-photo').click()" class="submit-btn" style="width:100%; background:#333; margin-bottom:15px;">📷 CAPTURE ROBOT PHOTO</button>
+                    <input type="file" id="f-photo" accept="image/*" capture="environment"
+                        onchange="previewRobotImage(this)" style="display:none;">
+                    <button onclick="document.getElementById('f-photo').click()" class="submit-btn"
+                        style="width:100%; background:#333; margin-bottom:15px;">📷 TAKE PICTURE</button>
                 </div>
 
                 <form class="scout-form" id="scout-form" onsubmit="handleScoutSubmit(event)">
-                    
-                    <div class="form-section-header">SECTION 1: THE BASICS</div>
+
+                    <div class="form-section-header">SECTION 1: BASICS</div>
                     <div style="display:flex; gap:20px;">
                         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
                             <label>Team Number</label>
@@ -517,7 +973,8 @@
                         <label>How does the robot navigate field terrain?</label>
                         <select id="f-terrain">
                             <option value="Easily drives OVER the BUMP">Easily drives OVER the BUMP (6.5" tall)</option>
-                            <option value="Easily drives UNDER the TRENCH">Easily drives UNDER the TRENCH (22.25" clearance)</option>
+                            <option value="Easily drives UNDER the TRENCH">Easily drives UNDER the TRENCH (22.25"
+                                clearance)</option>
                             <option value="Can do BOTH seamlessly">Can do BOTH seamlessly</option>
                             <option value="Flat ground only">Flat ground only</option>
                         </select>
@@ -528,7 +985,8 @@
                         <label>Where does this robot intake FUEL?</label>
                         <select id="f-intake">
                             <option value="Floor Sweep">Floor Sweep</option>
-                            <option value="CHUTE & OUTPOST (Human Player)">CHUTE & OUTPOST (Human Player Station)</option>
+                            <option value="CHUTE & OUTPOST (Human Player)">CHUTE & OUTPOST (Human Player Station)
+                            </option>
                             <option value="Both">Both</option>
                         </select>
                     </div>
@@ -590,24 +1048,33 @@
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>Interview: "What is your main strategic pitch to an alliance captain?"</label>
-                        <textarea id="f-pitch" rows="3" placeholder="e.g. Massive fuel capacity, heavy defense, fast cycles..."></textarea>
+                        <textarea id="f-pitch" rows="3"
+                            placeholder="e.g. Massive fuel capacity, heavy defense, fast cycles..."></textarea>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>Scouter Private Note: Areas where their robot may fall short</label>
-                        <textarea id="f-vulnerabilities" rows="4" placeholder="e.g. Slow lift, exposed wiring, looks top-heavy, un-shielded swerve modules..."></textarea>
+                        <textarea id="f-vulnerabilities" rows="4"
+                            placeholder="e.g. Slow lift, exposed wiring, looks top-heavy, un-shielded swerve modules..."></textarea>
                     </div>
-
-                    <button type="submit" class="submit-btn" id="sub-btn" style="margin-top: 20px;">TRANSMIT REPORT TO MASTER SERVER</button>
+                    <div style="display:flex; gap:15px; margin-top: 20px;">
+                        <button type="submit" class="submit-btn" id="sub-btn" style="flex: 2;">SUBMIT PIT
+                            REPORT</button>
+                        <button type="button" onclick="saveDraft()" class="submit-btn"
+                            style="flex: 1; background: var(--warning-gold); color: black;">💾 SAVE DRAFT</button>
+                    </div>
                 </form>
             </div>
         </div>
 
         <div id="view-roster" class="view-section hidden">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h1>Intelligence Roster</h1>
-                <button onclick="downloadRosterCSV()" style="background:var(--success-green); color:white; border:none; padding:15px 35px; border-radius:12px; font-weight:950; cursor:pointer; text-transform: uppercase; font-size: 0.9rem;">📥 EXPORT DATA</button>
+                <h1>Team Data</h1>
+                <button onclick="downloadRosterCSV()"
+                    style="background:var(--success-green); color:white; border:none; padding:15px 35px; border-radius:12px; font-weight:950; cursor:pointer; text-transform: uppercase; font-size: 0.9rem;">📥
+                    EXPORT DATA</button>
             </div>
-            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Displaying teams verified for the active global event.</p>
+            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Displaying teams verified for the
+                active global event.</p>
             <div id="main-table"></div>
         </div>
 
@@ -616,85 +1083,106 @@
                 <h1 id="detail-team-name" style="border:none; margin:0;">TEAM PROFILE</h1>
                 <button class="nav-btn" onclick="switchView('view-roster')">← RETURN TO ROSTER</button>
             </div>
-            
+
             <div class="dashboard-grid">
                 <div class="card">
-                    <h3>Visual Evidence</h3>
+                    <h3>Robot Photo</h3>
                     <div class="image-container" id="detail-image-box"></div>
-                    
+
                     <h3 style="margin-top:40px; color: var(--wobot-red);">Technical Specifications</h3>
-                    <div id="pit-stats-content" style="background:#222; padding:30px; border-radius:15px; font-weight: 800; font-size: 1.1rem; line-height: 1.8;"></div>
+                    <div id="pit-stats-content"
+                        style="background:#222; padding:30px; border-radius:15px; font-weight: 800; font-size: 1.1rem; line-height: 1.8;">
+                    </div>
                 </div>
-                
+
                 <div class="card">
                     <h3>Strategic Pitch & Features</h3>
-                    <div id="detail-notes-block" style="font-size: 1.3rem; line-height: 1.8; color: #f0f0f0; margin-bottom: 30px;"></div>
-                    
+                    <div id="detail-notes-block"
+                        style="font-size: 1.3rem; line-height: 1.8; color: #f0f0f0; margin-bottom: 30px;"></div>
+
                     <h3 style="margin-top:40px; color: var(--wobot-red);">Scouter Identified Vulnerabilities</h3>
-                    <div id="detail-vulnerabilities-block" style="font-size: 1.2rem; line-height: 1.8; color: var(--warning-gold);"></div>
+                    <div id="detail-vulnerabilities-block"
+                        style="font-size: 1.2rem; line-height: 1.8; color: var(--warning-gold);"></div>
                 </div>
             </div>
         </div>
 
         <div id="view-admin" class="view-section hidden">
-            <h1>System Command Hub</h1>
-            
+            <h1>Admin Dashboard</h1>
+
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
                 <div class="card" style="border-top: 4px solid var(--wobot-red);">
-                    <h3 style="color: var(--wobot-red);">🏆 Scouter Leaderboard</h3>
-                    <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Most pits successfully scouted at the current event.</p>
+                    <h3 style="color: var(--wobot-red);">🏆 Scouting Leaderboard</h3>
+                    <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Most pits successfully
+                        scouted at the current event.</p>
                     <div id="admin-leaderboard" class="admin-scroll-box"></div>
                 </div>
                 <div class="card" style="border-top: 4px solid var(--warning-gold);">
-                    <h3 style="color: var(--warning-gold);">📋 Active Global Assignments</h3>
-                    <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Pending tasks assigned across the scouter pool.</p>
+                    <h3 style="color: var(--warning-gold);">📋 Active Assignments</h3>
+                    <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Pending tasks assigned
+                        across the scouter pool.</p>
                     <div id="admin-pending-assignments" class="admin-scroll-box"></div>
                 </div>
             </div>
-            
+
             <div class="card" style="border: 2px solid var(--warning-gold);">
-                <h3 style="color: var(--warning-gold);">🌍 Global Event Configuration</h3>
-                <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">Set the active competition. This filters all incoming and outgoing data worldwide.</p>
+                <h3 style="color: var(--warning-gold);">🌍 Event Settings</h3>
+                <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">Set the active competition.
+                    This filters all incoming and outgoing data worldwide.</p>
                 <div style="display:flex; gap:15px; align-items:flex-end; flex-wrap: wrap;">
                     <div style="flex:1; min-width: 250px;">
-                        <label style="color:var(--warning-gold); font-weight:900; font-size:0.8rem; text-transform:uppercase;">TBA Event Key</label>
-                        <input type="text" id="admin-event-input" placeholder="e.g. 2026micmp" style="width:100%; padding:15px; border-radius:8px; border:1px solid var(--border-grey); background:#222; color:white; font-size:1.1rem; margin-top:5px;">
+                        <label
+                            style="color:var(--warning-gold); font-weight:900; font-size:0.8rem; text-transform:uppercase;">TBA
+                            Event Key</label>
+                        <input type="text" id="admin-event-input" placeholder="e.g. 2026micmp"
+                            style="width:100%; padding:15px; border-radius:8px; border:1px solid var(--border-grey); background:#222; color:white; font-size:1.1rem; margin-top:5px;">
                     </div>
-                    <button onclick="setGlobalEvent()" class="submit-btn" style="background:var(--warning-gold); color:black; width:auto; padding:15px 35px; font-size: 0.9rem;">SET EVENT & SYNC TBA</button>
+                    <button onclick="setGlobalEvent()" class="submit-btn"
+                        style="background:var(--warning-gold); color:black; width:auto; padding:15px 35px; font-size: 0.9rem;">SET
+                        EVENT & SYNC TBA</button>
                 </div>
             </div>
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
-                
+
                 <div class="card">
-                    <h3>Auto Dispatcher Engine</h3>
-                    <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Automatically balance un-scouted teams from the current event across all Scouters.</p>
-                    <button onclick="autoAssign()" class="submit-btn" style="background:var(--success-green); width:100%; padding:18px 25px; font-size: 0.9rem;">🚀 AUTO-BALANCE ROSTER</button>
+                    <h3>Auto-Assign Teams</h3>
+                    <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Automatically balance
+                        un-scouted teams from the current event across all Scouters.</p>
+                    <button onclick="autoAssign()" class="submit-btn"
+                        style="background:var(--success-green); width:100%; padding:18px 25px; font-size: 0.9rem;">🚀
+                        AUTO-BALANCE ROSTER</button>
                 </div>
 
                 <div class="card">
-                    <h3>Targeted Manual Dispatch</h3>
-                    <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Directly assign a specific team to a chosen scouter.</p>
+                    <h3>Manual Team Assignment</h3>
+                    <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Directly assign a
+                        specific team to a chosen scouter.</p>
                     <div style="display:flex; flex-direction:column; gap:10px;">
-                        <select id="manual-scout-select" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
+                        <select id="manual-scout-select"
+                            style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
                             <option value="">Loading Scouters...</option>
                         </select>
-                        <select id="manual-team-select" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
+                        <select id="manual-team-select"
+                            style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
                             <option value="">Loading Event Teams...</option>
                         </select>
-                        <button onclick="manualAssign()" class="submit-btn" style="background:#444; border: 1px solid #666; width:100%; padding:15px 25px; font-size: 0.9rem; margin-top:5px;">🎯 DIRECT ASSIGN TEAM</button>
+                        <button onclick="manualAssign()" class="submit-btn"
+                            style="background:#444; border: 1px solid #666; width:100%; padding:15px 25px; font-size: 0.9rem; margin-top:5px;">🎯
+                            DIRECT ASSIGN TEAM</button>
                     </div>
                 </div>
 
             </div>
 
             <div id="owner-only-tools" class="owner-section hidden">
-                <h2 style="color:var(--owner-purple); letter-spacing: 6px; font-size: 2rem;">👑 MASTER OWNER CONTROL</h2>
+                <h2 style="color:var(--owner-purple); letter-spacing: 6px; font-size: 2rem;">👑 OWNER CONTROLS</h2>
                 <div class="card">
-                    <h3>Security Clearance Database</h3>
-                    <p style="color:var(--text-muted); font-size: 1rem; margin-bottom: 25px;">Override scouter ranks or initiate a global permission reset to 'scouter' level.</p>
+                    <h3>User Roles</h3>
+                    <p style="color:var(--text-muted); font-size: 1rem; margin-bottom: 25px;">Override scouter ranks or
+                        initiate a global permission reset to 'scouter' level.</p>
                     <div id="user-admin-table"></div>
-                    <button onclick="assignAllToScouter()" class="owner-btn">🛠️ EXECUTE GLOBAL SECURITY RESET</button>
+                    <button onclick="assignAllToScouter()" class="owner-btn">🛠️ RESET ALL USERS TO SCOUTER</button>
                 </div>
             </div>
         </div>
@@ -705,13 +1193,55 @@
 
     <script>
         /**
+        * REFRESH SAFEGUARD
+        * Prevents accidental data loss and forced logouts by asking for confirmation 
+        * before the page reloads or closes.
+        */
+        window.addEventListener('beforeunload', (event) => {
+            // Only show the warning if a user is currently logged in
+            if (currentUser) {
+                // Standard procedure for modern browsers to trigger the confirmation dialog
+                event.preventDefault();
+                event.returnValue = 'WARNING YOU WILL HAVE TO SIGN BACK IN BE SURE YOU WISH TO RELOAD';
+                return event.returnValue;
+            }
+        });
+        /**
+        * STARTUP BLANK SLATE
+        * This nukes everything before the app even starts.
+        * This guarantees a fresh sign-in on every single refresh.
+        */
+        (function nukeAllStorage() {
+            sessionStorage.clear();
+            localStorage.clear();
+            // Hunt specifically for the key you found
+            sessionStorage.removeItem('wobot_clean_session');
+            localStorage.removeItem('wobot_clean_session');
+        })();
+        /**
+         * INITIALIZATION AND AGGRESSIVE CACHE CLEARING
+         * This script runs immediately and deletes old Supabase local storage bugs.
+         */
+        localStorage.removeItem('supabase.auth.token');
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('sb-')) localStorage.removeItem(key);
+        });
+
+        /**
          * SUPABASE SYSTEM CONFIGURATION
          * Connecting to production DB: fqmycfmmlrbrjjdqdubx
          */
         const SB_URL = 'https://fqmycfmmlrbrjjdqdubx.supabase.co';
         const SB_KEY = 'sb_publishable_3nYicQyxHJYsHXZ8FYaJsg_ZDmWcq71';
-        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
-        
+
+        // Ensure Supabase uses sessionStorage and a brand new custom storage key
+        const sbClient = window.supabase.createClient(SB_URL, SB_KEY, {
+            auth: {
+                storageKey: 'wobot_clean_session',
+                storage: window.sessionStorage
+            }
+        });
+
         // MASTER OWNER IMMUTABLE LOCK
         const OWNER_ID_LOCK = "carmelokyles@gmail.com";
 
@@ -727,7 +1257,7 @@
         let adminTableInstance = null;
 
         /**
-         * UI NOTIFICATION ENGINE (Haptic Support Included)
+         * UI NOTIFICATION ENGINE
          */
         function showToast(message) {
             if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
@@ -736,7 +1266,7 @@
             toast.className = 'toast';
             toast.innerText = message;
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 600);
@@ -766,7 +1296,7 @@
             const registerControls = document.getElementById('register-controls');
             const regFields = document.getElementById('registration-fields');
             const errorDiv = document.getElementById('auth-error');
-            
+
             errorDiv.innerText = "";
 
             if (mode === 'register') {
@@ -786,9 +1316,11 @@
          * NETWORK SENSING PROTOCOL
          */
         async function checkConnection() {
+            if (!currentUser) return; // Prevent checking the database if the user isn't fully logged in
+
             const pill = document.getElementById('conn-pill');
             const syncArea = document.getElementById('sync-area');
-            const queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
+            const queue = JSON.parse(sessionStorage.getItem('wobot_offline_queue') || '[]');
 
             try {
                 const { error } = await sbClient.from('pit_scouting').select('id').limit(1);
@@ -796,11 +1328,11 @@
             } catch { isOnline = false; }
 
             if (isOnline) {
-                pill.innerText = "LINK ACTIVE"; pill.className = "status-pill online";
+                pill.innerText = "ONLINE"; pill.className = "status-pill online";
                 if (queue.length > 0) syncArea.classList.remove('hidden');
                 else syncArea.classList.add('hidden');
             } else {
-                pill.innerText = "OFFLINE BUFFER"; pill.className = "status-pill offline";
+                pill.innerText = "OFFLINE"; pill.className = "status-pill offline";
                 syncArea.classList.remove('hidden');
             }
             document.getElementById('queue-count').innerText = queue.length;
@@ -815,24 +1347,24 @@
             const passwordField = document.getElementById('password');
             const errorDiv = document.getElementById('auth-error');
             const loginBtn = document.getElementById('login-trigger-btn');
-            
+
             const email = emailField.value.trim().toLowerCase();
             const password = passwordField.value.trim();
 
             if (!email || !password) {
-                errorDiv.innerText = "ACCESS ERROR: Credentials cannot be empty.";
+                errorDiv.innerText = "Please enter an email and password.";
                 return;
             }
 
-            loginBtn.innerText = "AUTHENTICATING...";
+            loginBtn.innerText = "LOGGING IN...";
             errorDiv.innerText = "";
 
             const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-            
+
             if (error) {
-                errorDiv.innerText = `DENIED: ${error.message}`;
-                loginBtn.innerText = "INITIALIZE SESSION";
-                showToast("AUTHENTICATION FAILED: Ensure you have Registered first.");
+                errorDiv.innerText = `Error: ${error.message}`;
+                loginBtn.innerText = "LOG IN";
+                showToast("Login failed. Please check your credentials.");
             }
         }
 
@@ -851,16 +1383,16 @@
             const teamCodeInput = codeField.value.trim();
 
             if (!email || !password) {
-                errorDiv.innerText = "REGISTRATION ERROR: Email and Passkey required.";
+                errorDiv.innerText = "Please enter an email and password.";
                 return;
             }
 
             if (!teamCodeInput) {
-                errorDiv.innerText = "SECURITY ALERT: Team Authorization Code is required for new accounts.";
+                errorDiv.innerText = "Team code is required for new accounts.";
                 return;
             }
 
-            regBtn.innerText = "VERIFYING AUTHORIZATION CODE...";
+            regBtn.innerText = "VERIFYING CODE...";
             errorDiv.innerText = "";
 
             try {
@@ -875,30 +1407,30 @@
                 }
 
                 if (codeData.key_value !== teamCodeInput) {
-                    errorDiv.innerText = "REGISTRATION DENIED: Invalid Team Authorization Code.";
-                    regBtn.innerText = "PROVISION NEW SCOUTER";
-                    showToast("ERROR: Incorrect Team Code.");
+                    errorDiv.innerText = "Invalid team code.";
+                    regBtn.innerText = "CREATE ACCOUNT";
+                    showToast("Error: Incorrect team code.");
                     return;
                 }
             } catch (err) {
-                errorDiv.innerText = `DATABASE ERROR: ${err.message}`;
-                regBtn.innerText = "PROVISION NEW SCOUTER";
+                errorDiv.innerText = `Database Error: ${err.message}`;
+                regBtn.innerText = "CREATE ACCOUNT";
                 return;
             }
 
-            regBtn.innerText = "PROVISIONING NEW ACCOUNT...";
-            
+            regBtn.innerText = "CREATING ACCOUNT...";
+
             const { data, error } = await sbClient.auth.signUp({
                 email: email,
                 password: password,
             });
 
             if (error) {
-                errorDiv.innerText = `REGISTRATION FAILED: ${error.message}`;
-                regBtn.innerText = "PROVISION NEW SCOUTER";
-                showToast("ERROR: Account provisioning failed.");
+                errorDiv.innerText = `Registration Failed: ${error.message}`;
+                regBtn.innerText = "CREATE ACCOUNT";
+                showToast("Error: Account creation failed.");
             } else {
-                showToast("ACCOUNT CREATED! Session Initiated.");
+                showToast("Account created successfully!");
             }
         }
 
@@ -906,6 +1438,8 @@
          * SECURE LOGOUT UTILITY
          */
         function handleLogout() {
+            sessionStorage.clear();
+            localStorage.clear();
             sbClient.auth.signOut().then(() => {
                 location.reload();
             }).catch(error => {
@@ -916,14 +1450,54 @@
 
         /**
          * SYSTEM CORE: SESSION & ROLE DELEGATION
-         */
+/**
+ * SYSTEM CORE: SESSION RECOVERY & REFRESH KILLSWITCH
+ */
+        // 1. Immediate verification on page load (Fixes the Refresh Bug)
+        // 1. Immediate verification on page load (Fixes the Refresh Bug)
+        /**
+        * SYSTEM CORE: SESSION & ROLE DELEGATION
+        */
+        // 1. Surgical verification on page load
+        (async function verifySessionOnLoad() {
+            try {
+                const { data: { session } } = await sbClient.auth.getSession();
+
+                // If we have a session, try a quick 'health check' query
+                if (session) {
+                    const { error } = await sbClient.from('api_keys').select('name').limit(1);
+                    // If the query fails with a JWT error, the session is a zombie. Kill it.
+                    if (error && error.code === 'PGRST301') throw new Error("Zombie Session");
+                }
+            } catch (err) {
+                console.warn("Cleaning up stale session data...");
+                sessionStorage.clear();
+                localStorage.clear();
+                // Force the UI back to login state
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-container').classList.add('hidden');
+            }
+        })();
+
+        // 2. Standard State Change Listener (Handles the actual UI toggling)
         sbClient.auth.onAuthStateChange(async (event, session) => {
+            const authScreen = document.getElementById('auth-screen');
+            const appContainer = document.getElementById('app-container');
+
+            if (!session) {
+                authScreen.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                currentUser = null;
+                return;
+            }
+
             if (session) {
                 currentUser = session.user.email;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-container').classList.remove('hidden');
+                authScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
                 document.getElementById('user-display').innerText = currentUser.toUpperCase();
 
+                // Standard Role check logic
                 if (currentUser.toLowerCase() === OWNER_ID_LOCK) {
                     currentUserRole = 'owner';
                 } else {
@@ -931,13 +1505,13 @@
                         const { data: profile } = await sbClient.from('profiles').select('role').eq('id', session.user.id).single();
                         currentUserRole = profile ? profile.role : 'scouter';
                     } catch (e) {
-                        currentUserRole = 'scouter'; 
+                        currentUserRole = 'scouter';
                     }
                 }
 
                 initPermissionsUI();
-                await fetchGlobalEventKey(); // Get the active event FIRST
-                refreshApplicationData(); // THEN fetch data
+                await fetchGlobalEventKey();
+                refreshApplicationData();
                 checkConnection();
             }
         });
@@ -951,14 +1525,14 @@
                 if (data && data.key_value) {
                     activeEventKey = data.key_value;
                 } else {
-                    activeEventKey = "2026default"; 
+                    activeEventKey = "2026default";
                 }
-                
+
                 document.getElementById('global-event-display').innerText = `EVENT: ${activeEventKey.toUpperCase()}`;
-                
+
                 const adminInput = document.getElementById('admin-event-input');
                 if (adminInput) adminInput.value = activeEventKey;
-                
+
             } catch (err) {
                 console.error("Failed to fetch global event:", err);
             }
@@ -988,18 +1562,25 @@
                     .select('*')
                     .eq('event_key', activeEventKey)
                     .order('team_number', { ascending: true });
-                
+
                 if (error) {
                     console.error("Database fetch rejected:", error.message);
                     if (error.code === 'PGRST106' || error.message.includes('team_number')) {
-                        showToast("CRITICAL: Supabase API Cache needs resetting. Go to Dashboard -> API -> Reload Schema Cache.");
+                        showToast("Error loading data. Try refreshing the page.");
+                    }
+                    // FIX: Automatically flush local storage and reload if the JWT token expires or corrupts
+                    if (error.code === 'PGRST301' || error.message.toLowerCase().includes('jwt')) {
+                        sessionStorage.clear();
+                        localStorage.clear();
+                        handleLogout();
+                        return;
                     }
                     throw error;
                 }
 
                 globalDataCache = data || [];
                 renderActiveAssignments();
-                
+
                 if (['admin', 'owner'].includes(currentUserRole)) {
                     populateManualDispatchDropdowns();
                     loadAdminTelemetry(); // Populates Leaderboard & Global Assignments
@@ -1019,19 +1600,19 @@
                 const name = report.scouter_name || 'Unknown';
                 scouterCounts[name] = (scouterCounts[name] || 0) + 1;
             });
-            const sortedLeaderboard = Object.entries(scouterCounts).sort((a,b) => b[1] - a[1]);
-            
+            const sortedLeaderboard = Object.entries(scouterCounts).sort((a, b) => b[1] - a[1]);
+
             let leaderHTML = sortedLeaderboard.map((entry, index) => `
                 <div style="display:flex; justify-content:space-between; padding: 12px; border-bottom: 1px solid var(--border-grey);">
                     <span style="font-weight:bold; color:white;">
-                        <span style="color:var(--text-muted); margin-right:10px;">#${index+1}</span>
+                        <span style="color:var(--text-muted); margin-right:10px;">#${index + 1}</span>
                         ${entry[0].split('@')[0].toUpperCase()}
                     </span>
                     <span style="color:var(--wobot-red); font-weight:900;">${entry[1]} COMPLETED</span>
                 </div>
             `).join('');
-            
-            if(!leaderHTML) leaderHTML = "<p style='color:var(--text-muted); text-align:center; padding: 20px;'>Awaiting data collection for this event.</p>";
+
+            if (!leaderHTML) leaderHTML = "<p style='color:var(--text-muted); text-align:center; padding: 20px;'>Awaiting data collection for this event.</p>";
             document.getElementById('admin-leaderboard').innerHTML = leaderHTML;
 
             // 2. Fetch Active Global Assignments
@@ -1043,14 +1624,14 @@
                     .eq('completed', false);
 
                 let pendingHTML = "";
-                if(allAssignments && allAssignments.length > 0) {
+                if (allAssignments && allAssignments.length > 0) {
                     const grouped = {};
                     allAssignments.forEach(a => {
                         const name = a.scouter_email.split('@')[0].toUpperCase();
-                        if(!grouped[name]) grouped[name] = [];
+                        if (!grouped[name]) grouped[name] = [];
                         grouped[name].push(a.team_number);
                     });
-                    
+
                     pendingHTML = Object.entries(grouped).map(entry => `
                         <div style="padding: 12px; border-bottom: 1px solid var(--border-grey);">
                             <strong style="color:var(--warning-gold); display:block; margin-bottom:5px;">${entry[0]}</strong>
@@ -1073,20 +1654,20 @@
             try {
                 const { data: profiles } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
                 const scouterSelect = document.getElementById('manual-scout-select');
-                
+
                 if (profiles && profiles.length > 0) {
-                    scouterSelect.innerHTML = `<option value="">-- Select Target Scouter --</option>` + 
+                    scouterSelect.innerHTML = `<option value="">-- Select Target Scouter --</option>` +
                         profiles.map(p => `<option value="${p.email}">${p.email}</option>`).join('');
                 } else {
                     scouterSelect.innerHTML = `<option value="">No Active Scouters Available</option>`;
                 }
 
                 const teamSelect = document.getElementById('manual-team-select');
-                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
-                
+                const cachedTeams = JSON.parse(sessionStorage.getItem('cachedEventTeams') || '[]');
+
                 if (cachedTeams.length > 0) {
                     const sortedTeams = cachedTeams.sort((a, b) => a - b);
-                    teamSelect.innerHTML = `<option value="">-- Select Target Team --</option>` + 
+                    teamSelect.innerHTML = `<option value="">-- Select Target Team --</option>` +
                         sortedTeams.map(teamNum => `<option value="${teamNum}">Team ${teamNum}</option>`).join('');
                 } else {
                     teamSelect.innerHTML = `<option value="">No Teams Cached (Sync TBA first)</option>`;
@@ -1103,13 +1684,13 @@
         function switchView(targetId) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
+
             const activeView = document.getElementById(targetId);
-            if(activeView) activeView.classList.remove('hidden');
+            if (activeView) activeView.classList.remove('hidden');
 
             const activeBtnId = 'btn-' + targetId.split('-')[1];
             if (document.getElementById(activeBtnId)) document.getElementById(activeBtnId).classList.add('active');
-            
+
             if (targetId === 'view-roster') renderMasterRoster();
             if (targetId === 'view-admin' && currentUserRole === 'owner') loadUserAdminTable();
         }
@@ -1119,14 +1700,14 @@
          */
         async function renderActiveAssignments() {
             const list = document.getElementById('tasks-list');
-            
+
             const { data: assignments } = await sbClient
                 .from('scout_assignments')
                 .select('*')
                 .eq('scouter_email', currentUser)
                 .eq('event_key', activeEventKey)
                 .eq('completed', false);
-            
+
             const scoutedNumbers = globalDataCache.map(s => parseInt(s.team_number));
             const pendingTasks = assignments ? assignments.filter(a => !scoutedNumbers.includes(parseInt(a.team_number))) : [];
 
@@ -1157,7 +1738,7 @@
         function previewRobotImage(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const preview = document.getElementById('robot-photo-preview');
                     preview.src = e.target.result;
                     preview.classList.remove('hidden');
@@ -1171,24 +1752,24 @@
          * OFFLINE DATA BUFFER PROTOCOLS
          */
         function saveToOfflineQueue(data) {
-            let queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
+            let queue = JSON.parse(sessionStorage.getItem('wobot_offline_queue') || '[]');
             queue.push(data);
-            localStorage.setItem('wobot_offline_queue', JSON.stringify(queue));
+            sessionStorage.setItem('wobot_offline_queue', JSON.stringify(queue));
             checkConnection();
         }
 
         async function uploadOfflineData() {
-            if (!isOnline) return showToast("NETWORK PENDING: Wait for active link.");
-            let queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
+            if (!isOnline) return showToast("NETWORK PENDING: Wait for internet connection.");
+            let queue = JSON.parse(sessionStorage.getItem('wobot_offline_queue') || '[]');
             if (queue.length === 0) return;
 
             const { error } = await sbClient.from('pit_scouting').insert(queue);
             if (!error) {
-                localStorage.removeItem('wobot_offline_queue');
-                showToast("BUFFER UPLOADED: Sync complete.");
+                sessionStorage.removeItem('wobot_offline_queue');
+                showToast("Saved data uploaded successfully.");
                 refreshApplicationData();
                 checkConnection();
-            } else showToast(`SYNC ERROR: ${error.message}`);
+            } else showToast(`Error uploading data: ${error.message}`);
         }
 
         /**
@@ -1196,50 +1777,29 @@
          */
         async function handleScoutSubmit(event) {
             event.preventDefault();
+            const payload = getFormData();
             const submitBtn = document.getElementById('sub-btn');
             const teamNum = document.getElementById('f-team').value;
-            
-            const payload = {
-                team_number: teamNum,
-                event_key: activeEventKey,
-                team_nickname: document.getElementById('f-nickname').value,
-                scouter_initials: document.getElementById('f-initials').value,
-                drivetrain: document.getElementById('f-drive').value,
-                drive_motor: document.getElementById('f-motor').value,
-                terrain_nav: document.getElementById('f-terrain').value,
-                intake_loc: document.getElementById('f-intake').value,
-                fuel_capacity: document.getElementById('f-capacity').value || 0,
-                scoring_method: document.getElementById('f-scoring').value,
-                auton_start: document.getElementById('f-auton-start').value,
-                auton_fuel: document.getElementById('f-auton-fuel').value || 0,
-                auton_climb: document.getElementById('f-auton-climb').value,
-                max_climb: document.getElementById('f-max-climb').value,
-                climb_speed: document.getElementById('f-climb-speed').value,
-                proud_features: document.getElementById('f-proud').value,
-                strategic_pitch: document.getElementById('f-pitch').value,
-                vulnerabilities: document.getElementById('f-vulnerabilities').value,
-                scouter_name: currentUser,
-                created_at: new Date().toISOString()
-            };
+
 
             if (!isOnline) {
                 saveToOfflineQueue(payload);
-                showToast("OFFLINE MODE: Report buffered to local memory.");
+                showToast("OFFLINE MODE: Report saved to device memory.");
                 event.target.reset();
                 switchView('view-tasks');
                 return;
             }
 
-            submitBtn.innerText = "TRANSMITTING DATA TO MASTER..."; submitBtn.disabled = true;
+            submitBtn.innerText = "SUBMITTING..."; submitBtn.disabled = true;
 
             try {
                 const robotPhoto = document.getElementById('f-photo').files[0];
                 if (robotPhoto) {
                     const storagePath = `robot-photos/frc${teamNum}_${activeEventKey}_${Date.now()}.jpg`;
                     const { data: uploadData, error: uploadError } = await sbClient.storage.from('scouting-data').upload(storagePath, robotPhoto);
-                    
-                    if (uploadError) throw new Error("Media Transmission Failed.");
-                    
+
+                    if (uploadError) throw new Error("Photo upload failed.");
+
                     payload.image_url = sbClient.storage.from('scouting-data').getPublicUrl(storagePath).data.publicUrl;
                 }
 
@@ -1252,18 +1812,18 @@
                     .eq('team_number', teamNum)
                     .eq('event_key', activeEventKey);
 
-                showToast("SUCCESS: Tactical Pit Entry Transmitted.");
-                
+                showToast("Pit scouting report submitted successfully.");
+
             } catch (err) {
-                showToast(`CRITICAL FAULT: ${err.message}`);
+                showToast(`Error: ${err.message}`);
                 saveToOfflineQueue(payload);
             }
 
-            submitBtn.innerText = "TRANSMIT REPORT TO MASTER SERVER"; submitBtn.disabled = false;
+            submitBtn.innerText = "SUBMIT PIT REPORT"; submitBtn.disabled = false;
             event.target.reset();
             document.getElementById('robot-photo-preview').classList.add('hidden');
             document.getElementById('img-placeholder').classList.remove('hidden');
-            
+
             refreshApplicationData();
             switchView('view-tasks');
         }
@@ -1298,11 +1858,11 @@
         function launchDrillDownProfile(teamData) {
             switchView('view-detail');
             document.getElementById('detail-team-name').innerText = `TEAM ${teamData.team_number}: ${teamData.team_nickname ? teamData.team_nickname.toUpperCase() : 'UNKNOWN'}`;
-            
+
             const mediaBox = document.getElementById('detail-image-box');
-            mediaBox.innerHTML = teamData.image_url 
-                ? `<img src="${teamData.image_url}" class="robot-photo">` 
-                : `<div style="color:#444; font-weight:900;">NO PHOTOGRAPHIC DATA</div>`;
+            mediaBox.innerHTML = teamData.image_url
+                ? `<img src="${teamData.image_url}" class="robot-photo">`
+                : `<div style="color:#444; font-weight:900;">NO PHOTO AVAILABLE</div>`;
 
             document.getElementById('pit-stats-content').innerHTML = `
                 <div style="border-bottom:1px solid #444; padding-bottom:10px;">DRIVETRAIN: ${teamData.drivetrain} (${teamData.drive_motor || 'N/A'})</div>
@@ -1314,12 +1874,12 @@
                 <div style="border-bottom:1px solid #444; padding-bottom:10px;">MAX CLIMB: ${teamData.max_climb || 'N/A'} (${teamData.climb_speed || 'N/A'})</div>
                 <div>INSPECTED BY: ${teamData.scouter_initials || 'UNKNOWN'}</div>
             `;
-            
+
             document.getElementById('detail-notes-block').innerHTML = `
                 <p><strong style="color:var(--wobot-red);">PROUD FEATURES:</strong> ${teamData.proud_features || 'N/A'}</p>
                 <p><strong style="color:var(--wobot-red);">STRATEGIC PITCH:</strong> ${teamData.strategic_pitch || 'N/A'}</p>
             `;
-            document.getElementById('detail-vulnerabilities-block').innerText = teamData.vulnerabilities || "NO VULNERABILITIES IDENTIFIED.";
+            document.getElementById('detail-vulnerabilities-block').innerText = teamData.vulnerabilities || "No vulnerabilities identified.";
         }
 
         /**
@@ -1327,27 +1887,27 @@
          */
         async function setGlobalEvent() {
             const inputKey = document.getElementById('admin-event-input').value.trim();
-            if (!inputKey) return showToast("ERROR: Event Key cannot be blank.");
+            if (!inputKey) return showToast("Error: Event Key cannot be blank.");
 
             try {
                 const { error: dbError } = await sbClient.from('api_keys').update({ key_value: inputKey }).eq('name', 'active_event');
                 if (dbError) throw dbError;
 
-                showToast(`GLOBAL EVENT SHIFTED TO: ${inputKey.toUpperCase()}`);
-                
+                showToast(`Event changed to: ${inputKey.toUpperCase()}`);
+
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                 if (tbaKey) {
                     const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
                     const teams = await res.json();
-                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
-                    showToast(`TBA SYNC COMPLETE: ${teams.length} teams locked into cache.`);
+                    sessionStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
+                    showToast(`TBA Sync Complete: ${teams.length} teams loaded.`);
                 }
 
                 await fetchGlobalEventKey();
                 await refreshApplicationData();
 
             } catch (err) {
-                showToast("EVENT SHIFT FAILED: Database or API error.");
+                showToast("Event update failed: Database or API error.");
             }
         }
 
@@ -1356,12 +1916,12 @@
          */
         async function autoAssign() {
             const { data: scouters } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
-            const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
-            
+            const cachedTeams = JSON.parse(sessionStorage.getItem('cachedEventTeams') || '[]');
+
             const unscoutedList = cachedTeams.filter(num => !globalDataCache.map(d => parseInt(d.team_number)).includes(num)).sort((a, b) => a - b);
-            
-            if (unscoutedList.length === 0) return showToast("ROSTER SATURATED: No un-scouted teams available at this event.");
-            if (!scouters || scouters.length === 0) return showToast("DISPATCH HALTED: No scouters found in database.");
+
+            if (unscoutedList.length === 0) return showToast("No un-scouted teams available at this event.");
+            if (!scouters || scouters.length === 0) return showToast("No scouters found in database.");
 
             const scouterEmails = scouters.map(s => s.email);
             const blockSize = Math.ceil(unscoutedList.length / scouterEmails.length);
@@ -1369,20 +1929,20 @@
 
             scouterEmails.forEach((email, index) => {
                 unscoutedList.slice(index * blockSize, (index + 1) * blockSize).forEach(teamNum => {
-                    finalAssignments.push({ 
-                        scouter_email: email, 
+                    finalAssignments.push({
+                        scouter_email: email,
                         team_number: teamNum,
-                        event_key: activeEventKey 
+                        event_key: activeEventKey
                     });
                 });
             });
 
             const { error } = await sbClient.from('scout_assignments').insert(finalAssignments);
             if (!error) {
-                showToast("GLOBAL DISPATCH COMPLETE.");
+                showToast("Auto-assignment complete.");
                 refreshApplicationData();
             } else {
-                showToast("DISPATCH FAILED: " + error.message);
+                showToast("Assignment failed: " + error.message);
             }
         }
 
@@ -1394,7 +1954,7 @@
             const targetTeam = document.getElementById('manual-team-select').value;
 
             if (!targetScouter || !targetTeam) {
-                return showToast("DISPATCH ERROR: Select a scouter and target team from dropdowns.");
+                return showToast("Please select a scouter and a team.");
             }
 
             const assignmentPayload = {
@@ -1405,13 +1965,13 @@
             };
 
             const { error } = await sbClient.from('scout_assignments').insert([assignmentPayload]);
-            
+
             if (!error) {
-                showToast(`TARGETED DISPATCH: Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
+                showToast(`Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
                 document.getElementById('manual-team-select').selectedIndex = 0;
-                refreshApplicationData(); 
+                refreshApplicationData();
             } else {
-                showToast("ASSIGNMENT FAILED: " + error.message);
+                showToast("Assignment failed: " + error.message);
             }
         }
 
@@ -1430,30 +1990,30 @@
                         data: users,
                         layout: "fitColumns",
                         columns: [
-                            { title: "IDENTITY", field: "email", widthGrow: 2 },
-                            { 
-                                title: "RANK", 
-                                field: "role", 
-                                editor: "list", 
+                            { title: "USER EMAIL", field: "email", widthGrow: 2 },
+                            {
+                                title: "ROLE",
+                                field: "role",
+                                editor: "list",
                                 widthGrow: 1,
                                 editorParams: { values: ["scouter", "scout_lead", "admin"] },
                                 cellEdited: async (cell) => {
                                     const record = cell.getData();
                                     if (record.email.toLowerCase() === OWNER_ID_LOCK) {
-                                        showToast("PROTECTED: Master permissions immutable.");
-                                        loadUserAdminTable(); 
+                                        showToast("Error: Owner role cannot be changed.");
+                                        loadUserAdminTable();
                                         return;
                                     }
                                     const { error: upError } = await sbClient.from('profiles').update({ role: record.role }).eq('id', record.id);
-                                    if (upError) showToast("DENIED: Update failed.");
-                                    else showToast(`RANK UPDATED: ${record.email}`);
+                                    if (upError) showToast("Error: Role update failed.");
+                                    else showToast(`Role updated for ${record.email}`);
                                 }
                             }
                         ],
                     });
                 }
             } catch (err) {
-                console.error("ADMIN ERROR: Could not sync user database.");
+                console.error("Error loading user roles.");
             }
         }
 
@@ -1461,22 +2021,65 @@
          * OWNER MODULE: MASS PERMISSION DEMOTION
          */
         async function assignAllToScouter() {
-            if (!confirm("CRITICAL WARNING: Demote all users (except Master Admin) to scouter rank?")) return;
+            if (!confirm("Are you sure you want to reset all users to the 'scouter' role?")) return;
             const { error } = await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK);
             if (!error) {
-                showToast("GLOBAL SECURITY RESET COMPLETE.");
+                showToast("All users reset to scouter.");
                 loadUserAdminTable();
             } else {
-                showToast(`RESET FAILED: ${error.message}`);
+                showToast(`Reset failed: ${error.message}`);
             }
         }
 
         /**
          * UTILITY: CSV EXPORT
          */
-        function downloadRosterCSV() { 
-            if(mainTableInstance) mainTableInstance.download("csv", `WOBOT_${activeEventKey}_Scouting_Export.csv`); 
+        function downloadRosterCSV() {
+            if (mainTableInstance) mainTableInstance.download("csv", `WOBOT_${activeEventKey}_Scouting_Export.csv`);
+        }
+        /**
+ * DRAFT SYSTEM: MANUAL BACKUP
+ * Saves the current state of the form to the offline buffer immediately.
+ */
+        function saveDraft() {
+            const draftData = getFormData();
+
+            // We mark it as a draft so we know it wasn't a final submission
+            draftData.is_draft = true;
+
+            saveToOfflineQueue(draftData);
+            showToast("DRAFT SAVED: Progress stored in temporary buffer.");
+        }
+
+        /**
+         * HELPER: FORM DATA SCRAPER
+         * Consistently gathers all inputs from the Pit Scouting Form.
+         */
+        function getFormData() {
+            return {
+                team_number: document.getElementById('f-team').value,
+                event_key: activeEventKey,
+                team_nickname: document.getElementById('f-nickname').value,
+                scouter_initials: document.getElementById('f-initials').value,
+                drivetrain: document.getElementById('f-drive').value,
+                drive_motor: document.getElementById('f-motor').value,
+                terrain_nav: document.getElementById('f-terrain').value,
+                intake_loc: document.getElementById('f-intake').value,
+                fuel_capacity: document.getElementById('f-capacity').value || 0,
+                scoring_method: document.getElementById('f-scoring').value,
+                auton_start: document.getElementById('f-auton-start').value,
+                auton_fuel: document.getElementById('f-auton-fuel').value || 0,
+                auton_climb: document.getElementById('f-auton-climb').value,
+                max_climb: document.getElementById('f-max-climb').value,
+                climb_speed: document.getElementById('f-climb-speed').value,
+                proud_features: document.getElementById('f-proud').value,
+                strategic_pitch: document.getElementById('f-pitch').value,
+                vulnerabilities: document.getElementById('f-vulnerabilities').value,
+                scouter_name: currentUser,
+                created_at: new Date().toISOString()
+            };
         }
     </script>
 </body>
+
 </html>
