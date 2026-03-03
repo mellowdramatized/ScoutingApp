@@ -25,8 +25,8 @@ jobs:
 
       - name: Compile and Run Java Downloader
         run: |
-          javac DownloadCSV.java
-          java DownloadCSV
+          javac src/DownloadCSV.java
+          java -cp src DownloadCSV
 
       - name: Commit and Push Changes
         run: |
