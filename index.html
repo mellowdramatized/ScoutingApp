@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOBOT 141 - Scouting Master</title>
+
+    <link href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --primary-hover: #003d82;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-radius: 10px;
+            --shadow: 0 8px 16px rgba(0,0,0,0.08);
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px 40px; background-color: var(--bg-color); color: var(--text-main); }
+        h1 { color: var(--primary-color); border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+        .hidden { display: none !important; }
+        
+        #main-view { transition: opacity 0.3s ease; }
+        .table-container { box-shadow: var(--shadow); background-color: var(--card-bg); border-radius: var(--border-radius); margin-top: 15px; overflow: hidden; }
+        
+        #team-detail-view { max-width: 1400px; margin: 0 auto; }
+        
+        /* Updated Header Actions for Avatar */
+        .header-actions { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        #back-btn { padding: 10px 20px; background: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.2s; }
+        #back-btn:hover { background: var(--primary-hover); }
+        #detail-team-title { margin: 0; font-size: 2em; color: var(--text-main); border: none; display: flex; align-items: center; gap: 15px;}
+        
+        .tba-avatar { width: 40px; height: 40px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; align-items: start; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+        .card h3 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .image-container { width: 100%; height: 300px; background-color: #e9ecef; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .robot-photo { width: 100%; height: 100%; object-fit: cover; }
+        .no-photo { color: var(--text-muted); font-style: italic; }
+        
+        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { font-weight: bold; color: var(--text-muted); width: 40%;}
+        .stat-value { width: 60%; text-align: right; }
+        .scouter-notes { margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid var(--primary-color); border-radius: 4px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div id="main-view">
+        <h1>WOBOT 141 - Pit & Match Scouting</h1>
+        <p>Click any row to view the robot picture, detailed pit specs, and match history.</p>
+        <div id="main-table" class="table-container"></div>
+    </div>
+
+    <div id="team-detail-view" class="hidden">
+        <div class="header-actions">
+            <button id="back-btn">← Back to Roster</button>
+            <h1 id="detail-team-title">
+                <img id="tba-avatar" class="tba-avatar hidden" src="" alt="Team Avatar" onerror="this.classList.add('hidden')">
+                <span id="detail-team-name">Team ---</span>
+            </h1>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Robot Profile</h3>
+                <div class="image-container" id="robot-image-container"></div>
+                <div id="pit-stats-content"></div>
+            </div>
+            <div class="card">
+                <h3>Match Performance (Lovat)</h3>
+                <div id="match-table" class="table-container" style="box-shadow: none; margin-top: 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
+
+    <script>
+        let globalPitData = [];
+        let globalLovatData = [];
+        let mainTable, matchTable;
+
+        function getTeamNumber(row) {
+            return row["Team Number"] || row["teamNumber"] || row["team"] || row["Team"];
+        }
+
+        function getDriveDirectLink(url) {
+            if (!url) return null;
+            const match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) { return `https://drive.google.com/uc?export=view&id=${match[1]}`; }
+            return url; 
+        }
+
+        async function initApp() {
+            try {
+                const [pitRes, lovatRes] = await Promise.all([
+                    fetch('data.csv').catch(() => null),
+                    fetch('lovat_data.csv').catch(() => null)
+                ]);
+
+                if (!pitRes || !pitRes.ok) throw new Error("Could not load data.csv");
+                const pitText = await pitRes.text();
+                globalPitData = Papa.parse(pitText, { header: true, skipEmptyLines: true }).data;
+
+                if (lovatRes && lovatRes.ok) {
+                    const lovatText = await lovatRes.text();
+                    globalLovatData = Papa.parse(lovatText, { header: true, skipEmptyLines: true }).data;
+                }
+
+                renderMainView();
+            } catch (error) {
+                document.getElementById('main-view').innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function renderMainView() {
+            mainTable = new Tabulator("#main-table", {
+                data: globalPitData, 
+                layout: "fitColumns",
+                pagination: "local",
+                paginationSize: 15,
+                selectableRows: 1, 
+                columns: [
+                    { title: "Team", field: "Team Number", headerFilter: "input", width: 100 },
+                    { title: "Nickname", field: "Team Name/Robot Nickname (Optional)" },
+                    { title: "Drivetrain", field: "Drive Train Type", headerFilter: "list", headerFilterParams: { valuesLookup: true } },
+                    { title: "Build Rating", field: "How would you rate the robustness and build quality of the robot chassis?", sorter:"number" },
+                    { title: "Impression", field: "Scouter's Overall Impression (Is this a top-tier robot? Potential dark horse? Defense bot?)" }
+                ],
+            });
+
+            mainTable.on("rowClick", function(e, row){
+                openTeamDetail(row.getData());
+            });
+        }
+
+        function openTeamDetail(pitTeamData) {
+            const teamNum = String(pitTeamData["Team Number"]);
+
+            document.getElementById('main-view').classList.add('hidden');
+            document.getElementById('team-detail-view').classList.remove('hidden');
+
+            // --- SET TBA AVATAR ---
+            const avatarImg = document.getElementById('tba-avatar');
+            avatarImg.src = `https://www.thebluealliance.com/avatar/2026/frc${teamNum}.png`;
+            avatarImg.classList.remove('hidden'); // Show it (onerror will hide it if it fails)
+
+            document.getElementById('detail-team-name').innerText = `Team ${teamNum} - ${pitTeamData["Team Name/Robot Nickname (Optional)"] || "Unknown"}`;
+
+            const imgUrl = getDriveDirectLink(pitTeamData["Column 21"]); 
+            const imgContainer = document.getElementById('robot-image-container');
+            if (imgUrl) {
+                imgContainer.innerHTML = `<img src="${imgUrl}" alt="Robot Photo" class="robot-photo">`;
+            } else {
+                imgContainer.innerHTML = `<div class="no-photo">No Photo Uploaded</div>`;
+            }
+
+            document.getElementById('pit-stats-content').innerHTML = `
+                <div class="stat-row"><span class="stat-label">Drivetrain:</span><span class="stat-value">${pitTeamData["Drive Train Type"] || "N/A"}</span></div>
+                <div class="stat-row"><span class="stat-label">Motors:</span><span class="stat-value">${pitTeamData["Primary Motor Type for Drive Train"] || "N/A"}</span></div>
+                <div class="stat-row"><span class="stat-label">Weight/Height:</span><span class="stat-value">${pitTeamData["Robot Weight (lbs)"] || "?"} lbs / ${pitTeamData["Robot Height (inches)"] || "?"} in</span></div>
+                <div class="stat-row"><span class="stat-label">Build Rating:</span><span class="stat-value">${pitTeamData["How would you rate the robustness and build quality of the robot chassis?"] || "N/A"} / 10</span></div>
+                <div class="stat-row"><span class="stat-label">Cycle Time:</span><span class="stat-value">${pitTeamData["Estimated cycle time (time to acquire fuel, traverse field, and score)?"] || "N/A"} sec</span></div>
+                <div class="scouter-notes"><strong>Scouter Impression:</strong><br>${pitTeamData["Scouter's Overall Impression (Is this a top-tier robot? Potential dark horse? Defense bot?)"] || "None provided."}</div>
+            `;
+
+            const teamMatches = globalLovatData.filter(row => String(getTeamNumber(row)) === teamNum);
+            if (matchTable) { matchTable.destroy(); }
+            matchTable = new Tabulator("#match-table", {
+                data: teamMatches,
+                layout: "fitColumns",
+                pagination: "local",
+                paginationSize: 8,
+                autoColumns: true, 
+                placeholder: "No match data available from Lovat for this team yet.",
+            });
+        }
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            document.getElementById('team-detail-view').classList.add('hidden');
+            document.getElementById('main-view').classList.remove('hidden');
+            mainTable.redraw(); 
+        });
+
+        initApp();
+    </script>
+</body>
+</html>
+
