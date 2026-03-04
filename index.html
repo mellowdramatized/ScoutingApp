@@ -1056,6 +1056,7 @@
                         <textarea id="f-vulnerabilities" rows="4"
                             placeholder="e.g. Slow lift, exposed wiring, looks top-heavy, un-shielded swerve modules..."></textarea>
                     </div>
+
                     <div style="display:flex; gap:15px; margin-top: 20px;">
                         <button type="submit" class="submit-btn" id="sub-btn" style="flex: 2;">SUBMIT PIT
                             REPORT</button>
@@ -1143,7 +1144,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
 
                 <div class="card">
                     <h3>Auto-Assign Teams</h3>
@@ -1175,6 +1176,37 @@
 
             </div>
 
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="card">
+                    <h3 style="color: var(--text-white);">Lovat Cloud Sync</h3>
+                    <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Refresh the team list
+                        from the Supabase Lovat bucket or push a new file to the cloud.</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button onclick="syncLovatFromStorage()" class="submit-btn"
+                            style="background:var(--wobot-red); width:auto; padding:12px 25px;">🔄 PULL FROM
+                            BUCKET</button>
+
+                        <input type="file" id="f-lovat-upload" accept=".csv" onchange="uploadLovatToStorage(this)"
+                            style="display:none;">
+                        <button onclick="document.getElementById('f-lovat-upload').click()" class="submit-btn"
+                            style="background:#444; border: 1px solid #666; width:auto; padding:12px 25px;">⬆️ UPLOAD
+                            NEW CSV</button>
+                    </div>
+                </div>
+
+                <div class="card" style="border: 2px solid var(--success-green);">
+                    <h3 style="color: var(--success-green);">📥 Smart Data Export</h3>
+                    <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+                        Generates a CSV by merging the cloud <strong>lovat_data.csv</strong> with all current
+                        <strong>Pit Scouting</strong> entries.
+                    </p>
+                    <button onclick="exportMergedLovatData()" class="submit-btn"
+                        style="background:var(--success-green); width:auto; padding:12px 25px;">
+                        🚀 GENERATE MERGED CSV
+                    </button>
+                </div>
+            </div>
+
             <div id="owner-only-tools" class="owner-section hidden">
                 <h2 style="color:var(--owner-purple); letter-spacing: 6px; font-size: 2rem;">👑 OWNER CONTROLS</h2>
                 <div class="card">
@@ -1193,39 +1225,21 @@
 
     <script>
         /**
-        * REFRESH SAFEGUARD
-        * Prevents accidental data loss and forced logouts by asking for confirmation 
-        * before the page reloads or closes.
-        */
-        window.addEventListener('beforeunload', (event) => {
-            // Only show the warning if a user is currently logged in
-            if (currentUser) {
-                // Standard procedure for modern browsers to trigger the confirmation dialog
-                event.preventDefault();
-                event.returnValue = 'WARNING YOU WILL HAVE TO SIGN BACK IN BE SURE YOU WISH TO RELOAD';
-                return event.returnValue;
-            }
-        });
-        /**
-        * STARTUP BLANK SLATE
-        * This nukes everything before the app even starts.
-        * This guarantees a fresh sign-in on every single refresh.
-        */
+         * STARTUP BLANK SLATE
+         * This nukes everything before the app even starts.
+         * This guarantees a fresh sign-in on every single refresh.
+         */
         (function nukeAllStorage() {
             sessionStorage.clear();
             localStorage.clear();
-            // Hunt specifically for the key you found
+            // Hunt specifically for legacy keys
             sessionStorage.removeItem('wobot_clean_session');
             localStorage.removeItem('wobot_clean_session');
+            localStorage.removeItem('supabase.auth.token');
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('sb-')) localStorage.removeItem(key);
+            });
         })();
-        /**
-         * INITIALIZATION AND AGGRESSIVE CACHE CLEARING
-         * This script runs immediately and deletes old Supabase local storage bugs.
-         */
-        localStorage.removeItem('supabase.auth.token');
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('sb-')) localStorage.removeItem(key);
-        });
 
         /**
          * SUPABASE SYSTEM CONFIGURATION
@@ -1234,11 +1248,14 @@
         const SB_URL = 'https://fqmycfmmlrbrjjdqdubx.supabase.co';
         const SB_KEY = 'sb_publishable_3nYicQyxHJYsHXZ8FYaJsg_ZDmWcq71';
 
-        // Ensure Supabase uses sessionStorage and a brand new custom storage key
+        // Initialize with persistence disabled entirely to force clean sessions
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY, {
             auth: {
                 storageKey: 'wobot_clean_session',
-                storage: window.sessionStorage
+                storage: window.sessionStorage,
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false
             }
         });
 
@@ -1252,9 +1269,21 @@
         let currentUser = null;
         let currentUserRole = "scouter";
         let globalDataCache = [];
-        let activeEventKey = "Pending..."; // Holds the globally active competition event
+        let activeEventKey = "Pending...";
         let mainTableInstance = null;
         let adminTableInstance = null;
+        let previousAssignmentCount = 0;
+
+        /**
+         * REFRESH SAFEGUARD
+         */
+        window.addEventListener('beforeunload', (event) => {
+            if (currentUser) {
+                event.preventDefault();
+                event.returnValue = 'Unsaved changes may be lost. Are you sure you want to exit?';
+                return event.returnValue;
+            }
+        });
 
         /**
          * UI NOTIFICATION ENGINE
@@ -1282,9 +1311,11 @@
             if (passField.type === 'password') {
                 passField.type = 'text';
                 icon.innerText = '🙈';
+                showToast("Passkey visible.");
             } else {
                 passField.type = 'password';
                 icon.innerText = '👁️';
+                showToast("Passkey hidden.");
             }
         }
 
@@ -1304,11 +1335,13 @@
                 registerControls.classList.remove('hidden');
                 regFields.classList.remove('hidden');
                 document.getElementById('auth-form-container').style.border = '1px solid var(--warning-gold)';
+                showToast("MODE: Switched to Account Creation");
             } else {
                 registerControls.classList.add('hidden');
                 regFields.classList.add('hidden');
                 loginControls.classList.remove('hidden');
                 document.getElementById('auth-form-container').style.border = '1px solid var(--border-grey)';
+                showToast("MODE: Switched to Login");
             }
         }
 
@@ -1316,7 +1349,7 @@
          * NETWORK SENSING PROTOCOL
          */
         async function checkConnection() {
-            if (!currentUser) return; // Prevent checking the database if the user isn't fully logged in
+            if (!currentUser) return;
 
             const pill = document.getElementById('conn-pill');
             const syncArea = document.getElementById('sync-area');
@@ -1353,18 +1386,20 @@
 
             if (!email || !password) {
                 errorDiv.innerText = "Please enter an email and password.";
+                showToast("ERROR: Missing credentials.");
                 return;
             }
 
             loginBtn.innerText = "LOGGING IN...";
             errorDiv.innerText = "";
+            showToast("AUTHENTICATING: Please wait...");
 
             const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
 
             if (error) {
                 errorDiv.innerText = `Error: ${error.message}`;
                 loginBtn.innerText = "LOG IN";
-                showToast("Login failed. Please check your credentials.");
+                showToast("LOGIN FAILED: Please check your credentials.");
             }
         }
 
@@ -1384,16 +1419,19 @@
 
             if (!email || !password) {
                 errorDiv.innerText = "Please enter an email and password.";
+                showToast("ERROR: Missing credentials.");
                 return;
             }
 
             if (!teamCodeInput) {
                 errorDiv.innerText = "Team code is required for new accounts.";
+                showToast("ERROR: Team code required.");
                 return;
             }
 
             regBtn.innerText = "VERIFYING CODE...";
             errorDiv.innerText = "";
+            showToast("PROVISIONING: Setting up new scouter...");
 
             try {
                 const { data: codeData, error: codeError } = await sbClient
@@ -1409,7 +1447,7 @@
                 if (codeData.key_value !== teamCodeInput) {
                     errorDiv.innerText = "Invalid team code.";
                     regBtn.innerText = "CREATE ACCOUNT";
-                    showToast("Error: Incorrect team code.");
+                    showToast("ERROR: Incorrect team code.");
                     return;
                 }
             } catch (err) {
@@ -1428,9 +1466,9 @@
             if (error) {
                 errorDiv.innerText = `Registration Failed: ${error.message}`;
                 regBtn.innerText = "CREATE ACCOUNT";
-                showToast("Error: Account creation failed.");
+                showToast("ERROR: Account creation failed.");
             } else {
-                showToast("Account created successfully!");
+                showToast("ACCOUNT CREATED! Session Initiated.");
             }
         }
 
@@ -1438,6 +1476,7 @@
          * SECURE LOGOUT UTILITY
          */
         function handleLogout() {
+            showToast("SECURE LOGOUT: Wiping session data...");
             sessionStorage.clear();
             localStorage.clear();
             sbClient.auth.signOut().then(() => {
@@ -1449,37 +1488,26 @@
         }
 
         /**
-         * SYSTEM CORE: SESSION & ROLE DELEGATION
-/**
- * SYSTEM CORE: SESSION RECOVERY & REFRESH KILLSWITCH
- */
-        // 1. Immediate verification on page load (Fixes the Refresh Bug)
-        // 1. Immediate verification on page load (Fixes the Refresh Bug)
-        /**
-        * SYSTEM CORE: SESSION & ROLE DELEGATION
-        */
-        // 1. Surgical verification on page load
+         * SYSTEM CORE: SESSION RECOVERY & REFRESH KILLSWITCH
+         */
         (async function verifySessionOnLoad() {
             try {
                 const { data: { session } } = await sbClient.auth.getSession();
 
-                // If we have a session, try a quick 'health check' query
                 if (session) {
                     const { error } = await sbClient.from('api_keys').select('name').limit(1);
-                    // If the query fails with a JWT error, the session is a zombie. Kill it.
                     if (error && error.code === 'PGRST301') throw new Error("Zombie Session");
                 }
             } catch (err) {
                 console.warn("Cleaning up stale session data...");
                 sessionStorage.clear();
                 localStorage.clear();
-                // Force the UI back to login state
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('app-container').classList.add('hidden');
             }
         })();
 
-        // 2. Standard State Change Listener (Handles the actual UI toggling)
+        // Standard State Change Listener
         sbClient.auth.onAuthStateChange(async (event, session) => {
             const authScreen = document.getElementById('auth-screen');
             const appContainer = document.getElementById('app-container');
@@ -1497,7 +1525,6 @@
                 appContainer.classList.remove('hidden');
                 document.getElementById('user-display').innerText = currentUser.toUpperCase();
 
-                // Standard Role check logic
                 if (currentUser.toLowerCase() === OWNER_ID_LOCK) {
                     currentUserRole = 'owner';
                 } else {
@@ -1511,6 +1538,7 @@
 
                 initPermissionsUI();
                 await fetchGlobalEventKey();
+                await syncLovatFromStorage();
                 refreshApplicationData();
                 checkConnection();
             }
@@ -1542,6 +1570,10 @@
          * UI COMPONENT: DYNAMIC PERMISSION MAPPING
          */
         function initPermissionsUI() {
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+
             if (currentUserRole === 'owner') {
                 document.getElementById('btn-roster').classList.remove('hidden');
                 document.getElementById('btn-admin').classList.remove('hidden');
@@ -1564,11 +1596,9 @@
                     .order('team_number', { ascending: true });
 
                 if (error) {
-                    console.error("Database fetch rejected:", error.message);
                     if (error.code === 'PGRST106' || error.message.includes('team_number')) {
-                        showToast("Error loading data. Try refreshing the page.");
+                        showToast("ERROR: Error loading data. Try refreshing the page.");
                     }
-                    // FIX: Automatically flush local storage and reload if the JWT token expires or corrupts
                     if (error.code === 'PGRST301' || error.message.toLowerCase().includes('jwt')) {
                         sessionStorage.clear();
                         localStorage.clear();
@@ -1583,7 +1613,7 @@
 
                 if (['admin', 'owner'].includes(currentUserRole)) {
                     populateManualDispatchDropdowns();
-                    loadAdminTelemetry(); // Populates Leaderboard & Global Assignments
+                    loadAdminTelemetry();
                 }
             } catch (err) {
                 console.warn("Application Sync halted due to schema mismatch or offline status.");
@@ -1594,7 +1624,6 @@
          * ADMIN TELEMETRY ENGINE: LEADERBOARDS & ASSIGNMENTS
          */
         async function loadAdminTelemetry() {
-            // 1. Compile Leaderboard from existing globalDataCache
             const scouterCounts = {};
             globalDataCache.forEach(report => {
                 const name = report.scouter_name || 'Unknown';
@@ -1615,7 +1644,6 @@
             if (!leaderHTML) leaderHTML = "<p style='color:var(--text-muted); text-align:center; padding: 20px;'>Awaiting data collection for this event.</p>";
             document.getElementById('admin-leaderboard').innerHTML = leaderHTML;
 
-            // 2. Fetch Active Global Assignments
             try {
                 const { data: allAssignments } = await sbClient
                     .from('scout_assignments')
@@ -1691,6 +1719,15 @@
             const activeBtnId = 'btn-' + targetId.split('-')[1];
             if (document.getElementById(activeBtnId)) document.getElementById(activeBtnId).classList.add('active');
 
+            const viewNames = {
+                'view-tasks': 'My Teams',
+                'view-scout': 'Pit Scouting Form',
+                'view-roster': 'Team Data',
+                'view-admin': 'Admin Dashboard',
+                'view-detail': 'Team Profile'
+            };
+            showToast(`NAVIGATING TO: ${viewNames[targetId] || 'View'}`);
+
             if (targetId === 'view-roster') renderMasterRoster();
             if (targetId === 'view-admin' && currentUserRole === 'owner') loadUserAdminTable();
         }
@@ -1711,6 +1748,17 @@
             const scoutedNumbers = globalDataCache.map(s => parseInt(s.team_number));
             const pendingTasks = assignments ? assignments.filter(a => !scoutedNumbers.includes(parseInt(a.team_number))) : [];
 
+            if (pendingTasks.length > previousAssignmentCount && previousAssignmentCount !== 0) {
+                if (Notification.permission === "granted") {
+                    new Notification("New Scouting Assignment", {
+                        body: `You have ${pendingTasks.length} teams waiting for inspection.`,
+                        icon: "https://www.thebluealliance.com/avatar/2026/frc141.png"
+                    });
+                    if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+                }
+            }
+            previousAssignmentCount = pendingTasks.length;
+
             if (pendingTasks.length > 0) {
                 list.innerHTML = pendingTasks.map(task => `
                     <div class="card" style="display:flex; justify-content:space-between; align-items:center; border-left: 10px solid var(--wobot-red);">
@@ -1727,6 +1775,7 @@
         }
 
         function launchScoutingSession(teamNum) {
+            showToast(`INITIALIZING: Team ${teamNum} inspection.`);
             switchView('view-scout');
             document.getElementById('f-team').value = teamNum;
             window.scrollTo(0, 0);
@@ -1743,6 +1792,7 @@
                     preview.src = e.target.result;
                     preview.classList.remove('hidden');
                     document.getElementById('img-placeholder').classList.add('hidden');
+                    showToast("PHOTO ATTACHED: Ready for submission.");
                 }
                 reader.readAsDataURL(input.files[0]);
             }
@@ -1759,17 +1809,59 @@
         }
 
         async function uploadOfflineData() {
+            showToast("INITIATING: Uploading offline buffer...");
             if (!isOnline) return showToast("NETWORK PENDING: Wait for internet connection.");
             let queue = JSON.parse(sessionStorage.getItem('wobot_offline_queue') || '[]');
-            if (queue.length === 0) return;
+            if (queue.length === 0) {
+                showToast("BUFFER EMPTY: No offline data to upload.");
+                return;
+            }
 
             const { error } = await sbClient.from('pit_scouting').insert(queue);
             if (!error) {
                 sessionStorage.removeItem('wobot_offline_queue');
-                showToast("Saved data uploaded successfully.");
+                showToast("UPLOAD SUCCESS: Buffer cleared.");
                 refreshApplicationData();
                 checkConnection();
-            } else showToast(`Error uploading data: ${error.message}`);
+            } else showToast(`UPLOAD ERROR: ${error.message}`);
+        }
+
+        /**
+         * HELPER: FORM DATA SCRAPER
+         */
+        function getFormData() {
+            return {
+                team_number: document.getElementById('f-team').value,
+                event_key: activeEventKey,
+                team_nickname: document.getElementById('f-nickname').value,
+                scouter_initials: document.getElementById('f-initials').value,
+                drivetrain: document.getElementById('f-drive').value,
+                drive_motor: document.getElementById('f-motor').value,
+                terrain_nav: document.getElementById('f-terrain').value,
+                intake_loc: document.getElementById('f-intake').value,
+                fuel_capacity: document.getElementById('f-capacity').value || 0,
+                scoring_method: document.getElementById('f-scoring').value,
+                auton_start: document.getElementById('f-auton-start').value,
+                auton_fuel: document.getElementById('f-auton-fuel').value || 0,
+                auton_climb: document.getElementById('f-auton-climb').value,
+                max_climb: document.getElementById('f-max-climb').value,
+                climb_speed: document.getElementById('f-climb-speed').value,
+                proud_features: document.getElementById('f-proud').value,
+                strategic_pitch: document.getElementById('f-pitch').value,
+                vulnerabilities: document.getElementById('f-vulnerabilities').value,
+                scouter_name: currentUser,
+                created_at: new Date().toISOString()
+            };
+        }
+
+        /**
+         * DRAFT SYSTEM: MANUAL BACKUP
+         */
+        function saveDraft() {
+            const draftData = getFormData();
+            draftData.is_draft = true;
+            saveToOfflineQueue(draftData);
+            showToast("DRAFT SAVED: Progress stored in temporary buffer.");
         }
 
         /**
@@ -1777,10 +1869,11 @@
          */
         async function handleScoutSubmit(event) {
             event.preventDefault();
-            const payload = getFormData();
             const submitBtn = document.getElementById('sub-btn');
             const teamNum = document.getElementById('f-team').value;
 
+            showToast("PROCESSING: Generating submission payload...");
+            const payload = getFormData();
 
             if (!isOnline) {
                 saveToOfflineQueue(payload);
@@ -1795,14 +1888,15 @@
             try {
                 const robotPhoto = document.getElementById('f-photo').files[0];
                 if (robotPhoto) {
+                    showToast("UPLOADING: Sending image to server...");
                     const storagePath = `robot-photos/frc${teamNum}_${activeEventKey}_${Date.now()}.jpg`;
                     const { data: uploadData, error: uploadError } = await sbClient.storage.from('scouting-data').upload(storagePath, robotPhoto);
 
                     if (uploadError) throw new Error("Photo upload failed.");
-
                     payload.image_url = sbClient.storage.from('scouting-data').getPublicUrl(storagePath).data.publicUrl;
                 }
 
+                showToast("TRANSMITTING: Pushing data to master server...");
                 const { error: dbError } = await sbClient.from('pit_scouting').insert([payload]);
                 if (dbError) throw dbError;
 
@@ -1812,10 +1906,10 @@
                     .eq('team_number', teamNum)
                     .eq('event_key', activeEventKey);
 
-                showToast("Pit scouting report submitted successfully.");
+                showToast("SUCCESS: Pit scouting report submitted.");
 
             } catch (err) {
-                showToast(`Error: ${err.message}`);
+                showToast(`SUBMISSION ERROR: ${err.message}`);
                 saveToOfflineQueue(payload);
             }
 
@@ -1856,6 +1950,7 @@
          * DRILL-DOWN ANALYTICS: 2026 DETAILED ROBOT PROFILE
          */
         function launchDrillDownProfile(teamData) {
+            showToast(`LOADING PROFILE: Retrieving intel for Team ${teamData.team_number}`);
             switchView('view-detail');
             document.getElementById('detail-team-name').innerText = `TEAM ${teamData.team_number}: ${teamData.team_nickname ? teamData.team_nickname.toUpperCase() : 'UNKNOWN'}`;
 
@@ -1886,28 +1981,159 @@
          * ADMIN ENGINE: GLOBAL EVENT CONTROL & TBA SYNC
          */
         async function setGlobalEvent() {
+            showToast("UPDATING EVENT: Sending config to master database...");
             const inputKey = document.getElementById('admin-event-input').value.trim();
-            if (!inputKey) return showToast("Error: Event Key cannot be blank.");
+            if (!inputKey) return showToast("ERROR: Event Key cannot be blank.");
 
             try {
                 const { error: dbError } = await sbClient.from('api_keys').update({ key_value: inputKey }).eq('name', 'active_event');
                 if (dbError) throw dbError;
 
-                showToast(`Event changed to: ${inputKey.toUpperCase()}`);
+                showToast(`SUCCESS: Event changed to ${inputKey.toUpperCase()}`);
 
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                 if (tbaKey) {
+                    showToast("SYNCING TBA: Pulling official team list...");
                     const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
                     const teams = await res.json();
                     sessionStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
-                    showToast(`TBA Sync Complete: ${teams.length} teams loaded.`);
+                    showToast(`TBA SYNC COMPLETE: ${teams.length} teams loaded into memory.`);
                 }
 
                 await fetchGlobalEventKey();
                 await refreshApplicationData();
 
             } catch (err) {
-                showToast("Event update failed: Database or API error.");
+                showToast("EVENT UPDATE FAILED: Database or API error.");
+            }
+        }
+
+        /**
+         * LOVAT BUCKET SYNC
+         */
+        async function syncLovatFromStorage() {
+            try {
+                showToast("FETCHING: Pulling Lovat CSV from the cloud...");
+                const { data, error } = await sbClient.storage.from('scouting-data').download('lovat_data.csv');
+                if (error) throw error;
+
+                const csvText = await data.text();
+                parseAndCacheLovatTeams(csvText);
+            } catch (err) {
+                console.warn("Lovat storage sync skipped:", err.message);
+                showToast("SYNC FAILED: Could not retrieve Lovat CSV.");
+            }
+        }
+
+        /**
+         * LOVAT BUCKET UPLOAD
+         */
+        async function uploadLovatToStorage(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showToast("ERROR: Only CSV files are accepted.");
+                input.value = '';
+                return;
+            }
+
+            try {
+                showToast("UPLOADING: Pushing new CSV to cloud storage...");
+                const { data, error } = await sbClient.storage
+                    .from('scouting-data')
+                    .upload('lovat_data.csv', file, {
+                        cacheControl: '3600',
+                        upsert: true
+                    });
+
+                if (error) throw error;
+
+                showToast("UPLOAD SUCCESS: Updating local team cache...");
+                await syncLovatFromStorage();
+
+            } catch (err) {
+                console.error("Upload Error:", err);
+                showToast(`UPLOAD FAILED: ${err.message}`);
+            } finally {
+                input.value = '';
+            }
+        }
+
+        /**
+         * LOVAT PARSER
+         */
+        function parseAndCacheLovatTeams(csvText) {
+            const lines = csvText.split('\n');
+            const teamNumbers = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const columns = lines[i].split(',');
+                const teamNum = parseInt(columns[0]?.trim());
+                if (!isNaN(teamNum)) teamNumbers.push(teamNum);
+            }
+
+            if (teamNumbers.length > 0) {
+                const uniqueTeams = [...new Set(teamNumbers)].sort((a, b) => a - b);
+                sessionStorage.setItem('cachedEventTeams', JSON.stringify(uniqueTeams));
+                showToast(`LOVAT PARSED: ${uniqueTeams.length} teams registered.`);
+                populateManualDispatchDropdowns();
+            }
+        }
+
+        /**
+         * DATA MERGE ENGINE: LOVAT + PIT SCOUTING
+         */
+        async function exportMergedLovatData() {
+            try {
+                showToast("GENERATING EXPORT: Fetching cloud Lovat data...");
+
+                const { data: lovatBlob, error: lovatError } = await sbClient.storage.from('scouting-data').download('lovat_data.csv');
+                if (lovatError) throw new Error("Could not find lovat_data.csv in bucket.");
+
+                const lovatText = await lovatBlob.text();
+                const cleanText = lovatText.replace(/\r/g, ''); // <--- The magic fix
+                const rows = cleanText.split('\n').filter(row => row.trim() !== "");
+                const header = rows[0].split(',');
+
+                const newHeader = [...header, "PIT_DRIVETRAIN", "PIT_MAX_CLIMB", "PIT_VULNERABILITIES"].join(',');
+                const mergedRows = [newHeader];
+
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i].split(',');
+                    const teamNum = parseInt(columns[0]?.trim());
+
+                    const pitReport = globalDataCache.find(report => parseInt(report.team_number) === teamNum);
+
+                    if (pitReport) {
+                        const extraData = [
+                            `"${pitReport.drivetrain}"`,
+                            `"${pitReport.max_climb}"`,
+                            `"${pitReport.vulnerabilities?.replace(/"/g, '""') || ""}"`
+                        ];
+                        mergedRows.push([...columns, ...extraData].join(','));
+                    } else {
+                        mergedRows.push([...columns, "", "", ""].join(','));
+                    }
+                }
+
+                showToast("PACKAGING: Formatting CSV for download...");
+                const mergedCSV = mergedRows.join('\n');
+                const blob = new Blob([mergedCSV], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', `LOVAT_MERGED_${activeEventKey}.csv`);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                showToast("EXPORT SUCCESS: Merged file downloaded.");
+
+            } catch (err) {
+                console.error("Merge Error:", err);
+                showToast(`MERGE FAILED: ${err.message}`);
             }
         }
 
@@ -1915,13 +2141,14 @@
          * ADMIN ENGINE: AUTO DISPATCHER
          */
         async function autoAssign() {
+            showToast("INITIALIZING: Starting auto-dispatcher engine...");
             const { data: scouters } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
             const cachedTeams = JSON.parse(sessionStorage.getItem('cachedEventTeams') || '[]');
 
             const unscoutedList = cachedTeams.filter(num => !globalDataCache.map(d => parseInt(d.team_number)).includes(num)).sort((a, b) => a - b);
 
-            if (unscoutedList.length === 0) return showToast("No un-scouted teams available at this event.");
-            if (!scouters || scouters.length === 0) return showToast("No scouters found in database.");
+            if (unscoutedList.length === 0) return showToast("ABORTED: No un-scouted teams available at this event.");
+            if (!scouters || scouters.length === 0) return showToast("ABORTED: No active scouters found.");
 
             const scouterEmails = scouters.map(s => s.email);
             const blockSize = Math.ceil(unscoutedList.length / scouterEmails.length);
@@ -1939,10 +2166,10 @@
 
             const { error } = await sbClient.from('scout_assignments').insert(finalAssignments);
             if (!error) {
-                showToast("Auto-assignment complete.");
+                showToast("DISPATCH COMPLETE: Teams successfully auto-balanced.");
                 refreshApplicationData();
             } else {
-                showToast("Assignment failed: " + error.message);
+                showToast("DISPATCH FAILED: " + error.message);
             }
         }
 
@@ -1950,11 +2177,12 @@
          * ADMIN ENGINE: MANUAL TARGETED DISPATCH
          */
         async function manualAssign() {
+            showToast("PROCESSING: Assigning team to target scouter...");
             const targetScouter = document.getElementById('manual-scout-select').value;
             const targetTeam = document.getElementById('manual-team-select').value;
 
             if (!targetScouter || !targetTeam) {
-                return showToast("Please select a scouter and a team.");
+                return showToast("ERROR: Please select both a scouter and a team.");
             }
 
             const assignmentPayload = {
@@ -1967,11 +2195,11 @@
             const { error } = await sbClient.from('scout_assignments').insert([assignmentPayload]);
 
             if (!error) {
-                showToast(`Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
+                showToast(`TARGETED DISPATCH: Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
                 document.getElementById('manual-team-select').selectedIndex = 0;
                 refreshApplicationData();
             } else {
-                showToast("Assignment failed: " + error.message);
+                showToast("ASSIGNMENT FAILED: " + error.message);
             }
         }
 
@@ -2000,13 +2228,13 @@
                                 cellEdited: async (cell) => {
                                     const record = cell.getData();
                                     if (record.email.toLowerCase() === OWNER_ID_LOCK) {
-                                        showToast("Error: Owner role cannot be changed.");
+                                        showToast("ERROR: Owner role cannot be modified.");
                                         loadUserAdminTable();
                                         return;
                                     }
                                     const { error: upError } = await sbClient.from('profiles').update({ role: record.role }).eq('id', record.id);
-                                    if (upError) showToast("Error: Role update failed.");
-                                    else showToast(`Role updated for ${record.email}`);
+                                    if (upError) showToast("ERROR: Role update rejected by server.");
+                                    else showToast(`ROLE UPDATED: ${record.email} is now a ${record.role}`);
                                 }
                             }
                         ],
@@ -2022,12 +2250,13 @@
          */
         async function assignAllToScouter() {
             if (!confirm("Are you sure you want to reset all users to the 'scouter' role?")) return;
+            showToast("EXECUTING: Performing mass security reset...");
             const { error } = await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK);
             if (!error) {
-                showToast("All users reset to scouter.");
+                showToast("SECURITY RESET COMPLETE: All targeted users demoted to scouter.");
                 loadUserAdminTable();
             } else {
-                showToast(`Reset failed: ${error.message}`);
+                showToast(`RESET FAILED: ${error.message}`);
             }
         }
 
@@ -2035,49 +2264,12 @@
          * UTILITY: CSV EXPORT
          */
         function downloadRosterCSV() {
-            if (mainTableInstance) mainTableInstance.download("csv", `WOBOT_${activeEventKey}_Scouting_Export.csv`);
-        }
-        /**
- * DRAFT SYSTEM: MANUAL BACKUP
- * Saves the current state of the form to the offline buffer immediately.
- */
-        function saveDraft() {
-            const draftData = getFormData();
-
-            // We mark it as a draft so we know it wasn't a final submission
-            draftData.is_draft = true;
-
-            saveToOfflineQueue(draftData);
-            showToast("DRAFT SAVED: Progress stored in temporary buffer.");
-        }
-
-        /**
-         * HELPER: FORM DATA SCRAPER
-         * Consistently gathers all inputs from the Pit Scouting Form.
-         */
-        function getFormData() {
-            return {
-                team_number: document.getElementById('f-team').value,
-                event_key: activeEventKey,
-                team_nickname: document.getElementById('f-nickname').value,
-                scouter_initials: document.getElementById('f-initials').value,
-                drivetrain: document.getElementById('f-drive').value,
-                drive_motor: document.getElementById('f-motor').value,
-                terrain_nav: document.getElementById('f-terrain').value,
-                intake_loc: document.getElementById('f-intake').value,
-                fuel_capacity: document.getElementById('f-capacity').value || 0,
-                scoring_method: document.getElementById('f-scoring').value,
-                auton_start: document.getElementById('f-auton-start').value,
-                auton_fuel: document.getElementById('f-auton-fuel').value || 0,
-                auton_climb: document.getElementById('f-auton-climb').value,
-                max_climb: document.getElementById('f-max-climb').value,
-                climb_speed: document.getElementById('f-climb-speed').value,
-                proud_features: document.getElementById('f-proud').value,
-                strategic_pitch: document.getElementById('f-pitch').value,
-                vulnerabilities: document.getElementById('f-vulnerabilities').value,
-                scouter_name: currentUser,
-                created_at: new Date().toISOString()
-            };
+            if (mainTableInstance) {
+                showToast("EXPORTING: Downloading Team Data CSV to device.");
+                mainTableInstance.download("csv", `WOBOT_${activeEventKey}_Scouting_Export.csv`);
+            } else {
+                showToast("ERROR: No data available to export.");
+            }
         }
     </script>
 </body>
