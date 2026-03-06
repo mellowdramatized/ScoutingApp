@@ -1625,8 +1625,8 @@ async function handleLogout() {
                 localStorage.clear();
                 sessionStorage.clear();
                 
-                // THE FIX: This safely reloads the exact current page on GitHub Pages
-                window.location.reload(); 
+                // THE FIX: Safely route to the exact index file relative to the current folder
+                window.location.href = 'index.html';
             }
         }
         /* ==========================================================================
