@@ -897,6 +897,34 @@
                 border-width: 0.5px;
             }
         }
+
+        /* Dynamic Alliance Pick Room Rotation for Small Screens */
+        @media (max-width: 600px) {
+            .responsive-pick-container {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+
+            .responsive-pick-container .pick-slot {
+                width: 100% !important;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .responsive-pick-container .pick-slot label {
+                writing-mode: horizontal-tb !important;
+                /* Forces normal reading on mobile */
+                width: 50px;
+                margin-bottom: 0 !important;
+            }
+
+            .responsive-pick-container .alliance-number {
+                font-size: 1.5rem !important;
+                width: 25px !important;
+            }
+        }
     </style>
 </head>
 
@@ -2148,76 +2176,20 @@
                 return epaB - epaA;
             });
 
+            // This holds the currently active Captains (shifts automatically as picks are made)
             let captainPool = sortedTeams.filter(t => !pickedIds.includes(parseInt(t.team_number)));
 
             for (let i = 1; i <= 8; i++) {
                 let capt = captainPool[i - 1] || { team_number: "???", rank: "-", epa: 0, match_climb: "-" };
                 let year = activeEventKey.substring(0, 4) || new Date().getFullYear();
-
                 let displayEPA = (capt.epa && !isNaN(Number(capt.epa))) ? Number(capt.epa).toFixed(1) : "-";
-                if (viewportHeight < 400) {
-                    let rowHtml = `
-                    <div class="card" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
-                        <div style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
-                        
-                        <div style="flex:1.5; display:flex; align-items:center; gap:10px; background:#111; padding:10px; border-radius:8px; border:1px solid var(--border-grey);">
-                            <img src="https://www.thebluealliance.com/avatar/${year}/frc${capt.team_number}.png" onerror="this.style.display='none'" style="height:35px; border-radius:4px;">
-                            <div>
-                                <div style="font-weight:900; font-size:1.1rem; color:var(--text-white);">Team ${capt.team_number} <span style="font-size:0.7rem; color:var(--accent-color); text-transform:uppercase;">(Captain)</span></div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);">Rank: ${capt.rank || '-'} | EPA: ${displayEPA} | Climb: ${capt.match_climb || '-'}</div>
-                            </div>
-                        </div>
 
-                        <div style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;writing-mode: vertical-lr; margin-bottom:2px; display:block;">Pick 1</label>
-                            <select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%;writing-mode: vertical-lr; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
-                                ${generateDraftOptions(sortedTeams, pickedIds, draftPicks[i].p1)}
-                            </select>
-                        </div>
-
-                        <div style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;writing-mode: vertical-lr; margin-bottom:2px; display:block;">Pick 2</label>
-                            <select onchange="updateDraftPick(${i}, 'p2', this.value)" style="width:100%; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
-                                ${generateDraftOptions(sortedTeams, pickedIds, draftPicks[i].p2)}
-                            </select>
-                        </div>
-                    </div>
-                `;
-                }
-                else {
-                    let rowHtml = `
-                    <div class="card" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
-                        <div style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
-                        
-                        <div style="flex:1.5; display:flex; align-items:center; gap:10px; background:#111; padding:10px; border-radius:8px; border:1px solid var(--border-grey);">
-                            <img src="https://www.thebluealliance.com/avatar/${year}/frc${capt.team_number}.png" onerror="this.style.display='none'" style="height:35px; border-radius:4px;">
-                            <div>
-                                <div style="font-weight:900; font-size:1.1rem; color:var(--text-white);">Team ${capt.team_number} <span style="font-size:0.7rem; color:var(--accent-color); text-transform:uppercase;">(Captain)</span></div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);">Rank: ${capt.rank || '-'} | EPA: ${displayEPA} | Climb: ${capt.match_climb || '-'}</div>
-                            </div>
-                        </div>
-
-                        <div style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;writing-mode: vertical-lr; margin-bottom:2px; display:block;">Pick 1</label>
-                            <select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%;writing-mode: vertical-lr; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
-                                ${generateDraftOptions(sortedTeams, pickedIds, draftPicks[i].p1)}
-                            </select>
-                        </div>
-
-                        <div style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;writing-mode: vertical-lr; margin-bottom:2px; display:block;">Pick 2</label>
-                            <select onchange="updateDraftPick(${i}, 'p2', this.value)" style="width:100%; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
-                                ${generateDraftOptions(sortedTeams, pickedIds, draftPicks[i].p2)}
-                            </select>
-                        </div>
-                    </div>
-                `;
-                }
                 let rowHtml = `
-                    <div class="card" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
-                        <div style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
+                    <div class="card responsive-pick-container" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
                         
-                        <div style="flex:1.5; display:flex; align-items:center; gap:10px; background:#111; padding:10px; border-radius:8px; border:1px solid var(--border-grey);">
+                        <div class="alliance-number" style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
+                        
+                        <div style="flex:1.5; width: 100%; display:flex; align-items:center; gap:10px; background:#111; padding:10px; border-radius:8px; border:1px solid var(--border-grey);">
                             <img src="https://www.thebluealliance.com/avatar/${year}/frc${capt.team_number}.png" onerror="this.style.display='none'" style="height:35px; border-radius:4px;">
                             <div>
                                 <div style="font-weight:900; font-size:1.1rem; color:var(--text-white);">Team ${capt.team_number} <span style="font-size:0.7rem; color:var(--accent-color); text-transform:uppercase;">(Captain)</span></div>
@@ -2225,19 +2197,20 @@
                             </div>
                         </div>
 
-                        <div style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;writing-mode: vertical-lr; margin-bottom:2px; display:block;">Pick 1</label>
-                            <select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%;writing-mode: vertical-lr; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
-                                ${generateDraftOptions(sortedTeams, pickedIds, draftPicks[i].p1)}
+                        <div class="pick-slot" style="flex:1;">
+                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 1</label>
+                            <select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
+                                ${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p1)}
                             </select>
                         </div>
 
-                        <div style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;writing-mode: vertical-lr; margin-bottom:2px; display:block;">Pick 2</label>
+                        <div class="pick-slot" style="flex:1;">
+                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 2</label>
                             <select onchange="updateDraftPick(${i}, 'p2', this.value)" style="width:100%; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-weight:bold;">
-                                ${generateDraftOptions(sortedTeams, pickedIds, draftPicks[i].p2)}
+                                ${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p2)}
                             </select>
                         </div>
+
                     </div>
                 `;
 
@@ -2245,21 +2218,27 @@
             }
         }
 
-        function generateDraftOptions(sortedTeams, pickedIds, currentValue) {
+        function generateDraftOptions(sortedTeams, pickedIds, captainPool, allianceIndex, currentValue) {
             let html = `<option value="">-- Available --</option>`;
+
+            // THE FIX: Slice off this alliance and all alliances above it. 
+            // If Alliance 3 is picking, this grabs Captains 1, 2, and 3, making them ineligible.
+            let ineligibleCaptainIds = captainPool.slice(0, allianceIndex).map(c => parseInt(c.team_number));
+
             sortedTeams.forEach(t => {
                 let num = parseInt(t.team_number);
                 let isSelected = (currentValue && parseInt(currentValue) === num);
-                let isRankOne = parseInt(t.rank) === 1;
 
-                if ((!pickedIds.includes(num) && !isRankOne) || isSelected) {
-                    let teamEPA = (t.epa && !isNaN(Number(t.epa))) ? Number(t.epa).toFixed(1) : "-";
-                    html += `<option value="${num}" ${isSelected ? 'selected' : ''}>${num} (Rk: ${t.rank || '-'} )</option>`;
+                // Allowed if: Not drafted by someone else AND not an ineligible captain
+                let isEligible = !pickedIds.includes(num) && !ineligibleCaptainIds.includes(num);
+
+                if (isEligible || isSelected) {
+                    html += `<option value="${num}" ${isSelected ? 'selected' : ''}>${num} (Rk: ${t.rank || '-'})</option>`;
                 }
             });
+
             return html;
         }
-
         function updateDraftPick(allianceIdx, pickSlot, teamValue) {
             draftPicks[allianceIdx][pickSlot] = teamValue;
             localStorage.setItem(`wobot_draft_${activeEventKey}`, JSON.stringify(draftPicks));
