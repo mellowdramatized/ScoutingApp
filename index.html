@@ -1440,12 +1440,12 @@
 
     <script>
         /* ==========================================================================
-           GLOBAL APP CONFIGURATION
-           ========================================================================== */
+                   GLOBAL APP CONFIGURATION
+                   ========================================================================== */
         const APP_CONFIG = {
             teamNumber: "141",
             teamName: "WOBOT",
-            appTitle: "Scouting Dashboard",
+            appTitle: "Scouting Dashboard v7.0",
             supabaseUrl: 'https://fqmycfmmlrbrjjdqdubx.supabase.co',
             supabaseAnonKey: 'sb_publishable_3nYicQyxHJYsHXZ8FYaJsg_ZDmWcq71',
             ownerEmailLock: "carmelokyles@gmail.com",
@@ -1456,8 +1456,13 @@
             document.getElementById('app-window-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber} - ${APP_CONFIG.appTitle}`;
             document.getElementById('auth-team-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber}`;
             document.getElementById('email').placeholder = `email@team${APP_CONFIG.teamNumber}.com`;
-            document.querySelectorAll('.dynamic-year-form-title').forEach(el => el.innerText = `${APP_CONFIG.defaultEventYear} Pit Scouting Form`);
-            const predictorInput = document.getElementById('predictor-team-input'); if (predictorInput) predictorInput.value = APP_CONFIG.teamNumber;
+
+            document.querySelectorAll('.dynamic-year-form-title').forEach(el => {
+                el.innerText = `${APP_CONFIG.defaultEventYear} Pit Scouting Form`;
+            });
+
+            const predictorInput = document.getElementById('predictor-team-input');
+            if (predictorInput) predictorInput.value = APP_CONFIG.teamNumber;
         }
         applyTeamBranding();
 
@@ -1465,29 +1470,47 @@
            THEME ENGINE
            ========================================================================== */
         function toggleTheme() {
-            const body = document.body; const isLight = body.classList.toggle('light-mode');
+            const body = document.body;
+            const isLight = body.classList.toggle('light-mode');
             localStorage.setItem('wobot_theme', isLight ? 'light' : 'dark');
             document.getElementById('theme-btn').innerText = isLight ? '🌙' : '☀️';
 
             // Swap tabulator CSS dynamically
             const themeLink = document.getElementById('tabulator-theme');
-            if (isLight) themeLink.href = "https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css";
-            else themeLink.href = "https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_midnight.min.css";
+            if (isLight) {
+                themeLink.href = "https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css";
+            } else {
+                themeLink.href = "https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_midnight.min.css";
+            }
         }
         if (localStorage.getItem('wobot_theme') === 'light') toggleTheme();
 
         /* ==========================================================================
            LOCAL CACHE RECOVERY
            ========================================================================== */
-        let lovatTeamCache = {}; let lovatMatchCache = {};
-        let draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } };
+        let lovatTeamCache = {};
+        let lovatMatchCache = {};
+
+        let draftPicks = {
+            1: { p1: "", p2: "" },
+            2: { p1: "", p2: "" },
+            3: { p1: "", p2: "" },
+            4: { p1: "", p2: "" },
+            5: { p1: "", p2: "" },
+            6: { p1: "", p2: "" },
+            7: { p1: "", p2: "" },
+            8: { p1: "", p2: "" }
+        };
+
         let activeProfileTeam = null;
 
         function loadCachesFromStorage() {
             try {
                 lovatTeamCache = JSON.parse(localStorage.getItem('lovatTeamCache') || '{}');
                 lovatMatchCache = JSON.parse(localStorage.getItem('lovatMatchCache') || '{}');
-            } catch (e) { console.warn("Cache load failed."); }
+            } catch (e) {
+                console.warn("Cache load failed, starting fresh.");
+            }
         }
         loadCachesFromStorage();
 
@@ -1495,63 +1518,222 @@
            SUPABASE CONFIGURATION
            ========================================================================== */
         const sbClient = window.supabase.createClient(APP_CONFIG.supabaseUrl, APP_CONFIG.supabaseAnonKey, {
-            auth: { storageKey: 'wobot_clean_session', storage: window.localStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+            auth: {
+                storageKey: 'wobot_clean_session',
+                storage: window.localStorage,
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: false
+            }
         });
+
         const OWNER_ID_LOCK = APP_CONFIG.ownerEmailLock;
-        let isOnline = true; let currentUser = null; let currentUserRole = "scouter"; let globalDataCache = []; let activeEventKey = "Pending...";
-        let mainTableInstance, adminTableInstance, matchTableInstance, poolTableInstance, picklistTableInstance;
-        let previousAssignmentCount = 0; let syncProcesses = 0;
+
+        let isOnline = true;
+        let currentUser = null;
+        let currentUserRole = "scouter";
+        let globalDataCache = [];
+        let activeEventKey = "Pending...";
+
+        let mainTableInstance = null;
+        let adminTableInstance = null;
+        let matchTableInstance = null;
+        let poolTableInstance = null;
+        let picklistTableInstance = null;
+
+        let previousAssignmentCount = 0;
+        let syncProcesses = 0;
 
         function showToast(message) {
-            try { if ("vibrate" in navigator && navigator.userActivation.hasBeenActive) navigator.vibrate([50, 50, 50]); } catch (e) { }
-            const container = document.getElementById('toast-container'); const currentToasts = container.getElementsByClassName('toast');
-            if (currentToasts.length >= 2) { currentToasts[0].classList.add('fade-out'); setTimeout(() => { if (currentToasts[0] && currentToasts[0].parentNode) currentToasts[0].remove(); }, 300); }
-            const toast = document.createElement('div'); toast.className = 'toast'; toast.innerText = message; container.appendChild(toast);
-            setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300); }, 3000);
+            try {
+                if ("vibrate" in navigator && navigator.userActivation.hasBeenActive) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+            } catch (e) { }
+
+            const container = document.getElementById('toast-container');
+            const currentToasts = container.getElementsByClassName('toast');
+
+            if (currentToasts.length >= 2) {
+                currentToasts[0].classList.add('fade-out');
+                setTimeout(() => { if (currentToasts[0] && currentToasts[0].parentNode) currentToasts[0].remove(); }, 300);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+            }, 3000);
         }
 
-        function togglePasswordVisibility() { const passField = document.getElementById('password'); const icon = document.getElementById('toggle-pass'); if (passField.type === 'password') { passField.type = 'text'; icon.innerText = 'HIDE'; } else { passField.type = 'password'; icon.innerText = 'SHOW'; } }
+        function togglePasswordVisibility() {
+            const passField = document.getElementById('password');
+            const icon = document.getElementById('toggle-pass');
+            if (passField.type === 'password') {
+                passField.type = 'text';
+                icon.innerText = 'HIDE';
+            } else {
+                passField.type = 'password';
+                icon.innerText = 'SHOW';
+            }
+        }
 
         function toggleAuthMode(mode) {
-            const loginControls = document.getElementById('login-controls'); const registerControls = document.getElementById('register-controls'); const regFields = document.getElementById('registration-fields'); const errorDiv = document.getElementById('auth-error'); errorDiv.innerText = "";
-            if (mode === 'register') { loginControls.classList.add('hidden'); registerControls.classList.remove('hidden'); regFields.classList.remove('hidden'); document.getElementById('auth-form-container').style.border = '1px solid var(--accent-color)'; showToast("Switched to Account Creation"); }
-            else { registerControls.classList.add('hidden'); regFields.classList.add('hidden'); loginControls.classList.remove('hidden'); document.getElementById('auth-form-container').style.border = '1px solid var(--border-grey)'; showToast("Switched to Login"); }
+            const loginControls = document.getElementById('login-controls');
+            const registerControls = document.getElementById('register-controls');
+            const regFields = document.getElementById('registration-fields');
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.innerText = "";
+
+            if (mode === 'register') {
+                loginControls.classList.add('hidden');
+                registerControls.classList.remove('hidden');
+                regFields.classList.remove('hidden');
+                document.getElementById('auth-form-container').style.border = '1px solid var(--accent-color)';
+                showToast("Switched to Account Creation");
+            } else {
+                registerControls.classList.add('hidden');
+                regFields.classList.add('hidden');
+                loginControls.classList.remove('hidden');
+                document.getElementById('auth-form-container').style.border = '1px solid var(--border-grey)';
+                showToast("Switched to Login");
+            }
         }
 
         /* ==========================================================================
-           YOUTUBE CINEMA MODAL
-           ========================================================================== */
+              YOUTUBE CINEMA MODAL ENGINE (TBA STYLE)
+              ========================================================================== */
         async function openMatchVideo(matchKey) {
-            const modal = document.getElementById('video-modal'); const statsContainer = document.getElementById('video-stats-container'); const videoContainer = document.getElementById('video-frame-container'); const title = document.getElementById('video-title');
-            modal.classList.add('show'); statsContainer.innerHTML = '<div style="color:var(--text-muted); font-weight:bold; font-size:1.2rem; text-align:center; padding: 40px;">Fetching match data from TBA...</div>'; videoContainer.innerHTML = '<div style="color:var(--text-muted); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%;">Loading video...</div>'; title.innerText = `MATCH: ${matchKey.toUpperCase()}`;
+            const modal = document.getElementById('video-modal');
+            const statsContainer = document.getElementById('video-stats-container');
+            const videoContainer = document.getElementById('video-frame-container');
+            const title = document.getElementById('video-title');
+
+            modal.classList.add('show');
+            statsContainer.innerHTML = '<div style="color:var(--text-muted); font-weight:bold; font-size:1.2rem; text-align:center; padding: 40px;">Fetching match data from TBA...</div>';
+            videoContainer.innerHTML = '<div style="color:var(--text-muted); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%;">Loading video...</div>';
+            title.innerText = `MATCH: ${matchKey.toUpperCase()}`;
+
             try {
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                 const res = await fetch(`https://www.thebluealliance.com/api/v3/match/${matchKey}`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
                 if (!res.ok) throw new Error("Match not found on TBA");
+
                 const matchData = await res.json();
-                let compLevel = matchData.comp_level.toUpperCase(); let matchNum = matchData.match_number; title.innerText = `${compLevel} ${matchNum} - EVENT ${matchData.event_key.toUpperCase()}`;
-                let rTeamsKeys = matchData.alliances.red.team_keys; let bTeamsKeys = matchData.alliances.blue.team_keys; let rTeams = rTeamsKeys.map(t => t.replace('frc', '')); let bTeams = bTeamsKeys.map(t => t.replace('frc', ''));
-                let rScore = matchData.alliances.red.score === -1 ? '?' : matchData.alliances.red.score; let bScore = matchData.alliances.blue.score === -1 ? '?' : matchData.alliances.blue.score;
-                let redPred = predictAllianceScore(rTeamsKeys); let bluePred = predictAllianceScore(bTeamsKeys);
+                let compLevel = matchData.comp_level.toUpperCase();
+                let matchNum = matchData.match_number;
+                title.innerText = `${compLevel} ${matchNum} - EVENT ${matchData.event_key.toUpperCase()}`;
+
+                let rTeamsKeys = matchData.alliances.red.team_keys;
+                let bTeamsKeys = matchData.alliances.blue.team_keys;
+                let rTeams = rTeamsKeys.map(t => t.replace('frc', ''));
+                let bTeams = bTeamsKeys.map(t => t.replace('frc', ''));
+
+                let redPred = predictAllianceScore(rTeamsKeys);
+                let bluePred = predictAllianceScore(bTeamsKeys);
+
+                // --- NEW: CLASSIC TBA HTML TABLE GENERATOR ---
+                let redBd = matchData.score_breakdown?.red || {};
+                let blueBd = matchData.score_breakdown?.blue || {};
+
+                const findVal = (bd, keywords) => {
+                    if (!bd) return '-';
+                    for (let kw of keywords) { if (bd[kw] !== undefined && bd[kw] !== null) return bd[kw]; }
+                    let keys = Object.keys(bd);
+                    for (let kw of keywords) {
+                        let match = keys.find(k => k.toLowerCase().includes(kw.toLowerCase()));
+                        if (match) return bd[match];
+                    }
+                    return '-';
+                };
+
+                const makeRow = (redVal, label, blueVal, isBold = false) => `
+                    <tr style="border-bottom: 1px solid var(--border-grey);">
+                        <td style="padding: 10px; background: rgba(230, 32, 32, ${isBold ? '0.2' : '0.05'}); color: ${isBold ? '#fff' : '#ff6b6b'}; font-weight: ${isBold ? '900' : 'normal'}; text-align: center; width: 30%; border-right: 1px solid var(--border-grey);">${redVal}</td>
+                        <td style="padding: 10px; text-align: center; color: var(--text-muted); font-size: 0.85rem; width: 40%; ${isBold ? 'font-weight: 900; color: var(--text-white); background: var(--card-grey);' : ''}">${label}</td>
+                        <td style="padding: 10px; background: rgba(59, 130, 246, ${isBold ? '0.2' : '0.05'}); color: ${isBold ? '#fff' : '#60a5fa'}; font-weight: ${isBold ? '900' : 'normal'}; text-align: center; width: 30%; border-left: 1px solid var(--border-grey);">${blueVal}</td>
+                    </tr>
+                `;
+
+                let rAutoTower = findVal(redBd, ['autoTowerPoints', 'autoTower']); let bAutoTower = findVal(blueBd, ['autoTowerPoints', 'autoTower']);
+                let rAutoFuel = findVal(redBd, ['autoFuel', 'autoFuelPoints']); let bAutoFuel = findVal(blueBd, ['autoFuel', 'autoFuelPoints']);
+                let rAuto = findVal(redBd, ['totalAuto', 'autoPoints', 'autoScore']); let bAuto = findVal(blueBd, ['totalAuto', 'autoPoints', 'autoScore']);
+
+                let rTeleFuel = findVal(redBd, ['teleopFuelPoints', 'teleopFuel']); let bTeleFuel = findVal(blueBd, ['teleopFuelPoints', 'teleopFuel']);
+                let rTeleop = findVal(redBd, ['totalTeleop', 'teleopPoints', 'teleopHub']); let bTeleop = findVal(blueBd, ['totalTeleop', 'teleopPoints', 'teleopHub']);
+
+                let rEnd1 = findVal(redBd, ['endgameRobot1', 'robot1Endgame']); let bEnd1 = findVal(blueBd, ['endgameRobot1', 'robot1Endgame']);
+                let rEnd2 = findVal(redBd, ['endgameRobot2', 'robot2Endgame']); let bEnd2 = findVal(blueBd, ['endgameRobot2', 'robot2Endgame']);
+                let rEnd3 = findVal(redBd, ['endgameRobot3', 'robot3Endgame']); let bEnd3 = findVal(blueBd, ['endgameRobot3', 'robot3Endgame']);
+                let rEndTower = findVal(redBd, ['endgameTowerPoints', 'endgamePoints']); let bEndTower = findVal(blueBd, ['endgameTowerPoints', 'endgamePoints']);
+
+                let rFoulStr = `${findVal(redBd, ['foulCount'])} / ${findVal(redBd, ['techFoulCount'])}`;
+                let bFoulStr = `${findVal(blueBd, ['foulCount'])} / ${findVal(blueBd, ['techFoulCount'])}`;
+                if (rFoulStr === '- / -') rFoulStr = '-'; if (bFoulStr === '- / -') bFoulStr = '-';
+
+                let rFoulPts = findVal(redBd, ['foulPoints']); let bFoulPts = findVal(blueBd, ['foulPoints']);
+                let rTotal = matchData.alliances?.red?.score || '-'; let bTotal = matchData.alliances?.blue?.score || '-';
+                let rRp = findVal(redBd, ['rp', 'rankingPoints']); let bRp = findVal(blueBd, ['rp', 'rankingPoints']);
+
+                let breakdownTableHtml = '';
+                if (matchData.score_breakdown) {
+                    breakdownTableHtml = `
+                        <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-grey); margin-top: 20px; background: var(--field-bg);">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: var(--card-grey); border-bottom: 2px solid var(--border-grey);">
+                                        <th style="padding: 12px; color: #ff6b6b; width: 30%; text-align: center; border-right: 1px solid var(--border-grey);">RED</th>
+                                        <th style="padding: 12px; color: var(--text-white); width: 40%; text-align: center; font-size: 0.8rem; letter-spacing: 2px;">OFFICIAL BREAKDOWN</th>
+                                        <th style="padding: 12px; color: #60a5fa; width: 30%; text-align: center; border-left: 1px solid var(--border-grey);">BLUE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rAutoTower !== '-' ? makeRow(rAutoTower, 'Auto Tower Points', bAutoTower) : ''}
+                                    ${rAutoFuel !== '-' ? makeRow(rAutoFuel, 'Auto Fuel', bAutoFuel) : ''}
+                                    ${makeRow(rAuto, 'Total Auto', bAuto, true)}
+                                    
+                                    ${rTeleFuel !== '-' ? makeRow(rTeleFuel, 'Teleop Fuel Points', bTeleFuel) : ''}
+                                    ${makeRow(rTeleop, 'Total Teleop', bTeleop, true)}
+                                    
+                                    ${makeRow(rEnd1, 'Robot 1 Endgame', bEnd1)}
+                                    ${makeRow(rEnd2, 'Robot 2 Endgame', bEnd2)}
+                                    ${makeRow(rEnd3, 'Robot 3 Endgame', bEnd3)}
+                                    ${rEndTower !== '-' ? makeRow(rEndTower, 'Endgame Total', bEndTower) : ''}
+                                    
+                                    ${makeRow(rFoulStr, 'Fouls / Major Fouls', bFoulStr)}
+                                    ${makeRow(rFoulPts, 'Foul Points', bFoulPts)}
+                                    
+                                    ${makeRow(rTotal, 'Total Score', bTotal, true)}
+                                    ${makeRow(`+${rRp} RP`, 'Ranking Points', `+${bRp} RP`, true)}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
 
                 statsContainer.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 10px;">
                         <h3 style="margin:0; color:var(--text-white); font-size:1.2rem; border:none;">Official Match Results</h3>
                     </div>
+                    
                     <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-grey); background: #111; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
                         <div style="display:flex; border-bottom: 1px solid var(--border-grey);">
                             <div style="flex:3; display:flex; background: rgba(230, 32, 32, 0.1);">
                                 ${rTeams.map(t => `<div style="flex:1; padding: 15px 5px; color: #ff6b6b; font-weight: 900; text-align: center; border-right: 1px solid rgba(255,255,255,0.05); font-size:1.1rem;">${t}</div>`).join('')}
                             </div>
-                            <div style="flex:1; padding: 15px 5px; background: rgba(230, 32, 32, 0.3); color: white; font-weight: 900; font-size: 1.5rem; text-align: center; display:flex; align-items:center; justify-content:center;">${rScore}</div>
                         </div>
                         <div style="display:flex;">
                             <div style="flex:3; display:flex; background: rgba(59, 130, 246, 0.1);">
                                 ${bTeams.map(t => `<div style="flex:1; padding: 15px 5px; color: #60a5fa; font-weight: 900; text-align: center; border-right: 1px solid rgba(255,255,255,0.05); font-size:1.1rem;">${t}</div>`).join('')}
                             </div>
-                            <div style="flex:1; padding: 15px 5px; background: rgba(59, 130, 246, 0.3); color: white; font-weight: 900; font-size: 1.5rem; text-align: center; display:flex; align-items:center; justify-content:center;">${bScore}</div>
                         </div>
                     </div>
+                    
+                    ${breakdownTableHtml}
+
                     <h3 style="margin:20px 0 10px 0; color:var(--admin-color); font-size:1.1rem; border:none;">Lovat Cloud Predictions</h3>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div style="background:var(--field-bg); padding:15px; border-radius:8px; border-left: 4px solid var(--primary-color);">
@@ -1563,20 +1745,23 @@
                             <div style="font-size:1.8rem; font-weight:900; color:var(--text-white);">${bluePred.score} <span style="font-size:0.9rem; color:var(--text-muted);">PTS</span></div>
                         </div>
                     </div>
-                    <div style="margin-top: 20px; padding: 20px; background: var(--field-bg); border: 1px solid var(--border-grey); border-radius: 8px; text-align:center;">
-                        <a href="https://www.thebluealliance.com/match/${matchKey}" target="_blank" class="submit-btn" style="text-decoration:none; background: #333; color: white; padding: 15px;">VIEW MATCH ON TBA 🔗</a>
-                    </div>
                 `;
+
                 if (matchData.videos && matchData.videos.length > 0) {
                     const ytVideo = matchData.videos.find(v => v.type === 'youtube');
-                    if (ytVideo) videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytVideo.key}?autoplay=1" allow="autoplay; encrypted-media; fullscreen"></iframe>`;
-                    else videoContainer.innerHTML = '<div style="color:var(--accent-color); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%; text-align:center; padding: 20px;">No YouTube video available for this match.</div>';
-                } else videoContainer.innerHTML = '<div style="color:var(--accent-color); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%; text-align:center; padding: 20px;">No video uploaded to TBA yet.</div>';
-            } catch (e) { statsContainer.innerHTML = '<div style="color:var(--danger-color); font-weight:bold; text-align:center; padding: 40px;">Failed to load match data. Ensure your TBA Key is valid.</div>'; videoContainer.innerHTML = ''; }
-        }
-        function closeMatchVideo() { document.getElementById('video-modal').classList.remove('show'); document.getElementById('video-frame-container').innerHTML = ''; }
-
-        /* ==========================================================================
+                    if (ytVideo) {
+                        videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytVideo.key}?autoplay=1" allow="autoplay; encrypted-media; fullscreen"></iframe>`;
+                    } else {
+                        videoContainer.innerHTML = '<div style="color:var(--accent-color); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%; text-align:center; padding: 20px;">No YouTube video available for this match.</div>';
+                    }
+                } else {
+                    videoContainer.innerHTML = '<div style="color:var(--accent-color); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%; text-align:center; padding: 20px;">No video uploaded to TBA yet.</div>';
+                }
+            } catch (e) {
+                statsContainer.innerHTML = '<div style="color:var(--danger-color); font-weight:bold; text-align:center; padding: 40px;">Failed to load match data. Ensure your TBA Key is valid.</div>';
+                videoContainer.innerHTML = '';
+            }
+        }   /* ==========================================================================
            FIELD VIEW PICKLIST MODAL
            ========================================================================== */
         function openFieldView() {
@@ -1597,82 +1782,224 @@
             document.getElementById('field-view-content').innerHTML = html;
             document.getElementById('field-view-modal').classList.add('show');
         }
-        function closeFieldView() { document.getElementById('field-view-modal').classList.remove('show'); }
+
+        function closeFieldView() {
+            document.getElementById('field-view-modal').classList.remove('show');
+        }
 
         /* ==========================================================================
            NETWORK SENSING
            ========================================================================== */
-        function setSyncState(isStarting) { if (isStarting) syncProcesses++; else syncProcesses = Math.max(0, syncProcesses - 1); updateConnectionUI(); }
-        function updateConnectionUI() {
-            if (!currentUser) return; const pill = document.getElementById('conn-pill'); const syncArea = document.getElementById('sync-area'); const queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
-            let isSyncing = syncProcesses > 0;
-            if (isSyncing) { pill.innerText = "SYNCING..."; pill.className = "status-pill syncing"; }
-            else if (isOnline) { pill.innerText = "ONLINE"; pill.className = "status-pill online"; if (queue.length > 0) syncArea.classList.remove('hidden'); else syncArea.classList.add('hidden'); }
-            else { pill.innerText = "OFFLINE"; pill.className = "status-pill offline"; syncArea.classList.remove('hidden'); }
-            const queueCountEl = document.getElementById('queue-count'); if (queueCountEl) queueCountEl.innerText = queue.length;
+        function setSyncState(isStarting) {
+            if (isStarting) syncProcesses++;
+            else syncProcesses = Math.max(0, syncProcesses - 1);
+            updateConnectionUI();
         }
-        async function checkConnection() { if (!currentUser) return; try { const { error } = await sbClient.from('pit_scouting').select('id').limit(1); isOnline = !error; } catch { isOnline = false; } updateConnectionUI(); }
+
+        function updateConnectionUI() {
+            if (!currentUser) return;
+            const pill = document.getElementById('conn-pill');
+            const syncArea = document.getElementById('sync-area');
+            const queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
+
+            let isSyncing = syncProcesses > 0;
+
+            if (isSyncing) {
+                pill.innerText = "SYNCING...";
+                pill.className = "status-pill syncing";
+            } else if (isOnline) {
+                pill.innerText = "ONLINE";
+                pill.className = "status-pill online";
+                if (queue.length > 0) syncArea.classList.remove('hidden');
+                else syncArea.classList.add('hidden');
+            } else {
+                pill.innerText = "OFFLINE";
+                pill.className = "status-pill offline";
+                syncArea.classList.remove('hidden');
+            }
+
+            const queueCountEl = document.getElementById('queue-count');
+            if (queueCountEl) queueCountEl.innerText = queue.length;
+        }
+
+        async function checkConnection() {
+            if (!currentUser) return;
+            try {
+                const { error } = await sbClient.from('pit_scouting').select('id').limit(1);
+                isOnline = !error;
+            } catch {
+                isOnline = false;
+            }
+            updateConnectionUI();
+        }
         setInterval(checkConnection, 7000);
 
         /* ==========================================================================
            AUTH
            ========================================================================== */
         async function handleLogin() {
-            const email = document.getElementById('email').value.trim().toLowerCase(); const password = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value.trim();
+
             if (!email || !password) return showToast("Missing credentials.");
-            document.getElementById('login-trigger-btn').innerText = "LOGGING IN..."; document.getElementById('auth-error').innerText = "";
+
+            document.getElementById('login-trigger-btn').innerText = "LOGGING IN...";
+            document.getElementById('auth-error').innerText = "";
+
             const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-            if (error) { document.getElementById('auth-error').innerText = `Error: ${error.message}`; document.getElementById('login-trigger-btn').innerText = "LOG IN"; showToast("Login failed."); } else { await bootApplication(); }
+
+            if (error) {
+                document.getElementById('auth-error').innerText = `Error: ${error.message}`;
+                document.getElementById('login-trigger-btn').innerText = "LOG IN";
+                showToast("Login failed.");
+            } else {
+                await bootApplication();
+            }
         }
 
         async function handleRegistration() {
-            const email = document.getElementById('email').value.trim().toLowerCase(); const password = document.getElementById('password').value.trim(); const teamCodeInput = document.getElementById('team-code').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value.trim();
+            const teamCodeInput = document.getElementById('team-code').value.trim();
+
             if (!email || !password || !teamCodeInput) return showToast("Missing credentials or team code.");
-            document.getElementById('register-trigger-btn').innerText = "VERIFYING CODE..."; document.getElementById('auth-error').innerText = "";
-            try { const { data: codeData, error: codeError } = await sbClient.from('api_keys').select('key_value').eq('name', 'teamCode').single(); if (codeError || !codeData || codeData.key_value !== teamCodeInput) throw new Error("Invalid team code."); } catch (err) { document.getElementById('auth-error').innerText = `Database Error: ${err.message}`; document.getElementById('register-trigger-btn').innerText = "CREATE ACCOUNT"; return showToast("Incorrect code."); }
+
+            document.getElementById('register-trigger-btn').innerText = "VERIFYING CODE...";
+            document.getElementById('auth-error').innerText = "";
+
+            try {
+                const { data: codeData, error: codeError } = await sbClient.from('api_keys').select('key_value').eq('name', 'teamCode').single();
+                if (codeError || !codeData || codeData.key_value !== teamCodeInput) throw new Error("Invalid team code.");
+            } catch (err) {
+                document.getElementById('auth-error').innerText = `Database Error: ${err.message}`;
+                document.getElementById('register-trigger-btn').innerText = "CREATE ACCOUNT";
+                return showToast("Incorrect code.");
+            }
+
             document.getElementById('register-trigger-btn').innerText = "CREATING ACCOUNT...";
             const { data, error } = await sbClient.auth.signUp({ email: email, password: password });
-            if (error) { document.getElementById('auth-error').innerText = `Registration Failed: ${error.message}`; document.getElementById('register-trigger-btn').innerText = "CREATE ACCOUNT"; showToast("Account creation failed."); } else { showToast("Account Created."); await bootApplication(); }
+
+            if (error) {
+                document.getElementById('auth-error').innerText = `Registration Failed: ${error.message}`;
+                document.getElementById('register-trigger-btn').innerText = "CREATE ACCOUNT";
+                showToast("Account creation failed.");
+            } else {
+                showToast("Account Created.");
+                await bootApplication();
+            }
         }
 
         async function handleLogout() {
             showToast("Logging out and clearing local cache...");
-            try { await sbClient.auth.signOut(); } catch (e) { console.error(e); }
-            finally { for (let key in localStorage) { if (key.startsWith('sb-') || key.startsWith('wobot_')) localStorage.removeItem(key); } localStorage.clear(); sessionStorage.clear(); window.location.href = 'index.html'; }
+            try {
+                await sbClient.auth.signOut();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                for (let key in localStorage) {
+                    if (key.startsWith('sb-') || key.startsWith('wobot_')) {
+                        localStorage.removeItem(key);
+                    }
+                }
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
         }
 
         async function bootApplication() {
-            try { const { data: { session }, error } = await sbClient.auth.getSession(); if (error) throw error; if (session) await launchSecureSession(session); else showAuthScreen(); }
-            catch (err) { localStorage.removeItem('wobot_clean_session'); showAuthScreen(); }
+            try {
+                const { data: { session }, error } = await sbClient.auth.getSession();
+                if (error) throw error;
+
+                if (session) {
+                    await launchSecureSession(session);
+                } else {
+                    showAuthScreen();
+                }
+            } catch (err) {
+                localStorage.removeItem('wobot_clean_session');
+                showAuthScreen();
+            }
         }
-        function showAuthScreen() { document.getElementById('auth-screen').classList.remove('hidden'); document.getElementById('app-container').classList.add('hidden'); currentUser = null; }
+
+        function showAuthScreen() {
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('app-container').classList.add('hidden');
+            currentUser = null;
+        }
 
         async function launchSecureSession(session) {
-            currentUser = session.user.email; document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); document.getElementById('user-display').innerText = currentUser.toUpperCase();
-            if (currentUser.toLowerCase() === OWNER_ID_LOCK) currentUserRole = 'owner';
-            else { try { const { data: profile } = await sbClient.from('profiles').select('role').eq('id', session.user.id).single(); currentUserRole = profile ? profile.role : 'scouter'; } catch (e) { currentUserRole = 'scouter'; } }
-            initPermissionsUI(); await fetchGlobalEventKey();
-            if (['strategist', 'drive_coach', 'admin', 'owner'].includes(currentUserRole)) await performBackgroundSync(); else await refreshApplicationData(); checkConnection();
+            currentUser = session.user.email;
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('user-display').innerText = currentUser.toUpperCase();
+
+            if (currentUser.toLowerCase() === OWNER_ID_LOCK) {
+                currentUserRole = 'owner';
+            } else {
+                try {
+                    const { data: profile } = await sbClient.from('profiles').select('role').eq('id', session.user.id).single();
+                    currentUserRole = profile ? profile.role : 'scouter';
+                } catch (e) {
+                    currentUserRole = 'scouter';
+                }
+            }
+
+            initPermissionsUI();
+            await fetchGlobalEventKey();
+
+            if (['strategist', 'drive_coach', 'admin', 'owner'].includes(currentUserRole)) {
+                await performBackgroundSync();
+            } else {
+                await refreshApplicationData();
+            }
+            checkConnection();
         }
+
         bootApplication();
-        sbClient.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT') showAuthScreen(); });
+
+        sbClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') showAuthScreen();
+        });
 
         /* ==========================================================================
            SYNC & DATA
            ========================================================================== */
         async function performBackgroundSync() {
             if (!activeEventKey || activeEventKey === "Pending...") return;
-            setSyncState(true); showToast("Syncing data in background...");
+
+            setSyncState(true);
+            showToast("Syncing data in background...");
+
             try {
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                 if (tbaKey) {
-                    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${activeEventKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } }); const teams = await res.json();
-                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number)))); let tbaMap = {}; teams.forEach(t => tbaMap[t.team_number] = t.nickname); localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
+                    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${activeEventKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
+                    const teams = await res.json();
+                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
+                    let tbaMap = {};
+                    teams.forEach(t => tbaMap[t.team_number] = t.nickname);
+                    localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
+
                     const rankRes = await fetch(`https://www.thebluealliance.com/api/v3/event/${activeEventKey}/rankings`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-                    if (rankRes.ok) { const rankData = await rankRes.json(); let rankMap = {}; if (rankData && rankData.rankings) rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank); localStorage.setItem('tbaRankCache', JSON.stringify(rankMap)); }
+                    if (rankRes.ok) {
+                        const rankData = await rankRes.json();
+                        let rankMap = {};
+                        if (rankData && rankData.rankings) {
+                            rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank);
+                        }
+                        localStorage.setItem('tbaRankCache', JSON.stringify(rankMap));
+                    }
                 }
-                await syncLovatFromStorage(); await refreshApplicationData(); showToast("Background sync complete.");
-            } catch (err) { console.warn(err); } finally { setSyncState(false); }
+                await syncLovatFromStorage();
+                await refreshApplicationData();
+                showToast("Background sync complete.");
+            } catch (err) {
+                console.warn(err);
+            } finally {
+                setSyncState(false);
+            }
         }
 
         async function fetchGlobalEventKey() {
@@ -1680,25 +2007,47 @@
                 const { data, error } = await sbClient.from('api_keys').select('key_value').eq('name', 'active_event').single();
                 activeEventKey = (data && data.key_value) ? data.key_value : `${APP_CONFIG.defaultEventYear}default`;
                 document.getElementById('global-event-display').innerText = `EVENT: ${activeEventKey.toUpperCase()}`;
-                const adminInput = document.getElementById('admin-event-input'); if (adminInput) adminInput.value = activeEventKey;
+
+                const adminInput = document.getElementById('admin-event-input');
+                if (adminInput) adminInput.value = activeEventKey;
+
                 let savedDraft = localStorage.getItem(`wobot_draft_${activeEventKey}`);
-                if (savedDraft) { try { draftPicks = JSON.parse(savedDraft); } catch (e) { localStorage.removeItem(`wobot_draft_${activeEventKey}`); } }
-                else { draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } }; }
+                if (savedDraft) {
+                    try {
+                        draftPicks = JSON.parse(savedDraft);
+                    } catch (e) {
+                        localStorage.removeItem(`wobot_draft_${activeEventKey}`);
+                    }
+                } else {
+                    draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } };
+                }
             } catch (err) { }
         }
 
         function initPermissionsUI() {
             if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
-            if (['strategist', 'drive_coach', 'admin', 'owner'].includes(currentUserRole)) { document.getElementById('btn-roster').classList.remove('hidden'); document.getElementById('btn-schedule').classList.remove('hidden'); document.getElementById('btn-picklist').classList.remove('hidden'); }
-            if (['admin', 'owner'].includes(currentUserRole)) document.getElementById('btn-admin').classList.remove('hidden');
-            if (currentUserRole === 'owner') document.getElementById('owner-only-tools').classList.remove('hidden');
+
+            if (['strategist', 'drive_coach', 'admin', 'owner'].includes(currentUserRole)) {
+                document.getElementById('btn-roster').classList.remove('hidden');
+                document.getElementById('btn-schedule').classList.remove('hidden');
+                document.getElementById('btn-picklist').classList.remove('hidden');
+            }
+            if (['admin', 'owner'].includes(currentUserRole)) {
+                document.getElementById('btn-admin').classList.remove('hidden');
+            }
+            if (currentUserRole === 'owner') {
+                document.getElementById('owner-only-tools').classList.remove('hidden');
+            }
         }
 
         async function refreshApplicationData() {
             setSyncState(true);
             try {
                 const { data, error } = await sbClient.from('pit_scouting').select('*').eq('event_key', activeEventKey);
-                if (error) { if (error.code === 'PGRST301' || error.message.toLowerCase().includes('jwt')) return; throw error; }
+                if (error) {
+                    if (error.code === 'PGRST301' || error.message.toLowerCase().includes('jwt')) return;
+                    throw error;
+                }
 
                 const tbaMap = JSON.parse(localStorage.getItem('tbaCache') || '{}');
                 const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
@@ -1707,27 +2056,63 @@
                 globalDataCache = [];
                 cachedTeams.forEach(teamNum => {
                     try {
-                        const pit = (data || []).find(p => parseInt(p.team_number) === teamNum) || {}; const avgs = lovatTeamCache[teamNum] || {};
-                        let l3 = parseFloat(avgs.percClimbThree) || 0; let l2 = parseFloat(avgs.percClimbTwo) || 0; let l1 = parseFloat(avgs.percClimbOne) || 0; let matchClimbStr = "N/A";
-                        if (avgs.numMatches && parseInt(avgs.numMatches) > 0) { matchClimbStr = "None"; if (l3 > 0) matchClimbStr = `L3 (${l3.toFixed(0)}%)`; else if (l2 > 0) matchClimbStr = `L2 (${l2.toFixed(0)}%)`; else if (l1 > 0) matchClimbStr = `L1 (${l1.toFixed(0)}%)`; }
-                        let pitClimbRaw = pit.max_climb || "Unknown"; let pitClimbStr = "Unknown";
-                        if (pitClimbRaw.includes("Level 3")) pitClimbStr = "L3"; else if (pitClimbRaw.includes("Level 2")) pitClimbStr = "L2"; else if (pitClimbRaw.includes("Level 1")) pitClimbStr = "L1"; else if (pitClimbRaw.includes("Cannot")) pitClimbStr = "None";
+                        const pit = (data || []).find(p => parseInt(p.team_number) === teamNum) || {};
+                        const avgs = lovatTeamCache[teamNum] || {};
+
+                        let l3 = parseFloat(avgs.percClimbThree) || 0;
+                        let l2 = parseFloat(avgs.percClimbTwo) || 0;
+                        let l1 = parseFloat(avgs.percClimbOne) || 0;
+                        let matchClimbStr = "N/A";
+
+                        if (avgs.numMatches && parseInt(avgs.numMatches) > 0) {
+                            matchClimbStr = "None";
+                            if (l3 > 0) matchClimbStr = `L3 (${l3.toFixed(0)}%)`;
+                            else if (l2 > 0) matchClimbStr = `L2 (${l2.toFixed(0)}%)`;
+                            else if (l1 > 0) matchClimbStr = `L1 (${l1.toFixed(0)}%)`;
+                        }
+
+                        let pitClimbRaw = pit.max_climb || "Unknown";
+                        let pitClimbStr = "Unknown";
+                        if (pitClimbRaw.includes("Level 3")) pitClimbStr = "L3";
+                        else if (pitClimbRaw.includes("Level 2")) pitClimbStr = "L2";
+                        else if (pitClimbRaw.includes("Level 1")) pitClimbStr = "L1";
+                        else if (pitClimbRaw.includes("Cannot")) pitClimbStr = "None";
 
                         globalDataCache.push({
-                            team_number: teamNum, team_nickname: pit.team_nickname || tbaMap[teamNum] || "Unknown", lovat_points: avgs.avgTotalPoints ? parseFloat(avgs.avgTotalPoints).toFixed(1) : 0, lovat_role: avgs.mainRole || "N/A", match_climb: matchClimbStr, pit_climb: pitClimbStr, rank: tbaRankCache[teamNum] || '-', ...pit
+                            team_number: teamNum,
+                            team_nickname: pit.team_nickname || tbaMap[teamNum] || "Unknown",
+                            lovat_points: avgs.avgTotalPoints ? parseFloat(avgs.avgTotalPoints).toFixed(1) : 0,
+                            lovat_role: avgs.mainRole || "N/A",
+                            match_climb: matchClimbStr,
+                            pit_climb: pitClimbStr,
+                            rank: tbaRankCache[teamNum] || '-',
+                            ...pit
                         });
                     } catch (err) { }
                 });
 
                 renderActiveAssignments();
-                if (['admin', 'owner'].includes(currentUserRole)) { populateManualDispatchDropdowns(); loadAdminTelemetry(data || []); }
-                if (!document.getElementById('view-picklist').classList.contains('hidden')) { renderAlliancePickRoom(); initRankingTool(); }
-            } catch (err) { console.warn(err); } finally { setSyncState(false); }
+                if (['admin', 'owner'].includes(currentUserRole)) {
+                    populateManualDispatchDropdowns();
+                    loadAdminTelemetry(data || []);
+                }
+                if (!document.getElementById('view-picklist').classList.contains('hidden')) {
+                    renderAlliancePickRoom();
+                    initRankingTool();
+                }
+            } catch (err) {
+                console.warn(err);
+            } finally {
+                setSyncState(false);
+            }
         }
 
         async function loadAdminTelemetry(pitData) {
             const scouterCounts = {};
-            pitData.forEach(report => { const name = report.scouter_name || 'Unknown'; scouterCounts[name] = (scouterCounts[name] || 0) + 1; });
+            pitData.forEach(report => {
+                const name = report.scouter_name || 'Unknown';
+                scouterCounts[name] = (scouterCounts[name] || 0) + 1;
+            });
             const sortedLeaderboard = Object.entries(scouterCounts).sort((a, b) => b[1] - a[1]);
             let leaderHTML = sortedLeaderboard.map((entry, index) => `
                 <div style="display:flex; justify-content:space-between; padding: 12px; border-bottom: 1px solid var(--border-grey);">
@@ -1735,22 +2120,30 @@
                     <span style="color:var(--primary-color); font-weight:900;">${entry[1]}</span>
                 </div>
             `).join('');
+
             if (!leaderHTML) leaderHTML = "<p style='color:var(--text-muted); text-align:center; padding: 20px;'>Awaiting data collection for this event.</p>";
             document.getElementById('admin-leaderboard').innerHTML = leaderHTML;
 
             try {
                 const { data: allAssignments } = await sbClient.from('scout_assignments').select('*').eq('event_key', activeEventKey).eq('completed', false);
                 let pendingHTML = "";
+
                 if (allAssignments && allAssignments.length > 0) {
                     const grouped = {};
-                    allAssignments.forEach(a => { const name = a.scouter_email.split('@')[0].toUpperCase(); if (!grouped[name]) grouped[name] = []; grouped[name].push(a.team_number); });
+                    allAssignments.forEach(a => {
+                        const name = a.scouter_email.split('@')[0].toUpperCase();
+                        if (!grouped[name]) grouped[name] = [];
+                        grouped[name].push(a.team_number);
+                    });
                     pendingHTML = Object.entries(grouped).map(entry => `
                         <div style="padding: 12px; border-bottom: 1px solid var(--border-grey);">
                             <strong style="color:var(--accent-color); display:block; margin-bottom:5px;">${entry[0]}</strong>
                             <div style="font-size: 0.9rem; color:var(--text-muted); font-weight: bold;">TEAMS PENDING: ${entry[1].join(', ')}</div>
                         </div>
                     `).join('');
-                } else { pendingHTML = "<p style='color:var(--success-color); text-align:center; padding: 20px; font-weight: bold;'>All assigned tasks completed.</p>"; }
+                } else {
+                    pendingHTML = "<p style='color:var(--success-color); text-align:center; padding: 20px; font-weight: bold;'>All assigned tasks completed.</p>";
+                }
                 document.getElementById('admin-pending-assignments').innerHTML = pendingHTML;
             } catch (err) { }
         }
@@ -1758,24 +2151,50 @@
         async function wipeAssignments() {
             if (!activeEventKey || activeEventKey === "Pending...") return showToast("Error: No active event set.");
             if (!confirm(`Are you absolutely sure you want to wipe ALL scouting assignments for ${activeEventKey.toUpperCase()}? This cannot be undone.`)) return;
+
             const { error } = await sbClient.from('scout_assignments').delete().eq('event_key', activeEventKey);
-            if (!error) { showToast("All assignments deleted."); refreshApplicationData(); } else { showToast(`Wipe failed: ${error.message}`); }
+
+            if (!error) {
+                showToast("All assignments deleted.");
+                refreshApplicationData();
+            } else {
+                showToast(`Wipe failed: ${error.message}`);
+            }
         }
 
         function switchView(targetId) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const activeView = document.getElementById(targetId); if (activeView) activeView.classList.remove('hidden');
-            const activeBtnId = 'btn-' + targetId.split('-')[1]; if (document.getElementById(activeBtnId)) document.getElementById(activeBtnId).classList.add('active');
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            const activeView = document.getElementById(targetId);
+            if (activeView) activeView.classList.remove('hidden');
+
+            const activeBtnId = 'btn-' + targetId.split('-')[1];
+            if (document.getElementById(activeBtnId)) document.getElementById(activeBtnId).classList.add('active');
+
             if (targetId === 'view-roster') setTimeout(() => { renderMasterRoster(); }, 50);
             if (targetId === 'view-picklist') setTimeout(() => { renderAlliancePickRoom(); initRankingTool(); }, 50);
-            if (targetId === 'view-schedule') { const container = document.getElementById('schedule-container'); if (container.innerHTML.trim() === '') loadTeamSchedule(); }
+            if (targetId === 'view-schedule') {
+                const container = document.getElementById('schedule-container');
+                if (container.innerHTML.trim() === '') loadTeamSchedule();
+            }
             if (targetId === 'view-admin' && currentUserRole === 'owner') loadUserAdminTable();
         }
 
         function switchDetailTab(tabName) {
-            document.getElementById('detail-overview-tab').classList.add('hidden'); document.getElementById('detail-matches-tab').classList.add('hidden'); document.getElementById('tab-overview-btn').classList.remove('active'); document.getElementById('tab-matches-btn').classList.remove('active');
-            if (tabName === 'overview') { document.getElementById('detail-overview-tab').classList.remove('hidden'); document.getElementById('tab-overview-btn').classList.add('active'); }
-            else if (tabName === 'matches') { document.getElementById('detail-matches-tab').classList.remove('hidden'); document.getElementById('tab-matches-btn').classList.add('active'); setTimeout(() => { if (matchTableInstance) matchTableInstance.redraw(true); }, 50); }
+            document.getElementById('detail-overview-tab').classList.add('hidden');
+            document.getElementById('detail-matches-tab').classList.add('hidden');
+            document.getElementById('tab-overview-btn').classList.remove('active');
+            document.getElementById('tab-matches-btn').classList.remove('active');
+
+            if (tabName === 'overview') {
+                document.getElementById('detail-overview-tab').classList.remove('hidden');
+                document.getElementById('tab-overview-btn').classList.add('active');
+            } else if (tabName === 'matches') {
+                document.getElementById('detail-matches-tab').classList.remove('hidden');
+                document.getElementById('tab-matches-btn').classList.add('active');
+                setTimeout(() => { if (matchTableInstance) matchTableInstance.redraw(true); }, 50);
+            }
         }
 
         async function renderActiveAssignments() {
@@ -1785,9 +2204,17 @@
             // Build Mini-Leaderboard for Scouter Dashboard
             if (assignments) {
                 const compCounts = {};
-                assignments.filter(a => a.completed).forEach(a => { const name = a.scouter_email.split('@')[0].toUpperCase(); compCounts[name] = (compCounts[name] || 0) + 1; });
+                assignments.filter(a => a.completed).forEach(a => {
+                    const name = a.scouter_email.split('@')[0].toUpperCase();
+                    compCounts[name] = (compCounts[name] || 0) + 1;
+                });
                 const top3 = Object.entries(compCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
-                document.getElementById('mini-leaderboard').innerHTML = top3.length > 0 ? top3.map((entry, idx) => `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--border-grey); padding-bottom:5px;"><span style="color:var(--text-muted); font-weight:bold;">#${idx + 1} ${entry[0]}</span><span style="color:var(--accent-color); font-weight:900;">${entry[1]}</span></div>`).join('') : '<div style="color:var(--text-muted); font-style:italic;">No data yet.</div>';
+
+                document.getElementById('mini-leaderboard').innerHTML = top3.length > 0 ? top3.map((entry, idx) => `
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--border-grey); padding-bottom:5px;">
+                        <span style="color:var(--text-muted); font-weight:bold;">#${idx + 1} ${entry[0]}</span>
+                        <span style="color:var(--accent-color); font-weight:900;">${entry[1]}</span>
+                    </div>`).join('') : '<div style="color:var(--text-muted); font-style:italic;">No data yet.</div>';
             }
 
             const myAssignments = assignments ? assignments.filter(a => a.scouter_email === currentUser) : [];
@@ -1803,7 +2230,9 @@
             const pendingTasks = myAssignments.filter(a => !a.completed && !scoutedNumbers.includes(parseInt(a.team_number)));
 
             if (pendingTasks.length > previousAssignmentCount && previousAssignmentCount !== 0) {
-                if (Notification.permission === "granted") new Notification("New Scouting Assignment", { body: `You have ${pendingTasks.length} teams waiting.`, icon: `https://www.thebluealliance.com/avatar/${APP_CONFIG.defaultEventYear}/frc${APP_CONFIG.teamNumber}.png` });
+                if (Notification.permission === "granted") {
+                    new Notification("New Scouting Assignment", { body: `You have ${pendingTasks.length} teams waiting.`, icon: `https://www.thebluealliance.com/avatar/${APP_CONFIG.defaultEventYear}/frc${APP_CONFIG.teamNumber}.png` });
+                }
             }
             previousAssignmentCount = pendingTasks.length;
 
@@ -1815,10 +2244,17 @@
                         <button onclick="launchScoutingSession(${task.team_number})" class="submit-btn" style="padding:12px 30px; font-size: 0.9rem;">INSPECT</button>
                     </div>
                 `).join('');
-            } else { list.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:900; border-style: dashed;">SCANNING COMPLETED... NO PENDING ASSIGNMENTS DETECTED.</div>`; }
+            } else {
+                list.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:900; border-style: dashed;">SCANNING COMPLETED... NO PENDING ASSIGNMENTS DETECTED.</div>`;
+            }
         }
 
-        function launchScoutingSession(teamNum) { showToast(`Loading form for Team ${teamNum}`); switchView('view-scout'); document.getElementById('f-team').value = teamNum; window.scrollTo(0, 0); }
+        function launchScoutingSession(teamNum) {
+            showToast(`Loading form for Team ${teamNum}`);
+            switchView('view-scout');
+            document.getElementById('f-team').value = teamNum;
+            window.scrollTo(0, 0);
+        }
 
         /* ==========================================================================
            IMAGE COMPRESSION & UPLOAD
@@ -1829,11 +2265,21 @@
                 const img = new Image();
                 img.onload = function () {
                     const canvas = document.getElementById('compression-canvas');
-                    const MAX_WIDTH = 800; const MAX_HEIGHT = 800; let width = img.width; let height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7); // Compress to 70% quality JPG
                     callback(dataUrl);
                 }
@@ -1846,19 +2292,28 @@
             if (input.files && input.files[0]) {
                 compressImage(input.files[0], (base64) => {
                     const preview = document.getElementById('robot-photo-preview');
-                    preview.src = base64; preview.classList.remove('hidden'); document.getElementById('img-placeholder').classList.add('hidden');
+                    preview.src = base64;
+                    preview.classList.remove('hidden');
+                    document.getElementById('img-placeholder').classList.add('hidden');
                     document.getElementById('f-photo-base64').value = base64; // Store compressed string
                     showToast("Photo optimized and ready.");
                 });
             }
         }
 
-        function saveToOfflineQueue(data) { let queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]'); queue.push(data); localStorage.setItem('wobot_offline_queue', JSON.stringify(queue)); checkConnection(); }
+        function saveToOfflineQueue(data) {
+            let queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
+            queue.push(data);
+            localStorage.setItem('wobot_offline_queue', JSON.stringify(queue));
+            checkConnection();
+        }
 
         // Utility to convert base64 back to Blob for Supabase Storage
         function dataURItoBlob(dataURI) {
-            var byteString = atob(dataURI.split(',')[1]); var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-            var ab = new ArrayBuffer(byteString.length); var ia = new Uint8Array(ab);
+            var byteString = atob(dataURI.split(',')[1]);
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
             for (var i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
             return new Blob([ab], { type: mimeString });
         }
@@ -1880,34 +2335,91 @@
             if (!isOnline) return showToast("Waiting for internet connection.");
             let queue = JSON.parse(localStorage.getItem('wobot_offline_queue') || '[]');
             if (queue.length === 0) return showToast("No offline data to upload.");
+
             setSyncState(true);
             try {
-                for (let i = 0; i < queue.length; i++) { await processPayloadUpload(queue[i]); }
-                localStorage.removeItem('wobot_offline_queue'); showToast("Upload successful."); await refreshApplicationData(); checkConnection();
-            } catch (err) { showToast(`Upload error: ${err.message}`); } finally { setSyncState(false); }
+                for (let i = 0; i < queue.length; i++) {
+                    await processPayloadUpload(queue[i]);
+                }
+                localStorage.removeItem('wobot_offline_queue');
+                showToast("Upload successful.");
+                await refreshApplicationData();
+                checkConnection();
+            } catch (err) {
+                showToast(`Upload error: ${err.message}`);
+            } finally {
+                setSyncState(false);
+            }
         }
 
         function getFormData() {
             return {
-                team_number: document.getElementById('f-team').value, event_key: activeEventKey, team_nickname: document.getElementById('f-nickname').value,
-                scouter_initials: document.getElementById('f-initials').value, drivetrain: document.getElementById('f-drive').value, drive_motor: document.getElementById('f-motor').value,
-                terrain_nav: document.getElementById('f-terrain').value, intake_loc: document.getElementById('f-intake').value, fuel_capacity: document.getElementById('f-capacity').value || 0,
-                scoring_method: document.getElementById('f-scoring').value, auton_start: document.getElementById('f-auton-start').value, auton_fuel: document.getElementById('f-auton-fuel').value || 0,
-                auton_climb: document.getElementById('f-auton-climb').value, max_climb: document.getElementById('f-max-climb').value, climb_speed: document.getElementById('f-climb-speed').value,
-                proud_features: document.getElementById('f-proud').value, strategic_pitch: document.getElementById('f-pitch').value, vulnerabilities: document.getElementById('f-vulnerabilities').value,
-                scouter_name: currentUser, created_at: new Date().toISOString(), image_base64: document.getElementById('f-photo-base64').value
+                team_number: document.getElementById('f-team').value,
+                event_key: activeEventKey,
+                team_nickname: document.getElementById('f-nickname').value,
+                scouter_initials: document.getElementById('f-initials').value,
+                drivetrain: document.getElementById('f-drive').value,
+                drive_motor: document.getElementById('f-motor').value,
+                terrain_nav: document.getElementById('f-terrain').value,
+                intake_loc: document.getElementById('f-intake').value,
+                fuel_capacity: document.getElementById('f-capacity').value || 0,
+                scoring_method: document.getElementById('f-scoring').value,
+                auton_start: document.getElementById('f-auton-start').value,
+                auton_fuel: document.getElementById('f-auton-fuel').value || 0,
+                auton_climb: document.getElementById('f-auton-climb').value,
+                max_climb: document.getElementById('f-max-climb').value,
+                climb_speed: document.getElementById('f-climb-speed').value,
+                proud_features: document.getElementById('f-proud').value,
+                strategic_pitch: document.getElementById('f-pitch').value,
+                vulnerabilities: document.getElementById('f-vulnerabilities').value,
+                scouter_name: currentUser,
+                created_at: new Date().toISOString(),
+                image_base64: document.getElementById('f-photo-base64').value
             };
         }
 
-        function saveDraft() { const draftData = getFormData(); draftData.is_draft = true; saveToOfflineQueue(draftData); showToast("Draft saved locally."); }
+        function saveDraft() {
+            const draftData = getFormData();
+            draftData.is_draft = true;
+            saveToOfflineQueue(draftData);
+            showToast("Draft saved locally.");
+        }
 
         async function handleScoutSubmit(event) {
-            event.preventDefault(); const submitBtn = document.getElementById('sub-btn'); const payload = getFormData();
-            if (!isOnline) { saveToOfflineQueue(payload); showToast("Report saved to device memory."); event.target.reset(); document.getElementById('f-photo-base64').value = ""; switchView('view-tasks'); return; }
-            submitBtn.innerText = "SUBMITTING..."; submitBtn.disabled = true; setSyncState(true);
-            try { await processPayloadUpload(payload); showToast("Report submitted successfully."); }
-            catch (err) { showToast(`Submission error: ${err.message}`); saveToOfflineQueue(payload); }
-            finally { setSyncState(false); submitBtn.innerText = "SUBMIT PIT REPORT"; submitBtn.disabled = false; event.target.reset(); document.getElementById('f-photo-base64').value = ""; document.getElementById('robot-photo-preview').classList.add('hidden'); document.getElementById('img-placeholder').classList.remove('hidden'); refreshApplicationData(); switchView('view-tasks'); }
+            event.preventDefault();
+            const submitBtn = document.getElementById('sub-btn');
+            const payload = getFormData();
+
+            if (!isOnline) {
+                saveToOfflineQueue(payload);
+                showToast("Report saved to device memory.");
+                event.target.reset();
+                document.getElementById('f-photo-base64').value = "";
+                switchView('view-tasks');
+                return;
+            }
+
+            submitBtn.innerText = "SUBMITTING...";
+            submitBtn.disabled = true;
+            setSyncState(true);
+
+            try {
+                await processPayloadUpload(payload);
+                showToast("Report submitted successfully.");
+            } catch (err) {
+                showToast(`Submission error: ${err.message}`);
+                saveToOfflineQueue(payload);
+            } finally {
+                setSyncState(false);
+                submitBtn.innerText = "SUBMIT PIT REPORT";
+                submitBtn.disabled = false;
+                event.target.reset();
+                document.getElementById('f-photo-base64').value = "";
+                document.getElementById('robot-photo-preview').classList.add('hidden');
+                document.getElementById('img-placeholder').classList.remove('hidden');
+                refreshApplicationData();
+                switchView('view-tasks');
+            }
         }
 
         /* ==========================================================================
@@ -1916,8 +2428,13 @@
         function predictAllianceScore(allianceTeamKeys) {
             let score = 0; let auto = 0; let tele = 0;
             allianceTeamKeys.forEach(teamKey => {
-                let tNum = parseInt(teamKey.replace('frc', '')); let avgs = lovatTeamCache[tNum];
-                if (avgs) { score += parseFloat(avgs.avgTotalPoints || 0); auto += parseFloat(avgs.avgAutoPoints || 0); tele += parseFloat(avgs.avgTeleopPoints || 0); }
+                let tNum = parseInt(teamKey.replace('frc', ''));
+                let avgs = lovatTeamCache[tNum];
+                if (avgs) {
+                    score += parseFloat(avgs.avgTotalPoints || 0);
+                    auto += parseFloat(avgs.avgAutoPoints || 0);
+                    tele += parseFloat(avgs.avgTeleopPoints || 0);
+                }
             });
             return { score: score.toFixed(1), auto: auto.toFixed(1), tele: tele.toFixed(1) };
         }
@@ -1929,49 +2446,73 @@
             const container = document.getElementById('schedule-container');
             container.innerHTML = '<div style="color:var(--text-muted); font-weight:bold;">Fetching match data from The Blue Alliance...</div>';
             setSyncState(true);
+
             try {
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                 if (!tbaKey) return showToast("Error: TBA API Key not set in Admin Panel.");
+
                 const res = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${targetTeam}/event/${activeEventKey}/matches/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
                 if (!res.ok) throw new Error("TBA fetch failed.");
                 let matches = await res.json();
-                if (matches.length === 0) { container.innerHTML = '<div style="color:var(--accent-color); font-weight:bold;">No matches found for this team at the active event yet.</div>'; return; }
+
+                if (matches.length === 0) {
+                    container.innerHTML = '<div style="color:var(--accent-color); font-weight:bold;">No matches found for this team at the active event yet.</div>';
+                    return;
+                }
 
                 const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
-                matches.sort((a, b) => { if (levelOrder[a.comp_level] !== levelOrder[b.comp_level]) return levelOrder[a.comp_level] - levelOrder[b.comp_level]; return a.match_number - b.match_number; });
-                currentScheduleMatches = matches; // Save for JUMP TO NEXT feature
+                matches.sort((a, b) => {
+                    if (levelOrder[a.comp_level] !== levelOrder[b.comp_level]) return levelOrder[a.comp_level] - levelOrder[b.comp_level];
+                    return a.match_number - b.match_number;
+                });
+                currentScheduleMatches = matches;
 
-                let projW = 0, projL = 0, projT = 0; let actW = 0, actL = 0, actT = 0;
-                let maxDiff = -9999; let easiestMatch = "None"; let minDiff = 9999; let hardestMatch = "None";
+                let projW = 0, projL = 0, projT = 0;
+                let actW = 0, actL = 0, actT = 0;
+                let maxDiff = -9999; let easiestMatch = "None";
+                let minDiff = 9999; let hardestMatch = "None";
 
                 let html = '';
                 matches.forEach(m => {
-                    let redTeams = m.alliances.red.team_keys; let blueTeams = m.alliances.blue.team_keys;
+                    let redTeams = m.alliances.red.team_keys;
+                    let blueTeams = m.alliances.blue.team_keys;
                     let targetIsRed = redTeams.includes(`frc${targetTeam}`);
-                    let redPred = predictAllianceScore(redTeams); let bluePred = predictAllianceScore(blueTeams);
-                    let targetProj = targetIsRed ? redPred.score : bluePred.score; let oppProj = targetIsRed ? bluePred.score : redPred.score;
+
+                    let redPred = predictAllianceScore(redTeams);
+                    let bluePred = predictAllianceScore(blueTeams);
+
+                    let targetProj = targetIsRed ? redPred.score : bluePred.score;
+                    let oppProj = targetIsRed ? bluePred.score : redPred.score;
                     let diff = parseFloat(targetProj) - parseFloat(oppProj);
+
                     let matchName = `${m.comp_level.toUpperCase()} ${m.match_number}`;
                     if (diff > maxDiff) { maxDiff = diff; easiestMatch = matchName; }
                     if (diff < minDiff) { minDiff = diff; hardestMatch = matchName; }
                     if (diff > 0) projW++; else if (diff < 0) projL++; else projT++;
 
-                    let redScore = m.alliances.red.score; let blueScore = m.alliances.blue.score;
+                    let redScore = m.alliances.red.score;
+                    let blueScore = m.alliances.blue.score;
                     let matchPlayed = redScore > -1 && blueScore > -1;
 
                     if (matchPlayed) {
-                        let targetAct = targetIsRed ? redScore : blueScore; let oppAct = targetIsRed ? blueScore : redScore;
+                        let targetAct = targetIsRed ? redScore : blueScore;
+                        let oppAct = targetIsRed ? blueScore : redScore;
                         if (targetAct > oppAct) actW++; else if (targetAct < oppAct) actL++; else actT++;
                     }
 
-                    let redWinProj = parseFloat(redPred.score) > parseFloat(bluePred.score); let blueWinProj = parseFloat(bluePred.score) > parseFloat(redPred.score);
+                    let redWinProj = parseFloat(redPred.score) > parseFloat(bluePred.score);
+                    let blueWinProj = parseFloat(bluePred.score) > parseFloat(redPred.score);
 
                     const getContribStr = (keys) => keys.map(t => {
-                        let num = t.replace('frc', ''); let pts = lovatTeamCache[num] ? Number(lovatTeamCache[num].avgTotalPoints || 0).toFixed(1) : '-'; let isTarget = num === targetTeam.toString();
+                        let num = t.replace('frc', '');
+                        let pts = lovatTeamCache[num] ? Number(lovatTeamCache[num].avgTotalPoints || 0).toFixed(1) : '-';
+                        let isTarget = num === targetTeam.toString();
                         return `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid var(--border-grey); padding-bottom:4px; ${isTarget ? 'color:var(--text-white); font-weight:900;' : 'color:var(--text-muted);'}"><span>${isTarget ? '► ' : ''}Team ${num}</span><span style="color:var(--accent-color); font-weight:bold;">${pts} pts</span></div>`;
                     }).join('');
 
-                    let rStr = getContribStr(redTeams); let bStr = getContribStr(blueTeams);
+                    let rStr = getContribStr(redTeams);
+                    let bStr = getContribStr(blueTeams);
+
                     let actualScoreBanner = matchPlayed ? `<div style="background:var(--field-bg); padding:10px; border-radius:8px; text-align:center; font-weight:900; margin-bottom:15px; color:var(--text-white); border: 1px solid var(--border-grey); display:flex; justify-content:center; align-items:center; gap:20px;"><span>ACTUAL SCORE: <span style="color:var(--primary-color);">RED ${redScore}</span> - <span style="color:var(--blue-alliance);">BLUE ${blueScore}</span></span><button onclick="openMatchVideo('${m.key}')" style="background:var(--primary-color); border:none; padding:5px 15px; border-radius:4px; color:white; font-weight:bold; cursor:pointer;">🎥 WATCH</button></div>` : '';
 
                     html += `<div id="match-card-${m.key}" class="card" style="padding:20px; display:flex; flex-direction:column; gap:15px; border-left: 6px solid var(--border-light);">
@@ -2004,8 +2545,14 @@
                         </div>
                     </div>
                 `;
-                container.innerHTML = statsHtml + html; showToast("Schedule and predictions loaded.");
-            } catch (err) { container.innerHTML = '<div style="color:var(--danger-color); font-weight:bold;">Failed to fetch schedule. Check connection or event key.</div>'; showToast("Failed to fetch schedule."); } finally { setSyncState(false); }
+                container.innerHTML = statsHtml + html;
+                showToast("Schedule and predictions loaded.");
+            } catch (err) {
+                container.innerHTML = '<div style="color:var(--danger-color); font-weight:bold;">Failed to fetch schedule. Check connection or event key.</div>';
+                showToast("Failed to fetch schedule.");
+            } finally {
+                setSyncState(false);
+            }
         }
 
         function jumpToNextMatch() {
@@ -2013,8 +2560,15 @@
             const nextMatch = currentScheduleMatches.find(m => m.alliances.red.score === -1);
             if (nextMatch) {
                 const el = document.getElementById(`match-card-${nextMatch.key}`);
-                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.borderLeft = "10px solid var(--accent-color)"; setTimeout(() => el.style.borderLeft = "6px solid var(--border-light)", 3000); showToast(`Jumped to Match ${nextMatch.match_number}`); }
-            } else showToast("All scheduled matches have been played.");
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.style.borderLeft = "10px solid var(--accent-color)";
+                    setTimeout(() => el.style.borderLeft = "6px solid var(--border-light)", 3000);
+                    showToast(`Jumped to Match ${nextMatch.match_number}`);
+                }
+            } else {
+                showToast("All scheduled matches have been played.");
+            }
         }
 
         /* ==========================================================================
@@ -2032,8 +2586,10 @@
                     {
                         title: "LOVAT PTS", field: "lovat_points", width: 130, hozAlign: "center", sorter: "number",
                         formatter: (cell) => {
-                            const val = cell.getValue(); if (val === undefined || val === null || val === "" || val == 0) return "-";
-                            const numVal = Number(val); const cls = numVal > 40 ? 'epa-high' : (numVal > 25 ? 'epa-mid' : 'epa-low');
+                            const val = cell.getValue();
+                            if (val === undefined || val === null || val === "" || val == 0) return "-";
+                            const numVal = Number(val);
+                            const cls = numVal > 40 ? 'epa-high' : (numVal > 25 ? 'epa-mid' : 'epa-low');
                             return `<span class="status-pill ${cls}">${numVal.toFixed(1)}</span>`;
                         }
                     },
@@ -2045,7 +2601,7 @@
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
         }
 
-        function launchDrillDownProfile(teamData) {
+        async function launchDrillDownProfile(teamData) {
             activeProfileTeam = teamData.team_number;
             switchView('view-detail'); switchDetailTab('overview');
             document.getElementById('detail-team-name').innerText = `TEAM ${teamData.team_number}: ${teamData.team_nickname ? teamData.team_nickname.toUpperCase() : 'UNKNOWN'}`;
@@ -2074,7 +2630,6 @@
             document.getElementById('detail-notes-block').innerHTML = `<p><strong style="color:var(--primary-color);">PROUD FEATURES:</strong> ${teamData.proud_features || 'N/A'}</p><p><strong style="color:var(--primary-color);">STRATEGIC PITCH:</strong> ${teamData.strategic_pitch || 'N/A'}</p>`;
             document.getElementById('detail-vulnerabilities-block').innerText = teamData.vulnerabilities || "No vulnerabilities identified/recorded.";
 
-            // Load Strategist Override Note
             const savedNote = localStorage.getItem(`wobot_note_${activeEventKey}_${teamData.team_number}`);
             document.getElementById('strategist-notes-input').value = savedNote || '';
 
@@ -2092,20 +2647,83 @@
                         <div style="background:var(--field-bg); padding: 15px; border-radius: 8px; grid-column: 1/-1;">MATCHES SCOUTED: <strong>${teamAvgs['numMatches'] || '0'}</strong></div>
                     </div>`;
             } else {
-                document.getElementById('detail-rank-val').innerText = `#${teamData.rank || '-'}`; document.getElementById('detail-expected-pts').innerHTML = `N/A <span style="font-size:1.2rem; color:var(--text-white);">PTS</span>`;
+                document.getElementById('detail-rank-val').innerText = `#${teamData.rank || '-'}`;
+                document.getElementById('detail-expected-pts').innerHTML = `N/A <span style="font-size:1.2rem; color:var(--text-white);">PTS</span>`;
                 document.getElementById('lovat-team-content').innerHTML = `<div style="padding: 15px; color: var(--text-muted);">No Lovat Averages available yet.</div>`;
             }
 
             if (matchTableInstance) matchTableInstance.destroy();
-            const rawMatches = lovatMatchCache[teamData.team_number] || [];
+            let rawMatches = lovatMatchCache[teamData.team_number] || [];
+
+            // --- NEW: TBA API FALLBACK LOGIC WITH FUZZY MATCHER ---
+            if (rawMatches.length === 0) {
+                document.getElementById('match-history-table').innerHTML = "<div style='padding:30px; text-align:center; color:var(--text-muted); font-weight:bold;'>Fetching TBA Fallback Data...</div>";
+                try {
+                    const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
+                    const res = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamData.team_number}/event/${activeEventKey}/matches`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
+
+                    if (res.ok) {
+                        const tbaMatches = await res.json();
+                        rawMatches = tbaMatches.filter(m => m.score_breakdown).map(m => {
+                            let isRed = m.alliances.red.team_keys.includes('frc' + teamData.team_number);
+                            let alliance = isRed ? 'red' : 'blue';
+                            let bd = m.score_breakdown[alliance];
+
+                            const findVal = (b, keywords) => {
+                                if (!b) return '-';
+                                for (let kw of keywords) { if (b[kw] !== undefined && b[kw] !== null) return b[kw]; }
+                                let keys = Object.keys(b);
+                                for (let kw of keywords) {
+                                    let match = keys.find(k => k.toLowerCase().includes(kw.toLowerCase()));
+                                    if (match) return b[match];
+                                }
+                                return '-';
+                            };
+
+                            let robotIndex = m.alliances[alliance].team_keys.indexOf('frc' + teamData.team_number) + 1;
+
+                            let climbStat = findVal(bd, [`endgameRobot${robotIndex}`, `robot${robotIndex}Endgame`, `endgameStatus${robotIndex}`]);
+                            let autoPts = findVal(bd, ['totalAuto', 'autoPoints', 'autoScore']);
+                            let teleopPts = findVal(bd, ['totalTeleop', 'teleopPoints', 'teleopHub', 'teleopFuel']);
+                            let rpPts = findVal(bd, ['rp', 'rankingPoints']);
+
+                            return {
+                                match: m.comp_level + m.match_number,
+                                totalPoints: m.alliances[alliance].score,
+                                autoPoints: autoPts,
+                                teleopPoints: teleopPts,
+                                endgameClimb: climbStat,
+                                accuracy: "TBA Fallback",
+                                driverAbility: "-",
+                                scouter: "TBA API",
+                                notes: `RP Earned: +${rpPts}`
+                            };
+                        });
+
+                        const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
+                        rawMatches.sort((a, b) => {
+                            let aLvl = a.match.replace(/[0-9]/g, ''); let bLvl = b.match.replace(/[0-9]/g, '');
+                            let aNum = parseInt(a.match.replace(/[^0-9]/g, '')); let bNum = parseInt(b.match.replace(/[^0-9]/g, ''));
+                            if (levelOrder[aLvl] !== levelOrder[bLvl]) return levelOrder[aLvl] - levelOrder[bLvl];
+                            return aNum - bNum;
+                        });
+                    }
+                } catch (e) {
+                    console.error("TBA fallback failed", e);
+                }
+            }
+
             matchTableInstance = new Tabulator("#match-history-table", {
-                data: rawMatches, layout: "fitColumns",
+                data: rawMatches,
+                layout: "fitColumns",
                 columns: [
                     {
                         title: "MATCH", field: "match", width: 140, hozAlign: "center",
                         formatter: (cell) => {
-                            const matchStr = cell.getValue(); if (!matchStr) return "-";
-                            let formattedMatchCode = matchStr.trim().toLowerCase().replace(/\s+/g, ''); formattedMatchCode = formattedMatchCode.replace(/^q(\d+)/, 'qm$1');
+                            const matchStr = cell.getValue();
+                            if (!matchStr) return "-";
+                            let formattedMatchCode = matchStr.trim().toLowerCase().replace(/\s+/g, '');
+                            formattedMatchCode = formattedMatchCode.replace(/^q(\d+)/, 'qm$1');
                             const matchKey = `${activeEventKey}_${formattedMatchCode}`;
                             return `<div style="display:flex; gap: 8px; align-items:center; justify-content:center;">
                                         <a href="https://www.thebluealliance.com/match/${matchKey}" target="_blank" style="color:var(--text-white); font-weight:bold; text-decoration:none;">${matchStr.toUpperCase()} 🔗</a>
@@ -2113,12 +2731,17 @@
                                     </div>`;
                         }
                     },
-                    { title: "TOTAL PTS", field: "totalPoints", width: 110, hozAlign: "center" }, { title: "AUTO PTS", field: "autoPoints", width: 110, hozAlign: "center" }, { title: "TELEOP", field: "teleopPoints", width: 100, hozAlign: "center" },
-                    { title: "CLIMB", field: "endgameClimb", width: 120 }, { title: "ACCURACY", field: "accuracy", width: 100 }, { title: "DRIVER", field: "driverAbility", width: 90 }, { title: "SCOUTER", field: "scouter", width: 120 }, { title: "NOTES", field: "notes", widthGrow: 2, formatter: "textarea" }
+                    { title: "TOTAL PTS", field: "totalPoints", width: 110, hozAlign: "center" },
+                    { title: "AUTO PTS", field: "autoPoints", width: 110, hozAlign: "center" },
+                    { title: "TELEOP", field: "teleopPoints", width: 100, hozAlign: "center" },
+                    { title: "CLIMB", field: "endgameClimb", width: 120 },
+                    { title: "ACCURACY", field: "accuracy", width: 100 },
+                    { title: "DRIVER", field: "driverAbility", width: 90 },
+                    { title: "SCOUTER", field: "scouter", width: 120 },
+                    { title: "NOTES", field: "notes", widthGrow: 2, formatter: "textarea" }
                 ],
             });
         }
-
         function saveStrategistNote() {
             if (!activeProfileTeam) return;
             const note = document.getElementById('strategist-notes-input').value;
@@ -2131,13 +2754,31 @@
            ========================================================================== */
         function renderAlliancePickRoom() {
             if (globalDataCache.length === 0) return;
-            const container = document.getElementById('draft-board-container'); container.innerHTML = "";
-            let pickedIds = []; for (let a = 1; a <= 8; a++) { if (draftPicks[a].p1) pickedIds.push(parseInt(draftPicks[a].p1)); if (draftPicks[a].p2) pickedIds.push(parseInt(draftPicks[a].p2)); }
-            let sortedTeams = [...globalDataCache].sort((a, b) => { let rankA = parseInt(a.rank) || 9999; let rankB = parseInt(b.rank) || 9999; if (rankA !== rankB) return rankA - rankB; let ptsA = parseFloat(a.lovat_points) || 0; let ptsB = parseFloat(b.lovat_points) || 0; return ptsB - ptsA; });
+            const container = document.getElementById('draft-board-container');
+            container.innerHTML = "";
+
+            let pickedIds = [];
+            for (let a = 1; a <= 8; a++) {
+                if (draftPicks[a].p1) pickedIds.push(parseInt(draftPicks[a].p1));
+                if (draftPicks[a].p2) pickedIds.push(parseInt(draftPicks[a].p2));
+            }
+
+            let sortedTeams = [...globalDataCache].sort((a, b) => {
+                let rankA = parseInt(a.rank) || 9999;
+                let rankB = parseInt(b.rank) || 9999;
+                if (rankA !== rankB) return rankA - rankB;
+                let ptsA = parseFloat(a.lovat_points) || 0;
+                let ptsB = parseFloat(b.lovat_points) || 0;
+                return ptsB - ptsA;
+            });
+
             let captainPool = sortedTeams.filter(t => !pickedIds.includes(parseInt(t.team_number)));
 
             for (let i = 1; i <= 8; i++) {
-                let capt = captainPool[i - 1] || { team_number: "???", rank: "-", lovat_points: 0, match_climb: "-" }; let year = activeEventKey.substring(0, 4) || new Date().getFullYear(); let displayPts = (capt.lovat_points && !isNaN(Number(capt.lovat_points))) ? Number(capt.lovat_points).toFixed(1) : "-";
+                let capt = captainPool[i - 1] || { team_number: "???", rank: "-", lovat_points: 0, match_climb: "-" };
+                let year = activeEventKey.substring(0, 4) || new Date().getFullYear();
+                let displayPts = (capt.lovat_points && !isNaN(Number(capt.lovat_points))) ? Number(capt.lovat_points).toFixed(1) : "-";
+
                 container.innerHTML += `
                     <div class="card responsive-pick-container" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
                         <div class="alliance-number" style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
@@ -2148,36 +2789,96 @@
                                 <div style="font-size:0.8rem; color:var(--text-muted);">Rank: ${capt.rank || '-'} | Lovat Pts: ${displayPts} | Climb: ${capt.match_climb || '-'}</div>
                             </div>
                         </div>
-                        <div class="pick-slot" style="flex:1;"><label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 1</label><select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%; padding:10px; background:var(--field-bg); border:1px solid var(--border-grey); color:var(--text-white); border-radius:6px; font-weight:bold;">${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p1)}</select></div>
-                        <div class="pick-slot" style="flex:1;"><label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 2</label><select onchange="updateDraftPick(${i}, 'p2', this.value)" style="width:100%; padding:10px; background:var(--field-bg); border:1px solid var(--border-grey); color:var(--text-white); border-radius:6px; font-weight:bold;">${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p2)}</select></div>
+                        <div class="pick-slot" style="flex:1;">
+                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 1</label>
+                            <select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%; padding:10px; background:var(--field-bg); border:1px solid var(--border-grey); color:var(--text-white); border-radius:6px; font-weight:bold;">${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p1)}</select>
+                        </div>
+                        <div class="pick-slot" style="flex:1;">
+                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 2</label>
+                            <select onchange="updateDraftPick(${i}, 'p2', this.value)" style="width:100%; padding:10px; background:var(--field-bg); border:1px solid var(--border-grey); color:var(--text-white); border-radius:6px; font-weight:bold;">${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p2)}</select>
+                        </div>
                     </div>`;
             }
         }
 
         function generateDraftOptions(sortedTeams, pickedIds, captainPool, allianceIndex, currentValue) {
-            let html = `<option value="">-- Available --</option>`; let ineligibleCaptainIds = captainPool.slice(0, allianceIndex).map(c => parseInt(c.team_number));
-            sortedTeams.forEach(t => { let num = parseInt(t.team_number); let isSelected = (currentValue && parseInt(currentValue) === num); let isEligible = !pickedIds.includes(num) && !ineligibleCaptainIds.includes(num); if (isEligible || isSelected) html += `<option value="${num}" ${isSelected ? 'selected' : ''}>${num} (Rk: ${t.rank || '-'})</option>`; });
+            let html = `<option value="">-- Available --</option>`;
+            let ineligibleCaptainIds = captainPool.slice(0, allianceIndex).map(c => parseInt(c.team_number));
+
+            sortedTeams.forEach(t => {
+                let num = parseInt(t.team_number);
+                let isSelected = (currentValue && parseInt(currentValue) === num);
+                let isEligible = !pickedIds.includes(num) && !ineligibleCaptainIds.includes(num);
+
+                if (isEligible || isSelected) {
+                    html += `<option value="${num}" ${isSelected ? 'selected' : ''}>${num} (Rk: ${t.rank || '-'})</option>`;
+                }
+            });
             return html;
         }
 
-        function updateDraftPick(allianceIdx, pickSlot, teamValue) { draftPicks[allianceIdx][pickSlot] = teamValue; localStorage.setItem(`wobot_draft_${activeEventKey}`, JSON.stringify(draftPicks)); renderAlliancePickRoom(); }
+        function updateDraftPick(allianceIdx, pickSlot, teamValue) {
+            draftPicks[allianceIdx][pickSlot] = teamValue;
+            localStorage.setItem(`wobot_draft_${activeEventKey}`, JSON.stringify(draftPicks));
+            renderAlliancePickRoom();
+        }
 
-        function clearDraft() { if (!confirm("Are you sure you want to reset the draft board?")) return; draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } }; localStorage.removeItem(`wobot_draft_${activeEventKey}`); renderAlliancePickRoom(); }
+        function clearDraft() {
+            if (!confirm("Are you sure you want to reset the draft board?")) return;
+            draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } };
+            localStorage.removeItem(`wobot_draft_${activeEventKey}`);
+            renderAlliancePickRoom();
+        }
 
         function initRankingTool() {
-            if (poolTableInstance) poolTableInstance.destroy(); if (picklistTableInstance) picklistTableInstance.destroy();
-            let poolData = []; let pickedIds = []; for (let a = 1; a <= 8; a++) { if (draftPicks[a].p1) pickedIds.push(parseInt(draftPicks[a].p1)); if (draftPicks[a].p2) pickedIds.push(parseInt(draftPicks[a].p2)); }
-            globalDataCache.forEach(t => { if (!pickedIds.includes(parseInt(t.team_number))) { poolData.push({ ...t }); } });
+            if (poolTableInstance) poolTableInstance.destroy();
+            if (picklistTableInstance) picklistTableInstance.destroy();
+
+            let poolData = [];
+            let pickedIds = [];
+
+            for (let a = 1; a <= 8; a++) {
+                if (draftPicks[a].p1) pickedIds.push(parseInt(draftPicks[a].p1));
+                if (draftPicks[a].p2) pickedIds.push(parseInt(draftPicks[a].p2));
+            }
+
+            globalDataCache.forEach(t => {
+                if (!pickedIds.includes(parseInt(t.team_number))) {
+                    poolData.push({ ...t });
+                }
+            });
 
             poolTableInstance = new Tabulator("#pool-table", {
-                data: poolData, layout: "fitColumns", movableRows: true, movableRowsConnectedTables: "#picklist-table", movableRowsReceiver: "add", movableRowsSender: "delete",
-                columns: [{ rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 }, { title: "Team", field: "team_number", width: 80 }, { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1) }, { title: "Rank", field: "rank", width: 70 }]
+                data: poolData,
+                layout: "fitColumns",
+                movableRows: true,
+                movableRowsConnectedTables: "#picklist-table",
+                movableRowsReceiver: "add",
+                movableRowsSender: "delete",
+                columns: [
+                    { rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 },
+                    { title: "Team", field: "team_number", width: 80 },
+                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1) },
+                    { title: "Rank", field: "rank", width: 70 }
+                ]
             });
 
             picklistTableInstance = new Tabulator("#picklist-table", {
-                data: [], layout: "fitColumns", movableRows: true, movableRowsConnectedTables: "#pool-table", movableRowsReceiver: "add", movableRowsSender: "delete",
-                columns: [{ rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 }, { title: "#", formatter: "rownum", width: 50, hozAlign: "center" }, { title: "Team", field: "team_number", width: 80 }, { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1) }, { title: "Climb", field: "pit_climb" }]
+                data: [],
+                layout: "fitColumns",
+                movableRows: true,
+                movableRowsConnectedTables: "#pool-table",
+                movableRowsReceiver: "add",
+                movableRowsSender: "delete",
+                columns: [
+                    { rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 },
+                    { title: "#", formatter: "rownum", width: 50, hozAlign: "center" },
+                    { title: "Team", field: "team_number", width: 80 },
+                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1) },
+                    { title: "Climb", field: "pit_climb" }
+                ]
             });
+
             picklistTableInstance.on("rowDblClick", (e, row) => launchDrillDownProfile(row.getData()));
         }
 
@@ -2185,58 +2886,180 @@
            ADMIN & SYNC TOOLS
            ========================================================================== */
         async function setGlobalEvent() {
-            setSyncState(true); const inputKey = document.getElementById('admin-event-input').value.trim(); if (!inputKey) { setSyncState(false); return; }
+            setSyncState(true);
+            const inputKey = document.getElementById('admin-event-input').value.trim();
+            if (!inputKey) {
+                setSyncState(false);
+                return;
+            }
+
             try {
                 await sbClient.from('api_keys').update({ key_value: inputKey }).eq('name', 'active_event');
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
+
                 if (tbaKey) {
-                    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } }); const teams = await res.json();
-                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number)))); let tbaMap = {}; teams.forEach(t => tbaMap[t.team_number] = t.nickname); localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
+                    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
+                    const teams = await res.json();
+                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
+
+                    let tbaMap = {};
+                    teams.forEach(t => tbaMap[t.team_number] = t.nickname);
+                    localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
+
                     const rankRes = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/rankings`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-                    if (rankRes.ok) { const rankData = await rankRes.json(); let rankMap = {}; if (rankData && rankData.rankings) rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank); localStorage.setItem('tbaRankCache', JSON.stringify(rankMap)); }
+
+                    if (rankRes.ok) {
+                        const rankData = await rankRes.json();
+                        let rankMap = {};
+                        if (rankData && rankData.rankings) {
+                            rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank);
+                        }
+                        localStorage.setItem('tbaRankCache', JSON.stringify(rankMap));
+                    }
                 }
-                await fetchGlobalEventKey(); await refreshApplicationData();
-                const scheduleContainer = document.getElementById('schedule-container'); if (scheduleContainer) scheduleContainer.innerHTML = '';
-            } catch (err) { console.error(err); } finally { setSyncState(false); }
+                await fetchGlobalEventKey();
+                await refreshApplicationData();
+
+                const scheduleContainer = document.getElementById('schedule-container');
+                if (scheduleContainer) scheduleContainer.innerHTML = '';
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setSyncState(false);
+            }
         }
 
         async function syncLovatFromStorage() {
             try {
-                const { data: teamData } = await sbClient.storage.from('scouting-data').download('lovat_team_data.csv'); if (teamData) parseLovatTeamData(await teamData.text());
-                const { data: matchData } = await sbClient.storage.from('scouting-data').download('lovat_match_data.csv'); if (matchData) parseLovatMatchData(await matchData.text());
+                const { data: teamData } = await sbClient.storage.from('scouting-data').download('lovat_team_data.csv');
+                if (teamData) parseLovatTeamData(await teamData.text());
+
+                const { data: matchData } = await sbClient.storage.from('scouting-data').download('lovat_match_data.csv');
+                if (matchData) parseLovatMatchData(await matchData.text());
             } catch (err) { }
         }
 
         async function uploadLovatToStorage(input, fileName) {
-            const file = input.files[0]; if (!file) return; setSyncState(true);
-            try { const { error } = await sbClient.storage.from('scouting-data').upload(fileName, file, { cacheControl: '3600', upsert: true }); if (!error) await syncLovatFromStorage(); showToast("Lovat Data Uploaded."); }
-            catch (err) { showToast("Upload failed."); } finally { setSyncState(false); }
+            const file = input.files[0];
+            if (!file) return;
+
+            setSyncState(true);
+            try {
+                const { error } = await sbClient.storage.from('scouting-data').upload(fileName, file, { cacheControl: '3600', upsert: true });
+                if (!error) await syncLovatFromStorage();
+                showToast("Lovat Data Uploaded.");
+            } catch (err) {
+                showToast("Upload failed.");
+            } finally {
+                setSyncState(false);
+            }
         }
 
         function parseLovatTeamData(csvText) {
-            const lines = csvText.replace(/\r/g, '').split('\n').filter(r => r.trim() !== ""); if (lines.length < 2) return; const headers = lines[0].split(','); lovatTeamCache = {};
-            for (let i = 1; i < lines.length; i++) { const columns = lines[i].split(','); const teamNum = parseInt(columns[0]?.trim()); if (!isNaN(teamNum)) { let rowData = {}; headers.forEach((h, idx) => rowData[h.trim()] = columns[idx]?.trim()); lovatTeamCache[teamNum] = rowData; } }
+            const lines = csvText.replace(/\r/g, '').split('\n').filter(r => r.trim() !== "");
+            if (lines.length < 2) return;
+
+            const headers = lines[0].split(',');
+            lovatTeamCache = {};
+
+            for (let i = 1; i < lines.length; i++) {
+                const columns = lines[i].split(',');
+                const teamNum = parseInt(columns[0]?.trim());
+                if (!isNaN(teamNum)) {
+                    let rowData = {};
+                    headers.forEach((h, idx) => rowData[h.trim()] = columns[idx]?.trim());
+                    lovatTeamCache[teamNum] = rowData;
+                }
+            }
             localStorage.setItem('lovatTeamCache', JSON.stringify(lovatTeamCache));
         }
 
         function parseLovatMatchData(csvText) {
-            const lines = csvText.replace(/\r/g, '').split('\n').filter(r => r.trim() !== ""); if (lines.length < 2) return; const headers = lines[0].split(','); lovatMatchCache = {}; const teamIdx = headers.findIndex(h => h.trim() === 'teamNumber');
+            const lines = csvText.replace(/\r/g, '').split('\n').filter(r => r.trim() !== "");
+            if (lines.length < 2) return;
+
+            const headers = lines[0].split(',');
+            lovatMatchCache = {};
+            const teamIdx = headers.findIndex(h => h.trim() === 'teamNumber');
+
             for (let i = 1; i < lines.length; i++) {
-                const cols = []; let inQuotes = false, current = '';
-                for (let char of lines[i]) { if (char === '"') inQuotes = !inQuotes; else if (char === ',' && !inQuotes) { cols.push(current); current = ''; } else current += char; } cols.push(current);
+                const cols = [];
+                let inQuotes = false, current = '';
+
+                for (let char of lines[i]) {
+                    if (char === '"') inQuotes = !inQuotes;
+                    else if (char === ',' && !inQuotes) { cols.push(current); current = ''; }
+                    else current += char;
+                }
+                cols.push(current);
+
                 const teamNum = parseInt(cols[teamIdx]?.trim());
-                if (!isNaN(teamNum)) { let rowData = {}; headers.forEach((h, idx) => rowData[h.trim()] = cols[idx]?.trim().replace(/^"|"$/g, '')); if (!lovatMatchCache[teamNum]) lovatMatchCache[teamNum] = []; lovatMatchCache[teamNum].push(rowData); }
+                if (!isNaN(teamNum)) {
+                    let rowData = {};
+                    headers.forEach((h, idx) => rowData[h.trim()] = cols[idx]?.trim().replace(/^"|"$/g, ''));
+                    if (!lovatMatchCache[teamNum]) lovatMatchCache[teamNum] = [];
+                    lovatMatchCache[teamNum].push(rowData);
+                }
             }
             localStorage.setItem('lovatMatchCache', JSON.stringify(lovatMatchCache));
         }
 
-        /* ==========================================================================
-                   ADMIN TEAM ASSIGNMENT TOOLS
-                   ========================================================================== */
+        async function autoAssign() {
+            setSyncState(true);
+            try {
+                const { data: scouters } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
+                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
+
+                const { data: existingAssignments } = await sbClient.from('scout_assignments').select('team_number').eq('event_key', activeEventKey);
+                const assignedNumbers = existingAssignments ? existingAssignments.map(a => parseInt(a.team_number)) : [];
+
+                const unscoutedList = cachedTeams.filter(num =>
+                    !globalDataCache.find(d => d.team_number === num && d.id) &&
+                    !assignedNumbers.includes(num)
+                ).sort((a, b) => a - b);
+
+                if (unscoutedList.length === 0) {
+                    showToast("No unscouted or unassigned teams left!");
+                    return;
+                }
+
+                if (!scouters || scouters.length === 0) {
+                    showToast("Error: No scouter accounts found.");
+                    return;
+                }
+
+                // Deduplicate scouters
+                const uniqueScouters = scouters.filter((value, index, self) =>
+                    index === self.findIndex((t) => (
+                        t.email.split('@')[0] === value.email.split('@')[0]
+                    ))
+                );
+
+                let finalAssignments = [];
+
+                unscoutedList.forEach((teamNum, index) => {
+                    const scouterIndex = index % uniqueScouters.length;
+                    finalAssignments.push({
+                        scouter_email: uniqueScouters[scouterIndex].email,
+                        team_number: teamNum,
+                        event_key: activeEventKey
+                    });
+                });
+
+                const { error } = await sbClient.from('scout_assignments').insert(finalAssignments);
+                if (error) throw error;
+
+                showToast(`Auto-assigned ${finalAssignments.length} teams across ${uniqueScouters.length} scouters.`);
+                await refreshApplicationData();
+            } catch (err) {
+                showToast(`Auto-assign error: ${err.message}`);
+            } finally {
+                setSyncState(false);
+            }
+        }
 
         async function populateManualDispatchDropdowns() {
             try {
-                // Fetch Scouters
                 const { data: profiles } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
                 const scouterSelect = document.getElementById('manual-scout-select');
 
@@ -2247,7 +3070,6 @@
                     scouterSelect.innerHTML = `<option value="">No Active Scouters Available</option>`;
                 }
 
-                // Fetch Teams
                 const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
                 const teamSelect = document.getElementById('manual-team-select');
 
@@ -2281,12 +3103,10 @@
                 }];
 
                 const { error } = await sbClient.from('scout_assignments').insert(payload);
-
                 if (error) throw error;
 
                 showToast(`Success: Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
 
-                // Reset the dropdowns so the admin doesn't accidentally double-assign
                 document.getElementById('manual-scout-select').value = "";
                 document.getElementById('manual-team-select').value = "";
 
@@ -2298,68 +3118,23 @@
             }
         }
 
-        async function autoAssign() {
-            setSyncState(true);
-            try {
-                const { data: scouters } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
-                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
-
-                // Safety Check: Get teams that are already assigned so we don't double-assign them
-                const { data: existingAssignments } = await sbClient.from('scout_assignments').select('team_number').eq('event_key', activeEventKey);
-                const assignedNumbers = existingAssignments ? existingAssignments.map(a => parseInt(a.team_number)) : [];
-
-                // Filter out teams that are either already scouted OR already assigned to someone
-                const unscoutedList = cachedTeams.filter(num =>
-                    !globalDataCache.find(d => d.team_number === num && d.id) &&
-                    !assignedNumbers.includes(num)
-                ).sort((a, b) => a - b);
-
-                if (unscoutedList.length === 0) {
-                    showToast("No unscouted or unassigned teams left!");
-                    return;
-                }
-
-                if (!scouters || scouters.length === 0) {
-                    showToast("Error: No scouter accounts found.");
-                    return;
-                }
-
-                let finalAssignments = [];
-
-                // THE FIX: Round-Robin Distribution (Like dealing a deck of cards)
-                unscoutedList.forEach((teamNum, index) => {
-                    // Uses modulo to cycle evenly through the scouter array (0, 1, 2, 3, 0, 1, 2...)
-                    const scouterIndex = index % scouters.length;
-                    finalAssignments.push({
-                        scouter_email: scouters[scouterIndex].email,
-                        team_number: teamNum,
-                        event_key: activeEventKey
-                    });
-                });
-
-                const { error } = await sbClient.from('scout_assignments').insert(finalAssignments);
-                if (error) throw error;
-
-                showToast(`Auto-assigned ${finalAssignments.length} teams across ${scouters.length} scouters.`);
-                await refreshApplicationData();
-            } catch (err) {
-                showToast(`Auto-assign error: ${err.message}`);
-            } finally {
-                setSyncState(false);
-            }
-        }
         async function loadUserAdminTable() {
             try {
                 const { data: users } = await sbClient.from('profiles').select('*').order('email', { ascending: true });
                 if (adminTableInstance) adminTableInstance.setData(users);
                 else {
                     adminTableInstance = new Tabulator("#user-admin-table", {
-                        data: users, layout: "fitColumns",
+                        data: users,
+                        layout: "fitColumns",
                         columns: [
                             { title: "USER EMAIL", field: "email", widthGrow: 2 },
                             {
                                 title: "ROLE", field: "role", editor: "list", widthGrow: 1, editorParams: { values: ["scouter", "strategist", "drive_coach", "admin"] },
-                                cellEdited: async (cell) => { const record = cell.getData(); if (record.email.toLowerCase() === OWNER_ID_LOCK) return loadUserAdminTable(); await sbClient.from('profiles').update({ role: record.role }).eq('id', record.id); }
+                                cellEdited: async (cell) => {
+                                    const record = cell.getData();
+                                    if (record.email.toLowerCase() === OWNER_ID_LOCK) return loadUserAdminTable();
+                                    await sbClient.from('profiles').update({ role: record.role }).eq('id', record.id);
+                                }
                             }
                         ],
                     });
@@ -2367,8 +3142,15 @@
             } catch (err) { }
         }
 
-        async function assignAllToScouter() { if (!confirm("Reset all user permissions?")) return; await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK); loadUserAdminTable(); }
-        function downloadRosterCSV() { if (mainTableInstance) mainTableInstance.download("csv", `${APP_CONFIG.teamName}_Scouting_Export.csv`); }
+        async function assignAllToScouter() {
+            if (!confirm("Reset all user permissions?")) return;
+            await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK);
+            loadUserAdminTable();
+        }
+
+        function downloadRosterCSV() {
+            if (mainTableInstance) mainTableInstance.download("csv", `${APP_CONFIG.teamName}_Scouting_Export.csv`);
+        }
     </script>
 </body>
 
