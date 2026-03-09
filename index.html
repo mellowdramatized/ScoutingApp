@@ -1761,9 +1761,10 @@
                 statsContainer.innerHTML = '<div style="color:var(--danger-color); font-weight:bold; text-align:center; padding: 40px;">Failed to load match data. Ensure your TBA Key is valid.</div>';
                 videoContainer.innerHTML = '';
             }
-        }   /* ==========================================================================
-           FIELD VIEW PICKLIST MODAL
-           ========================================================================== */
+        }
+        /* ==========================================================================
+          FIELD VIEW PICKLIST MODAL
+          ========================================================================== */
         function openFieldView() {
             if (!picklistTableInstance) return;
             const data = picklistTableInstance.getData();
@@ -1786,6 +1787,32 @@
         function closeFieldView() {
             document.getElementById('field-view-modal').classList.remove('show');
         }
+        /* ==========================================================================
+           MODAL CLOSING LOGIC (BUTTON & BACKGROUND CLICK)
+           ========================================================================== */
+
+        function closeMatchVideo() {
+            document.getElementById('video-modal').classList.remove('show');
+            document.getElementById('video-frame-container').innerHTML = '';
+        }
+
+        // Close Match Video if clicking on the dark background
+        document.getElementById('video-modal').addEventListener('click', function (event) {
+            if (event.target === this) {
+                closeMatchVideo();
+            }
+        });
+
+        function closeFieldView() {
+            document.getElementById('field-view-modal').classList.remove('show');
+        }
+
+        // Close Field View if clicking on the dark background
+        document.getElementById('field-view-modal').addEventListener('click', function (event) {
+            if (event.target === this) {
+                closeFieldView();
+            }
+        });
 
         /* ==========================================================================
            NETWORK SENSING
