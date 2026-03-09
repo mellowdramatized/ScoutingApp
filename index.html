@@ -1791,13 +1791,14 @@
            MODAL CLOSING LOGIC (BUTTON & BACKGROUND CLICK)
            ========================================================================== */
 
+
         function closeMatchVideo() {
             document.getElementById('video-modal').classList.remove('show');
             document.getElementById('video-frame-container').innerHTML = '';
         }
 
-        // Close Match Video if clicking on the dark background
-        document.getElementById('video-modal').addEventListener('click', function (event) {
+        // The "Click Off" listener for Match Video
+        document.getElementById('video-modal').addEventListener('mousedown', function (event) {
             if (event.target === this) {
                 closeMatchVideo();
             }
@@ -1807,8 +1808,8 @@
             document.getElementById('field-view-modal').classList.remove('show');
         }
 
-        // Close Field View if clicking on the dark background
-        document.getElementById('field-view-modal').addEventListener('click', function (event) {
+        // The "Click Off" listener for Field View
+        document.getElementById('field-view-modal').addEventListener('mousedown', function (event) {
             if (event.target === this) {
                 closeFieldView();
             }
