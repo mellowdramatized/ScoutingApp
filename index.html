@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-window-title">Loading Dashboard...</title>
 
     <link id="tabulator-theme" href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_midnight.min.css"
@@ -150,6 +150,17 @@
             border: 1px solid var(--border-grey);
         }
 
+        /* MOBILE RESPONSIVE TABLE FIXES */
+        .tabulator {
+            font-size: 14px !important;
+        }
+
+        .tabulator-cell {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            min-width: 40px !important;
+        }
+
         .tabulator-row.tabulator-moving {
             border: 2px solid var(--accent-color) !important;
             background: #222 !important;
@@ -179,13 +190,14 @@
             margin-bottom: 20px;
         }
 
-        h3 {
+        h2.sub-title {
             font-size: var(--font-h3);
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 800;
             margin-bottom: 15px;
             color: var(--text-white);
+            border: none;
         }
 
         /* ==========================================================================
@@ -562,7 +574,7 @@
             transition: width 0.5s ease;
         }
 
-        /* YOUTUBE CINEMA MODAL */
+        /* YOUTUBE CINEMA & FIELD MODALS */
         #video-modal,
         #field-view-modal {
             position: fixed;
@@ -901,7 +913,7 @@
             <div class="match-detail-body">
                 <div id="video-stats-container" style="display:flex; flex-direction:column; gap: 20px;"></div>
                 <div style="display:flex; flex-direction:column; gap: 15px;">
-                    <h3 style="margin:0; color:var(--text-white); font-size: 1.2rem; border:none;">Video Footage</h3>
+                    <h2 class="sub-title" style="margin:0; border:none;">Video Footage</h2>
                     <div class="video-wrapper" id="video-frame-container"></div>
                 </div>
             </div>
@@ -927,8 +939,9 @@
                 style="letter-spacing: 10px; color: var(--text-muted); margin-bottom: 50px; font-weight: 900; font-size: 1.2rem;">
                 SCOUTING DASHBOARD</p>
             <div class="scout-form" style="max-width:500px;" id="auth-form-container">
-                <div style="display:flex; flex-direction:column; gap:12px; text-align:left;"><label>EMAIL
-                        ADDRESS</label><input type="email" id="email" placeholder="email@team.com" autocomplete="email">
+                <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+                    <label>EMAIL ADDRESS</label>
+                    <input type="email" id="email" placeholder="email@team.com" autocomplete="email">
                 </div>
                 <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
                     <label>PASSWORD</label>
@@ -1002,9 +1015,11 @@
                 style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; flex-wrap:wrap; gap:20px;">
                 <h1 style="margin:0; border:none;">My Assigned Teams</h1>
             </div>
+
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px; gap: 20px;">
                 <div class="card" style="margin-bottom:0; padding:25px; border-top: 4px solid var(--success-color);">
-                    <h3 style="color:var(--success-color); font-size:1rem; margin-bottom:10px;">MY PROGRESS</h3>
+                    <h2 class="sub-title" style="color:var(--success-color); font-size:1rem; margin-bottom:10px;">MY
+                        PROGRESS</h2>
                     <div
                         style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.2rem; color:var(--text-white);">
                         <span id="scout-progress-text">0 / 0 Scouted</span>
@@ -1015,7 +1030,8 @@
                     </div>
                 </div>
                 <div class="card" style="margin-bottom:0; padding:25px; border-top: 4px solid var(--accent-color);">
-                    <h3 style="color:var(--accent-color); font-size:1rem; margin-bottom:10px;">TOP 3 SCOUTERS</h3>
+                    <h2 class="sub-title" style="color:var(--accent-color); font-size:1rem; margin-bottom:10px;">TOP 3
+                        SCOUTERS</h2>
                     <div id="mini-leaderboard" style="display:flex; flex-direction:column; gap:8px;"></div>
                 </div>
             </div>
@@ -1029,12 +1045,14 @@
             <div class="dashboard-grid">
 
                 <div class="card" style="height: fit-content;">
-                    <h3>Robot Photo</h3>
+                    <h2 class="sub-title">Robot Photo</h2>
                     <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Photos are automatically
                         compressed to save data.</p>
                     <div class="image-container" id="robot-image-container">
                         <span id="img-placeholder">NO PHOTO SELECTED</span>
-                        <img id="robot-photo-preview" class="robot-photo hidden">
+                        <img id="robot-photo-preview" class="robot-photo hidden"
+                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                            alt="Robot Photo Preview">
                     </div>
                     <input type="file" id="f-photo" accept="image/*" capture="environment"
                         onchange="previewRobotImage(this)" style="display:none;">
@@ -1211,19 +1229,19 @@
                 the pool and shift remaining captains up.</p>
 
             <div class="card" style="border-top: 5px solid var(--admin-color); margin-bottom: 20px;">
-                <h3 style="color: var(--admin-color);">Alliance Selection Board</h3>
+                <h2 class="sub-title" style="color: var(--admin-color);">Alliance Selection Board</h2>
                 <div style="display: flex; flex-direction: column; gap: 15px;" id="draft-board-container"></div>
             </div>
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-top: 30px;">
                 <div class="card">
-                    <h3 style="color:var(--accent-color);">Available Pool</h3>
+                    <h2 class="sub-title" style="color:var(--accent-color);">Available Pool</h2>
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Drag teams to the right
                         to rank them.</p>
                     <div id="pool-table"></div>
                 </div>
                 <div class="card">
-                    <h3 style="color:var(--success-color);">Ranked Picklist</h3>
+                    <h2 class="sub-title" style="color:var(--success-color);">Ranked Picklist</h2>
                     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Double-click any row to
                         view full profile.</p>
                     <div id="picklist-table"></div>
@@ -1247,9 +1265,10 @@
             <div id="detail-overview-tab">
                 <div class="dashboard-grid">
                     <div class="card">
-                        <h3>Robot Photo</h3>
+                        <h2 class="sub-title">Robot Photo</h2>
                         <div class="image-container" id="detail-image-box"></div>
-                        <h3 style="margin-top:40px; color: var(--primary-color);">Technical Specifications</h3>
+                        <h2 class="sub-title" style="margin-top:40px; color: var(--primary-color);">Technical
+                            Specifications</h2>
                         <div id="pit-stats-content"
                             style="background:var(--field-bg); padding:30px; border-radius:15px; font-weight: 800; font-size: 1.1rem; line-height: 1.8; border:1px solid var(--border-grey);">
                         </div>
@@ -1277,25 +1296,25 @@
                         </div>
 
                         <div class="card" style="margin-bottom: 0;">
-                            <h3 style="color: var(--danger-color);">Strategist Overrides</h3>
+                            <h2 class="sub-title" style="color: var(--danger-color);">Strategist Overrides</h2>
                             <textarea id="strategist-notes-input" rows="3"
                                 style="width:100%; padding:15px; border-radius:8px; background:var(--field-bg); border:1px solid var(--danger-color); color:var(--text-white); font-weight:bold; font-size:1.1rem;"
-                                placeholder="Add custom notes here (e.g. Broken intake, do not pick)"></textarea>
+                                placeholder="Add custom War Room notes here (e.g. Broken intake, do not pick)"></textarea>
                             <button onclick="saveStrategistNote()" class="submit-btn"
                                 style="width:auto; margin-top:10px; background:var(--danger-color); padding:10px 20px; font-size:0.85rem;">SAVE
                                 OVERRIDE</button>
 
-                            <h3 style="margin-top:30px;">Strategic Pitch & Features</h3>
+                            <h2 class="sub-title" style="margin-top:30px;">Strategic Pitch & Features</h2>
                             <div id="detail-notes-block"
                                 style="font-size: 1.2rem; line-height: 1.8; margin-bottom: 30px;"></div>
-                            <h3 style="margin-top:20px; color: var(--primary-color);">Scouter Identified Vulnerabilities
-                            </h3>
+                            <h2 class="sub-title" style="margin-top:20px; color: var(--primary-color);">Scouter
+                                Identified Vulnerabilities</h2>
                             <div id="detail-vulnerabilities-block"
                                 style="font-size: 1.1rem; line-height: 1.8; color: var(--accent-color);"></div>
                         </div>
 
                         <div class="card" style="margin-bottom: 0; border-top: 5px solid var(--admin-color);">
-                            <h3 style="color: var(--admin-color);">Lovat Match Averages</h3>
+                            <h2 class="sub-title" style="color: var(--admin-color);">Lovat Match Averages</h2>
                             <div id="lovat-team-content" style="font-size: 1.1rem; line-height: 1.8; overflow-x: auto;">
                             </div>
                         </div>
@@ -1305,7 +1324,7 @@
 
             <div id="detail-matches-tab" class="hidden">
                 <div class="card" style="border-top: 5px solid var(--success-color);">
-                    <h3 style="color: var(--success-color);">Raw Match History</h3>
+                    <h2 class="sub-title" style="color: var(--success-color);">Raw Match History</h2>
                     <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Displays raw "by scout"
                         report data for consistency tracking and scouter notes.</p>
                     <div id="match-history-table"></div>
@@ -1318,13 +1337,13 @@
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
                 <div class="card" style="border-top: 4px solid var(--primary-color);">
-                    <h3 style="color: var(--primary-color);">Scouting Leaderboard</h3>
+                    <h2 class="sub-title" style="color: var(--primary-color);">Scouting Leaderboard</h2>
                     <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Most pits successfully
                         scouted at the current event.</p>
                     <div id="admin-leaderboard" class="admin-scroll-box"></div>
                 </div>
                 <div class="card" style="border-top: 4px solid var(--accent-color);">
-                    <h3 style="color: var(--accent-color);">Active Assignments</h3>
+                    <h2 class="sub-title" style="color: var(--accent-color);">Active Assignments</h2>
                     <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Pending tasks assigned
                         across the scouter pool.</p>
                     <div id="admin-pending-assignments" class="admin-scroll-box"></div>
@@ -1332,7 +1351,7 @@
             </div>
 
             <div class="card" style="border: 2px solid var(--accent-color);">
-                <h3 style="color: var(--accent-color);">Event Settings</h3>
+                <h2 class="sub-title" style="color: var(--accent-color);">Event Settings</h2>
                 <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">Set the active competition.
                     This updates TBA rosters and internal databases.</p>
                 <div style="display:flex; gap:15px; align-items:flex-end; flex-wrap: wrap;">
@@ -1351,7 +1370,7 @@
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
                 <div class="card">
-                    <h3>Auto-Assign Teams</h3>
+                    <h2 class="sub-title">Auto-Assign Teams</h2>
                     <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Automatically balance
                         un-scouted teams from the current event across all Scouters.</p>
                     <button onclick="autoAssign()" class="submit-btn"
@@ -1359,7 +1378,7 @@
                         ROSTER</button>
                 </div>
                 <div class="card">
-                    <h3>Manual Team Assignment</h3>
+                    <h2 class="sub-title">Manual Team Assignment</h2>
                     <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Directly assign a
                         specific team to a chosen scouter.</p>
                     <div style="display:flex; flex-direction:column; gap:10px;">
@@ -1379,7 +1398,7 @@
             </div>
 
             <div class="card" style="border: 2px solid var(--danger-color); margin-bottom: 30px;">
-                <h3 style="color: var(--danger-color);">Danger Zone: Wipe Assignments</h3>
+                <h2 class="sub-title" style="color: var(--danger-color);">Danger Zone: Wipe Assignments</h2>
                 <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Permanently delete all
                     active and completed scouting assignments for the current event.</p>
                 <button onclick="wipeAssignments()" class="submit-btn"
@@ -1389,7 +1408,7 @@
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
                 <div class="card" style="border-top: 4px solid var(--admin-color);">
-                    <h3 style="color: var(--admin-color);">Lovat Cloud Sync</h3>
+                    <h2 class="sub-title" style="color: var(--admin-color);">Lovat Cloud Sync</h2>
                     <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Pull existing data from
                         Supabase, or manually upload new Lovat exports.</p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 10px;">
@@ -1412,7 +1431,7 @@
                 </div>
 
                 <div class="card" style="border: 2px solid var(--success-color);">
-                    <h3 style="color: var(--success-color);">Smart Data Export</h3>
+                    <h2 class="sub-title" style="color: var(--success-color);">Smart Data Export</h2>
                     <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Generates a CSV by
                         merging the cloud <strong>lovat_team_data.csv</strong> with all current <strong>Pit
                             Scouting</strong> entries.</p>
@@ -1425,7 +1444,7 @@
             <div id="owner-only-tools" class="owner-section hidden">
                 <h2 style="color:var(--admin-color); letter-spacing: 6px; font-size: 2rem;">OWNER CONTROLS</h2>
                 <div class="card">
-                    <h3>User Roles</h3>
+                    <h2 class="sub-title">User Roles</h2>
                     <p style="color:var(--text-muted); font-size: 1rem; margin-bottom: 25px;">Assign roles (Strategist,
                         Drive Coach, Admin) or initiate a global permission reset.</p>
                     <div id="user-admin-table"></div>
@@ -1440,8 +1459,8 @@
 
     <script>
         /* ==========================================================================
-                   GLOBAL APP CONFIGURATION
-                   ========================================================================== */
+           GLOBAL APP CONFIGURATION
+           ========================================================================== */
         const APP_CONFIG = {
             teamNumber: "141",
             teamName: "WOBOT",
@@ -1604,8 +1623,8 @@
         }
 
         /* ==========================================================================
-              YOUTUBE CINEMA MODAL ENGINE (TBA STYLE)
-              ========================================================================== */
+           YOUTUBE CINEMA MODAL ENGINE (TBA STYLE)
+           ========================================================================== */
         async function openMatchVideo(matchKey) {
             const modal = document.getElementById('video-modal');
             const statsContainer = document.getElementById('video-stats-container');
@@ -1635,7 +1654,6 @@
                 let redPred = predictAllianceScore(rTeamsKeys);
                 let bluePred = predictAllianceScore(bTeamsKeys);
 
-                // --- NEW: CLASSIC TBA HTML TABLE GENERATOR ---
                 let redBd = matchData.score_breakdown?.red || {};
                 let blueBd = matchData.score_breakdown?.blue || {};
 
@@ -1681,8 +1699,8 @@
                 let breakdownTableHtml = '';
                 if (matchData.score_breakdown) {
                     breakdownTableHtml = `
-                        <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-grey); margin-top: 20px; background: var(--field-bg);">
-                            <table style="width: 100%; border-collapse: collapse;">
+                        <div style="border-radius: 8px; overflow-x: auto; border: 1px solid var(--border-grey); margin-top: 20px; background: var(--field-bg); -webkit-overflow-scrolling: touch;">
+                            <table style="width: 100%; min-width: 350px; border-collapse: collapse;">
                                 <thead>
                                     <tr style="background: var(--card-grey); border-bottom: 2px solid var(--border-grey);">
                                         <th style="padding: 12px; color: #ff6b6b; width: 30%; text-align: center; border-right: 1px solid var(--border-grey);">RED</th>
@@ -1716,7 +1734,7 @@
 
                 statsContainer.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 10px;">
-                        <h3 style="margin:0; color:var(--text-white); font-size:1.2rem; border:none;">Official Match Results</h3>
+                        <h2 class="sub-title" style="margin:0; border:none;">Official Match Results</h2>
                     </div>
                     
                     <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-grey); background: #111; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
@@ -1734,7 +1752,7 @@
                     
                     ${breakdownTableHtml}
 
-                    <h3 style="margin:20px 0 10px 0; color:var(--admin-color); font-size:1.1rem; border:none;">Lovat Cloud Predictions</h3>
+                    <h2 class="sub-title" style="margin:20px 0 10px 0; color:var(--admin-color); border:none;">Lovat Cloud Predictions</h2>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div style="background:var(--field-bg); padding:15px; border-radius:8px; border-left: 4px solid var(--primary-color);">
                             <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:5px;">Red Expected</div>
@@ -1762,9 +1780,22 @@
                 videoContainer.innerHTML = '';
             }
         }
+
         /* ==========================================================================
-          FIELD VIEW PICKLIST MODAL
-          ========================================================================== */
+           MODAL CLOSING LOGIC (BUTTON & BACKGROUND CLICK)
+           ========================================================================== */
+        function closeMatchVideo() {
+            document.getElementById('video-modal').classList.remove('show');
+            document.getElementById('video-frame-container').innerHTML = '';
+        }
+
+        document.getElementById('video-modal').addEventListener('mousedown', function (event) {
+            if (event.target === this) closeMatchVideo();
+        });
+
+        /* ==========================================================================
+           FIELD VIEW PICKLIST MODAL
+           ========================================================================== */
         function openFieldView() {
             if (!picklistTableInstance) return;
             const data = picklistTableInstance.getData();
@@ -1787,32 +1818,9 @@
         function closeFieldView() {
             document.getElementById('field-view-modal').classList.remove('show');
         }
-        /* ==========================================================================
-           MODAL CLOSING LOGIC (BUTTON & BACKGROUND CLICK)
-           ========================================================================== */
 
-
-        function closeMatchVideo() {
-            document.getElementById('video-modal').classList.remove('show');
-            document.getElementById('video-frame-container').innerHTML = '';
-        }
-
-        // The "Click Off" listener for Match Video
-        document.getElementById('video-modal').addEventListener('mousedown', function (event) {
-            if (event.target === this) {
-                closeMatchVideo();
-            }
-        });
-
-        function closeFieldView() {
-            document.getElementById('field-view-modal').classList.remove('show');
-        }
-
-        // The "Click Off" listener for Field View
         document.getElementById('field-view-modal').addEventListener('mousedown', function (event) {
-            if (event.target === this) {
-                closeFieldView();
-            }
+            if (event.target === this) closeFieldView();
         });
 
         /* ==========================================================================
@@ -2308,7 +2316,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7); // Compress to 70% quality JPG
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                     callback(dataUrl);
                 }
                 img.src = event.target.result;
@@ -2323,7 +2331,7 @@
                     preview.src = base64;
                     preview.classList.remove('hidden');
                     document.getElementById('img-placeholder').classList.add('hidden');
-                    document.getElementById('f-photo-base64').value = base64; // Store compressed string
+                    document.getElementById('f-photo-base64').value = base64;
                     showToast("Photo optimized and ready.");
                 });
             }
@@ -2336,7 +2344,6 @@
             checkConnection();
         }
 
-        // Utility to convert base64 back to Blob for Supabase Storage
         function dataURItoBlob(dataURI) {
             var byteString = atob(dataURI.split(',')[1]);
             var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -2352,7 +2359,7 @@
                 const storagePath = `robot-photos/frc${payload.team_number}_${payload.event_key}_${Date.now()}.jpg`;
                 const { error: uploadError } = await sbClient.storage.from('scouting-data').upload(storagePath, blob, { contentType: 'image/jpeg' });
                 if (!uploadError) payload.image_url = sbClient.storage.from('scouting-data').getPublicUrl(storagePath).data.publicUrl;
-                delete payload.image_base64; // Remove heavy string before DB insert
+                delete payload.image_base64;
             }
             const { error: dbError } = await sbClient.from('pit_scouting').insert([payload]);
             if (dbError) throw dbError;
@@ -2548,11 +2555,11 @@
                                 ${actualScoreBanner}
                                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                                     <div style="background:rgba(230, 32, 32, 0.05); border: 2px solid ${redWinProj ? 'var(--primary-color)' : 'var(--border-light)'}; border-radius:8px; padding:15px;">
-                                        <h3 style="color:var(--primary-color); margin-bottom:15px;">RED ALLIANCE ${redWinProj ? ' (FAVORED)' : ''}</h3><div style="margin-bottom:15px;">${rStr}</div>
+                                        <h2 class="sub-title" style="color:var(--primary-color); margin-bottom:15px;">RED ALLIANCE ${redWinProj ? ' (FAVORED)' : ''}</h2><div style="margin-bottom:15px;">${rStr}</div>
                                         <div style="font-size:0.9rem; color:var(--text-muted); border-top: 2px dashed var(--border-light); padding-top: 10px;">Projected Total: <strong style="color:var(--text-white); font-size:1.2rem;">${redPred.score}</strong><br>Auto: ${redPred.auto} | Teleop: ${redPred.tele}</div>
                                     </div>
                                     <div style="background:rgba(59, 130, 246, 0.05); border: 2px solid ${blueWinProj ? 'var(--blue-alliance)' : 'var(--border-light)'}; border-radius:8px; padding:15px;">
-                                        <h3 style="color:var(--blue-alliance); margin-bottom:15px;">BLUE ALLIANCE ${blueWinProj ? ' (FAVORED)' : ''}</h3><div style="margin-bottom:15px;">${bStr}</div>
+                                        <h2 class="sub-title" style="color:var(--blue-alliance); margin-bottom:15px;">BLUE ALLIANCE ${blueWinProj ? ' (FAVORED)' : ''}</h2><div style="margin-bottom:15px;">${bStr}</div>
                                         <div style="font-size:0.9rem; color:var(--text-muted); border-top: 2px dashed var(--border-light); padding-top: 10px;">Projected Total: <strong style="color:var(--text-white); font-size:1.2rem;">${bluePred.score}</strong><br>Auto: ${bluePred.auto} | Teleop: ${bluePred.tele}</div>
                                     </div>
                                 </div>
@@ -2562,12 +2569,12 @@
                 let statsHtml = `
                     <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                         <div class="card" style="margin-bottom:0; padding: 20px; border-top: 4px solid var(--accent-color);">
-                            <h3 style="color:var(--accent-color); font-size:1rem; margin-bottom:5px;">WIN / LOSS RECORD</h3>
+                            <h2 class="sub-title" style="color:var(--accent-color); font-size:1rem; margin-bottom:5px;">WIN / LOSS RECORD</h2>
                             <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Projected Record:</span><span style="color:var(--text-white);">${projW} - ${projL} - ${projT}</span></div>
                             <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Actual Record:</span><span style="color:var(--text-white);">${actW} - ${actL} - ${actT}</span></div>
                         </div>
                         <div class="card" style="margin-bottom:0; padding: 20px; border-top: 4px solid var(--success-color);">
-                            <h3 style="color:var(--success-color); font-size:1rem; margin-bottom:5px;">SCHEDULE DIFFICULTY</h3>
+                            <h2 class="sub-title" style="color:var(--success-color); font-size:1rem; margin-bottom:5px;">SCHEDULE DIFFICULTY</h2>
                             <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Easiest Match:</span><span style="color:var(--success-color);">${easiestMatch} (+${maxDiff > 0 ? maxDiff.toFixed(1) : maxDiff.toFixed(1)})</span></div>
                             <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Hardest Match:</span><span style="color:var(--danger-color);">${hardestMatch} (${minDiff > 0 ? '+' + minDiff.toFixed(1) : minDiff.toFixed(1)})</span></div>
                         </div>
@@ -2605,14 +2612,20 @@
         function renderMasterRoster() {
             if (mainTableInstance) mainTableInstance.destroy();
             mainTableInstance = new Tabulator("#main-table", {
-                data: globalDataCache, layout: "fitColumns", pagination: "local", paginationSize: 15,
+                data: globalDataCache,
+                layout: "fitColumns",
+                responsiveLayout: "collapse",
+                responsiveLayoutCollapseStartOpen: false,
+                pagination: "local",
+                paginationSize: 15,
                 columns: [
-                    { title: "AVATAR", field: "team_number", width: 90, hozAlign: "center", formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" onerror="this.style.display='none'" style="height:40px;">` },
-                    { title: "TEAM", field: "team_number", headerFilter: "input", width: 100, sorter: "number", hozAlign: "center" },
-                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 1.5 },
-                    { title: "RANK", field: "rank", width: 80, hozAlign: "center", sorter: "number" },
+                    { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
+                    { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 0, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
+                    { title: "TEAM", field: "team_number", headerFilter: "input", width: 80, sorter: "number", hozAlign: "center", responsive: 0 },
+                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 0 },
+                    { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 2 },
                     {
-                        title: "LOVAT PTS", field: "lovat_points", width: 130, hozAlign: "center", sorter: "number",
+                        title: "LOVAT", field: "lovat_points", width: 90, hozAlign: "center", sorter: "number", responsive: 1,
                         formatter: (cell) => {
                             const val = cell.getValue();
                             if (val === undefined || val === null || val === "" || val == 0) return "-";
@@ -2621,21 +2634,21 @@
                             return `<span class="status-pill ${cls}">${numVal.toFixed(1)}</span>`;
                         }
                     },
-                    { title: "MATCH CLIMB", field: "match_climb", width: 130, hozAlign: "center" },
-                    { title: "PIT CLIMB", field: "pit_climb", width: 100, hozAlign: "center" },
-                    { title: "PIT STATUS", field: "id", hozAlign: "center", width: 120, formatter: (cell) => cell.getValue() ? "Yes" : "No" }
+                    { title: "MATCH CLIMB", field: "match_climb", width: 130, hozAlign: "center", responsive: 3 },
+                    { title: "PIT CLIMB", field: "pit_climb", width: 100, hozAlign: "center", responsive: 4 },
+                    { title: "DONE", field: "id", hozAlign: "center", width: 70, responsive: 2, formatter: "tickCross" }
                 ],
             });
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
         }
-
         async function launchDrillDownProfile(teamData) {
             activeProfileTeam = teamData.team_number;
-            switchView('view-detail'); switchDetailTab('overview');
+            switchView('view-detail');
+            switchDetailTab('overview');
             document.getElementById('detail-team-name').innerText = `TEAM ${teamData.team_number}: ${teamData.team_nickname ? teamData.team_nickname.toUpperCase() : 'UNKNOWN'}`;
 
             const mediaBox = document.getElementById('detail-image-box');
-            mediaBox.innerHTML = teamData.image_url ? `<img src="${teamData.image_url}" class="robot-photo">` : `<div id="img-placeholder">NO PHOTO AVAILABLE</div>`;
+            mediaBox.innerHTML = teamData.image_url ? `<img src="${teamData.image_url}" class="robot-photo" alt="Robot Photo">` : `<div id="img-placeholder">NO PHOTO AVAILABLE</div>`;
 
             document.getElementById('pit-stats-content').innerHTML = `
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">DRIVETRAIN: ${teamData.drivetrain || 'N/A'} (${teamData.drive_motor || 'N/A'})</div>
@@ -2683,7 +2696,7 @@
             if (matchTableInstance) matchTableInstance.destroy();
             let rawMatches = lovatMatchCache[teamData.team_number] || [];
 
-            // --- NEW: TBA API FALLBACK LOGIC WITH FUZZY MATCHER ---
+            // TBA API FALLBACK LOGIC WITH FUZZY MATCHER
             if (rawMatches.length === 0) {
                 document.getElementById('match-history-table').innerHTML = "<div style='padding:30px; text-align:center; color:var(--text-muted); font-weight:bold;'>Fetching TBA Fallback Data...</div>";
                 try {
@@ -2741,12 +2754,16 @@
                 }
             }
 
+            // MOBILE RESPONSIVE MATCH HISTORY
             matchTableInstance = new Tabulator("#match-history-table", {
                 data: rawMatches,
                 layout: "fitColumns",
+                responsiveLayout: "collapse",
+                responsiveLayoutCollapseStartOpen: false,
                 columns: [
+                    { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
                     {
-                        title: "MATCH", field: "match", width: 140, hozAlign: "center",
+                        title: "MATCH", field: "match", width: 120, hozAlign: "center", responsive: 0,
                         formatter: (cell) => {
                             const matchStr = cell.getValue();
                             if (!matchStr) return "-";
@@ -2759,14 +2776,36 @@
                                     </div>`;
                         }
                     },
-                    { title: "TOTAL PTS", field: "totalPoints", width: 110, hozAlign: "center" },
-                    { title: "AUTO PTS", field: "autoPoints", width: 110, hozAlign: "center" },
-                    { title: "TELEOP", field: "teleopPoints", width: 100, hozAlign: "center" },
-                    { title: "CLIMB", field: "endgameClimb", width: 120 },
-                    { title: "ACCURACY", field: "accuracy", width: 100 },
-                    { title: "DRIVER", field: "driverAbility", width: 90 },
-                    { title: "SCOUTER", field: "scouter", width: 120 },
-                    { title: "NOTES", field: "notes", widthGrow: 2, formatter: "textarea" }
+                    { title: "TOTAL", field: "totalPoints", width: 80, hozAlign: "center", responsive: 0 },
+                    { title: "AUTO", field: "autoPoints", width: 70, hozAlign: "center", responsive: 2 },
+                    { title: "TELEOP", field: "teleopPoints", width: 80, hozAlign: "center", responsive: 2 },
+                    { title: "CLIMB", field: "endgameClimb", width: 90, hozAlign: "center", responsive: 3 },
+                    { title: "ACCURACY", field: "accuracy", width: 100, hozAlign: "center", responsive: 4 },
+                    { title: "DRIVER", field: "driverAbility", width: 80, hozAlign: "center", responsive: 4 },
+                    { title: "SCOUTER", field: "scouter", width: 100, hozAlign: "center", responsive: 5 },
+                    {
+                        title: "SCOUTER NOTES", field: "notes", widthGrow: 3, minWidth: 280, responsive: 1,
+                        formatter: (cell) => {
+                            const val = cell.getValue();
+
+                            if (!val || val.trim() === "" || val === "-" || val.includes("Total Shift Pts: N/A")) {
+                                return `<span style="color:var(--text-muted); font-style:italic;">No notes recorded</span>`;
+                            }
+
+                            return `
+                                <div style="background: rgba(243, 156, 18, 0.1); 
+                                            padding: 12px; 
+                                            border-radius: 6px; 
+                                            border-left: 4px solid var(--accent-color); 
+                                            white-space: pre-wrap; 
+                                            font-size: 0.95rem; 
+                                            line-height: 1.5; 
+                                            text-align: left; 
+                                            color: var(--text-white); 
+                                            margin: 6px 0; 
+                                            word-break: break-word;">${val}</div>`;
+                        }
+                    }
                 ],
             });
         }
@@ -2811,7 +2850,7 @@
                     <div class="card responsive-pick-container" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
                         <div class="alliance-number" style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
                         <div style="flex:1.5; width:100%; display:flex; align-items:center; gap:10px; background:var(--field-bg); padding:10px; border-radius:8px; border:1px solid var(--border-grey);">
-                            <img src="https://www.thebluealliance.com/avatar/${year}/frc${capt.team_number}.png" onerror="this.style.display='none'" style="height:35px; border-radius:4px;">
+                            <img src="https://www.thebluealliance.com/avatar/${year}/frc${capt.team_number}.png" alt="Avatar" onerror="this.style.display='none'" style="height:35px; border-radius:4px;">
                             <div>
                                 <div style="font-weight:900; font-size:1.1rem; color:var(--text-white);">Team ${capt.team_number} <span style="font-size:0.7rem; color:var(--accent-color); text-transform:uppercase;">(Captain)</span></div>
                                 <div style="font-size:0.8rem; color:var(--text-muted);">Rank: ${capt.rank || '-'} | Lovat Pts: ${displayPts} | Climb: ${capt.match_climb || '-'}</div>
