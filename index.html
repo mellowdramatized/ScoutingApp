@@ -970,6 +970,16 @@
                 <div id="auth-error"
                     style="color:var(--primary-color); margin-top:25px; font-weight: 950; font-size: 1rem; min-height: 28px;">
                 </div>
+
+                <div
+                    style="margin-top: 20px; border-top: 1px solid var(--border-grey); padding-top: 25px; text-align: center;">
+                    <a href="src/guide.html" target="_blank"
+                        style="color: var(--text-muted); font-weight: 900; text-decoration: none; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.2s;"
+                        onmouseover="this.style.color='var(--accent-color)'"
+                        onmouseout="this.style.color='var(--text-muted)'">
+                        📖 View Sign In Guide
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -1099,7 +1109,6 @@
                             <option value="Easily drives UNDER the TRENCH">Easily drives UNDER the TRENCH (22.25"
                                 clearance)</option>
                             <option value="Can do BOTH seamlessly">Can do BOTH seamlessly</option>
-                            <option value="Flat ground only">Flat ground only</option>
                         </select>
                     </div>
 
@@ -1119,8 +1128,7 @@
                         <label>How does the robot score FUEL into the HUB?</label>
                         <select id="f-scoring">
                             <option value="High-speed Shooter">High-speed Shooter</option>
-                            <option value="High-volume Dumper">High-volume Dumper</option>
-                            <option value="Push & Low Score">Push & Low Score</option>
+                            <option value="High-volume Feeder">High-volume Feeder</option>
                             <option value="Do not score FUEL">Do not score FUEL</option>
                         </select>
                     </div>
@@ -1470,6 +1478,16 @@
             ownerEmailLock: "carmelokyles@gmail.com",
             defaultEventYear: "2026"
         };
+        /* ==========================================================================
+           FIRST-TIME VISITOR ROUTING
+           ========================================================================== */
+        // Check if this specific device has ever opened the dashboard before
+        if (!localStorage.getItem('wobot_has_visited')) {
+            // Drop the flag so they don't get caught in an infinite loop
+            localStorage.setItem('wobot_has_visited', 'true');
+            // Instantly route them to the Sign In Guide
+            window.location.href = 'src/index.html';
+        }
 
         function applyTeamBranding() {
             document.getElementById('app-window-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber} - ${APP_CONFIG.appTitle}`;
@@ -1932,13 +1950,19 @@
             } catch (e) {
                 console.error(e);
             } finally {
-                for (let key in localStorage) {
-                    if (key.startsWith('sb-') || key.startsWith('wobot_')) {
-                        localStorage.removeItem(key);
-                    }
-                }
+                // 1. Rescue the persistent UI flags before the nuke
+                const hasVisited = localStorage.getItem('wobot_has_visited');
+                const savedTheme = localStorage.getItem('wobot_theme');
+
+                // 2. Nuke all sensitive data and cached databases
                 localStorage.clear();
                 sessionStorage.clear();
+
+                // 3. Put the UI flags back
+                if (hasVisited) localStorage.setItem('wobot_has_visited', hasVisited);
+                if (savedTheme) localStorage.setItem('wobot_theme', savedTheme);
+
+                // 4. Reload to the clean login screen
                 window.location.href = 'index.html';
             }
         }
