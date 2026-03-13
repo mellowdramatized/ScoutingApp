@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="app-window-title">Loading Dashboard...</title>
+    <title id="app-window-title">Scouting Dashboard</title>
 
     <link id="tabulator-theme" href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_midnight.min.css"
         rel="stylesheet">
@@ -409,8 +409,7 @@
            ========================================================================== */
         .submit-btn,
         .owner-btn,
-        .sync-btn,
-        .register-btn {
+        .sync-btn {
             font-family: inherit;
             padding: 22px 35px;
             border: none;
@@ -450,19 +449,6 @@
             box-shadow: none;
         }
 
-        .register-btn {
-            background: var(--field-bg);
-            color: var(--text-muted);
-            border: 2px solid var(--border-light);
-            margin-top: 15px;
-        }
-
-        .register-btn:hover {
-            background: var(--border-grey);
-            color: var(--text-white);
-            transform: translateY(-2px);
-        }
-
         .owner-btn {
             background: var(--admin-color);
             margin-top: 30px;
@@ -485,24 +471,6 @@
         .sync-btn:hover {
             background: var(--accent-hover);
             transform: scale(1.05);
-        }
-
-        .toggle-auth-link {
-            color: var(--primary-color);
-            font-size: 0.85rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 25px;
-            padding: 10px;
-            transition: color 0.2s;
-        }
-
-        .toggle-auth-link:hover {
-            color: var(--text-white);
-            text-decoration: underline;
         }
 
         .image-container {
@@ -937,12 +905,14 @@
             <h1 id="auth-team-title" style="border:none; font-size: 4rem; margin-bottom: 0;">LOADING...</h1>
             <p
                 style="letter-spacing: 10px; color: var(--text-muted); margin-bottom: 50px; font-weight: 900; font-size: 1.2rem;">
-                SCOUTING DASHBOARD</p>
+                SCOUTING DASHBOARD
+            </p>
             <div class="scout-form" style="max-width:500px;" id="auth-form-container">
                 <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
                     <label>EMAIL ADDRESS</label>
                     <input type="email" id="email" placeholder="email@team.com" autocomplete="email">
                 </div>
+
                 <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
                     <label>PASSWORD</label>
                     <div style="position:relative; width:100%;">
@@ -952,21 +922,17 @@
                             style="position:absolute; right:20px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:0.9rem; font-weight:bold; color:var(--text-muted);">SHOW</span>
                     </div>
                 </div>
-                <div id="registration-fields" class="hidden"
-                    style="display:flex; flex-direction:column; gap:12px; text-align:left; margin-top: 10px; padding-top: 20px; border-top: 1px solid #333;">
-                    <label style="color: var(--accent-color);">TEAM CODE (NEW ACCOUNTS ONLY)</label>
-                    <input type="password" id="team-code" placeholder="Ask your Scouting Lead for the code">
+
+                <div
+                    style="display:flex; flex-direction:column; gap:12px; text-align:left; border-top: 2px dashed var(--border-grey); padding-top: 20px; margin-top: 10px;">
+                    <label style="color:var(--accent-color);">TEAM CODE (NEW SCOUTERS ONLY)</label>
+                    <input type="text" id="team-code" placeholder="Leave blank to log in">
                 </div>
+
                 <div id="login-controls" style="margin-top: 25px;">
-                    <button onclick="handleLogin()" class="submit-btn" id="login-trigger-btn">LOG IN</button>
-                    <span class="toggle-auth-link" onclick="toggleAuthMode('register')">NEED AN ACCOUNT? SIGN UP</span>
+                    <button onclick="handleAuth()" class="submit-btn" id="login-trigger-btn">ENTER DASHBOARD</button>
                 </div>
-                <div id="register-controls" class="hidden" style="margin-top: 25px;">
-                    <button onclick="handleRegistration()" class="register-btn" id="register-trigger-btn"
-                        style="color:white;">CREATE ACCOUNT</button>
-                    <span class="toggle-auth-link" onclick="toggleAuthMode('login')" style="color: var(--text-muted);">←
-                        RETURN TO LOGIN</span>
-                </div>
+
                 <div id="auth-error"
                     style="color:var(--primary-color); margin-top:25px; font-weight: 950; font-size: 1rem; min-height: 28px;">
                 </div>
@@ -977,7 +943,7 @@
                         style="color: var(--text-muted); font-weight: 900; text-decoration: none; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.2s;"
                         onmouseover="this.style.color='var(--accent-color)'"
                         onmouseout="this.style.color='var(--text-muted)'">
-                        📖 View Sign In Guide
+                        📖 View Scouter Training Guide
                     </a>
                 </div>
             </div>
@@ -1003,6 +969,12 @@
                         style="background:var(--accent-color); color:black; font-weight:900; padding:10px 20px; border-radius:8px; border:none;">
                         UPLOAD SAVED DATA (<span id="queue-count">0</span>)</button>
                 </div>
+
+                <a href="guide.html" target="_blank"
+                    style="background:transparent; border:2px solid var(--accent-color); color:var(--text-white); padding:12px 28px; border-radius:10px; font-weight:950; text-transform: uppercase; font-size: 0.85rem; text-decoration: none; display: flex; align-items: center; transition: var(--transition-smooth);"
+                    onmouseover="this.style.background='var(--accent-color)'; this.style.color='black';"
+                    onmouseout="this.style.background='transparent'; this.style.color='var(--text-white)';">TRAINING</a>
+
                 <button onclick="handleLogout()"
                     style="background:transparent; border:2px solid var(--border-light); color:var(--text-white); padding:12px 28px; cursor:pointer; border-radius:10px; font-weight:950; text-transform: uppercase; font-size: 0.85rem;">LOG
                     OUT</button>
@@ -1011,7 +983,8 @@
 
         <div class="nav-tabs">
             <button id="btn-tasks" class="nav-btn active" onclick="switchView('view-tasks')">My Teams</button>
-            <button id="btn-scout" class="nav-btn" onclick="switchView('view-scout')">Pit Scouting Form</button>
+            <button id="btn-scout" class="nav-btn" onclick="switchView('view-scout')">Pit Scouting</button>
+            <button id="btn-match-eval" class="nav-btn" onclick="switchView('view-match-eval')">Post-Match Eval</button>
             <button id="btn-roster" class="nav-btn hidden" onclick="switchView('view-roster')">Team Data</button>
             <button id="btn-schedule" class="nav-btn hidden" onclick="switchView('view-schedule')">Match
                 Predictor</button>
@@ -1038,6 +1011,11 @@
                     <div class="progress-container">
                         <div id="scout-progress-bar" class="progress-fill"></div>
                     </div>
+                </div>
+                <div class="card" style="margin-bottom:0; padding:25px; border-top: 4px solid var(--accent-color);">
+                    <h2 class="sub-title" style="color:var(--accent-color); font-size:1rem; margin-bottom:10px;">TOP 3
+                        SCOUTERS</h2>
+                    <div id="mini-leaderboard" style="display:flex; flex-direction:column; gap:8px;"></div>
                 </div>
             </div>
 
@@ -1104,6 +1082,7 @@
                             <option value="Easily drives UNDER the TRENCH">Easily drives UNDER the TRENCH (22.25"
                                 clearance)</option>
                             <option value="Can do BOTH seamlessly">Can do BOTH seamlessly</option>
+                            <option value="Flat ground only">Flat ground only</option>
                         </select>
                     </div>
 
@@ -1123,7 +1102,8 @@
                         <label>How does the robot score FUEL into the HUB?</label>
                         <select id="f-scoring">
                             <option value="High-speed Shooter">High-speed Shooter</option>
-                            <option value="High-volume Feeder">High-volume Feeder</option>
+                            <option value="High-volume Dumper">High-volume Dumper</option>
+                            <option value="Push & Low Score">Push & Low Score</option>
                             <option value="Do not score FUEL">Do not score FUEL</option>
                         </select>
                     </div>
@@ -1139,11 +1119,7 @@
                             Level 1 TOWER Climb?</label><select id="f-auton-climb">
                             <option value="No">No</option>
                             <option value="Yes">Yes</option>
-                        </select>
-                        <div style="display:flex; flex-direction:column; gap:8px;"><label>Does your robot use vision
-                                Alignment?</label><textarea id="f-proud" rows="3"
-                                placeholder="Record their response here..."></textarea></div>
-                    </div>
+                        </select></div>
 
                     <div class="form-section-header">SECTION 5: ENDGAME (THE TOWER)</div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
@@ -1179,10 +1155,57 @@
                     <div style="display:flex; gap:15px; margin-top: 20px;">
                         <button type="submit" class="submit-btn" id="sub-btn" style="flex: 2;">SUBMIT PIT
                             REPORT</button>
-                        <button type="button" onclick="saveDraft()" class="submit-btn"
+                        <button type="button" onclick="saveDraft('pit')" class="submit-btn"
                             style="flex: 1; background: var(--accent-color); color: black;">SAVE DRAFT</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <div id="view-match-eval" class="view-section hidden">
+            <h1>Post-Match Evaluation</h1>
+            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Qualitative scouting. We rely on
+                Lovat Cloud for fuel/climb counts. Use this to record driver skill, breakdowns, and strategy notes.</p>
+
+            <div class="scout-form" style="max-width: 800px; padding: 30px;">
+                <div style="display:flex; gap:15px; margin-bottom: 20px;">
+                    <div style="flex:1;"><label>Match #</label><input type="text" id="m-match" placeholder="e.g. QM12"
+                            style="font-size:1.5rem; text-align:center; font-weight:900;" required></div>
+                    <div style="flex:1;"><label>Team #</label><input type="number" id="m-team" placeholder="e.g. 141"
+                            style="font-size:1.5rem; text-align:center; font-weight:900;" required></div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <label>Driver Skill / Field Awareness</label>
+                    <select id="m-driver-skill">
+                        <option value="3">3 - Average</option>
+                        <option value="1">1 - Terrible / Disconnected</option>
+                        <option value="2">2 - Needs Improvement</option>
+                        <option value="4">4 - Good</option>
+                        <option value="5">5 - Exceptional</option>
+                    </select>
+                </div>
+
+                <div
+                    style="display:flex; align-items:center; gap:15px; background:var(--field-bg); padding:15px; border-radius:8px; border:1px solid var(--border-grey); margin-top: 10px;">
+                    <input type="checkbox" id="m-broke-down" style="width:25px; height:25px; cursor:pointer;">
+                    <label for="m-broke-down"
+                        style="margin:0; font-size:1rem; cursor:pointer; color:var(--danger-color);">ROBOT BROKE DOWN /
+                        DISABLED</label>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                    <label>Scouter Notes & Strategy</label>
+                    <textarea id="m-notes" rows="4"
+                        placeholder="How did they play? Did they play defense? Were they pushed around easily?"></textarea>
+                </div>
+
+                <div style="display:flex; gap:15px; margin-top: 20px;">
+                    <button type="button" onclick="handleMatchScoutSubmit()" class="submit-btn" id="sub-match-btn"
+                        style="flex: 2;">SUBMIT EVALUATION</button>
+                    <button type="button" onclick="saveDraft('match')" class="submit-btn"
+                        style="flex: 1; background: var(--accent-color); color: black;">SAVE DRAFT</button>
+                </div>
             </div>
         </div>
 
@@ -1466,27 +1489,25 @@
 
     <script>
         /* ==========================================================================
-           GLOBAL APP CONFIGURATION
+           FIRST-TIME VISITOR ROUTING
            ========================================================================== */
+        if (!localStorage.getItem('wobot_has_visited')) {
+            localStorage.setItem('wobot_has_visited', 'true');
+            window.location.href = 'guide.html';
+        }
+        /* ==========================================================================
+                   GLOBAL APP CONFIGURATION
+                   ========================================================================== */
         const APP_CONFIG = {
             teamNumber: "141",
             teamName: "WOBOT",
-            appTitle: "Scouting Dashboard",
+            appTitle: "Scouting Dashboard v8.0",
             supabaseUrl: 'https://gtmyuivkjtfxbswecrhz.supabase.co',
             supabaseAnonKey: 'sb_publishable_h6UZTcvyYUhJ6x4OeNwk8Q_ML3lPmRw',
             ownerEmailLock: "carmelokyles@gmail.com",
-            defaultEventYear: "2026"
+            defaultEventYear: "2026",
+            teamSignupCode: "wobot2026" // The secret code to authorize new accounts
         };
-        /* ==========================================================================
-           FIRST-TIME VISITOR ROUTING
-           ========================================================================== */
-        // Check if this specific device has ever opened the dashboard before
-        if (!localStorage.getItem('wobot_has_visited')) {
-            // Drop the flag so they don't get caught in an infinite loop
-            localStorage.setItem('wobot_has_visited', 'true');
-            // Instantly route them to the Sign In Guide
-            window.location.href = 'src/index.html';
-        }
 
         function applyTeamBranding() {
             document.getElementById('app-window-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber} - ${APP_CONFIG.appTitle}`;
@@ -1511,7 +1532,6 @@
             localStorage.setItem('wobot_theme', isLight ? 'light' : 'dark');
             document.getElementById('theme-btn').innerText = isLight ? '🌙' : '☀️';
 
-            // Swap tabulator CSS dynamically
             const themeLink = document.getElementById('tabulator-theme');
             if (isLight) {
                 themeLink.href = "https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css";
@@ -1526,16 +1546,11 @@
            ========================================================================== */
         let lovatTeamCache = {};
         let lovatMatchCache = {};
+        let wobotMatchData = [];
 
         let draftPicks = {
-            1: { p1: "", p2: "" },
-            2: { p1: "", p2: "" },
-            3: { p1: "", p2: "" },
-            4: { p1: "", p2: "" },
-            5: { p1: "", p2: "" },
-            6: { p1: "", p2: "" },
-            7: { p1: "", p2: "" },
-            8: { p1: "", p2: "" }
+            1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" },
+            5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" }
         };
 
         let activeProfileTeam = null;
@@ -1614,28 +1629,6 @@
             } else {
                 passField.type = 'password';
                 icon.innerText = 'SHOW';
-            }
-        }
-
-        function toggleAuthMode(mode) {
-            const loginControls = document.getElementById('login-controls');
-            const registerControls = document.getElementById('register-controls');
-            const regFields = document.getElementById('registration-fields');
-            const errorDiv = document.getElementById('auth-error');
-            errorDiv.innerText = "";
-
-            if (mode === 'register') {
-                loginControls.classList.add('hidden');
-                registerControls.classList.remove('hidden');
-                regFields.classList.remove('hidden');
-                document.getElementById('auth-form-container').style.border = '1px solid var(--accent-color)';
-                showToast("Switched to Account Creation");
-            } else {
-                registerControls.classList.add('hidden');
-                regFields.classList.add('hidden');
-                loginControls.classList.remove('hidden');
-                document.getElementById('auth-form-container').style.border = '1px solid var(--border-grey)';
-                showToast("Switched to Login");
             }
         }
 
@@ -1890,55 +1883,53 @@
         /* ==========================================================================
            AUTH
            ========================================================================== */
-        async function handleLogin() {
+        async function handleAuth() {
             const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value.trim();
+            const teamCode = document.getElementById('team-code').value.trim();
 
             if (!email || !password) return showToast("Missing credentials.");
 
-            document.getElementById('login-trigger-btn').innerText = "LOGGING IN...";
-            document.getElementById('auth-error').innerText = "";
+            const btn = document.getElementById('login-trigger-btn');
+            const errDiv = document.getElementById('auth-error');
+            btn.innerText = "AUTHENTICATING...";
+            errDiv.innerText = "";
 
-            const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                document.getElementById('auth-error').innerText = `Error: ${error.message}`;
-                document.getElementById('login-trigger-btn').innerText = "LOG IN";
-                showToast("Login failed.");
-            } else {
-                await bootApplication();
+            // SCENARIO 1: Returning User (No Team Code)
+            if (teamCode === "") {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    errDiv.innerText = "Login failed: Account not found or invalid password.";
+                    btn.innerText = "ENTER DASHBOARD";
+                    showToast("Login failed.");
+                } else {
+                    await bootApplication();
+                }
             }
-        }
+            // SCENARIO 2: New User Creation (Team Code Provided)
+            else {
+                if (teamCode !== APP_CONFIG.teamSignupCode) {
+                    errDiv.innerText = "Signup failed: Invalid Team Code.";
+                    btn.innerText = "ENTER DASHBOARD";
+                    return showToast("Invalid Team Code.");
+                }
 
-        async function handleRegistration() {
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const password = document.getElementById('password').value.trim();
-            const teamCodeInput = document.getElementById('team-code').value.trim();
+                // Try to create the new account
+                const { data, error } = await sbClient.auth.signUp({ email, password });
 
-            if (!email || !password || !teamCodeInput) return showToast("Missing credentials or team code.");
-
-            document.getElementById('register-trigger-btn').innerText = "VERIFYING CODE...";
-            document.getElementById('auth-error').innerText = "";
-
-            try {
-                const { data: codeData, error: codeError } = await sbClient.from('api_keys').select('key_value').eq('name', 'teamCode').single();
-                if (codeError || !codeData || codeData.key_value !== teamCodeInput) throw new Error("Invalid team code.");
-            } catch (err) {
-                document.getElementById('auth-error').innerText = `Database Error: ${err.message}`;
-                document.getElementById('register-trigger-btn').innerText = "CREATE ACCOUNT";
-                return showToast("Incorrect code.");
-            }
-
-            document.getElementById('register-trigger-btn').innerText = "CREATING ACCOUNT...";
-            const { data, error } = await sbClient.auth.signUp({ email: email, password: password });
-
-            if (error) {
-                document.getElementById('auth-error').innerText = `Registration Failed: ${error.message}`;
-                document.getElementById('register-trigger-btn').innerText = "CREATE ACCOUNT";
-                showToast("Account creation failed.");
-            } else {
-                showToast("Account Created.");
-                await bootApplication();
+                if (error) {
+                    // Graceful Fallback: If they accidentally typed the code but already have an account, just log them in!
+                    if (error.message.toLowerCase().includes("already registered")) {
+                        const loginAttempt = await sbClient.auth.signInWithPassword({ email, password });
+                        if (!loginAttempt.error) return await bootApplication();
+                    }
+                    errDiv.innerText = `Signup Error: ${error.message}`;
+                    btn.innerText = "ENTER DASHBOARD";
+                    showToast("Signup failed.");
+                } else {
+                    showToast("Account created successfully!");
+                    await bootApplication();
+                }
             }
         }
 
@@ -2102,11 +2093,16 @@
         async function refreshApplicationData() {
             setSyncState(true);
             try {
+                // Fetch Pit Data
                 const { data, error } = await sbClient.from('pit_scouting').select('*').eq('event_key', activeEventKey);
                 if (error) {
                     if (error.code === 'PGRST301' || error.message.toLowerCase().includes('jwt')) return;
                     throw error;
                 }
+
+                // Fetch Match Eval Data
+                const { data: matchDataRes } = await sbClient.from('match_scouting').select('*').eq('event_key', activeEventKey);
+                if (matchDataRes) wobotMatchData = matchDataRes;
 
                 const tbaMap = JSON.parse(localStorage.getItem('tbaCache') || '{}');
                 const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
@@ -2228,7 +2224,8 @@
             const activeView = document.getElementById(targetId);
             if (activeView) activeView.classList.remove('hidden');
 
-            const activeBtnId = 'btn-' + targetId.split('-')[1];
+            let activeBtnId = 'btn-' + targetId.split('-')[1];
+            if (targetId === 'view-match-eval') activeBtnId = 'btn-match-eval';
             if (document.getElementById(activeBtnId)) document.getElementById(activeBtnId).classList.add('active');
 
             if (targetId === 'view-roster') setTimeout(() => { renderMasterRoster(); }, 50);
@@ -2260,7 +2257,6 @@
             const list = document.getElementById('tasks-list');
             const { data: assignments } = await sbClient.from('scout_assignments').select('*').eq('event_key', activeEventKey);
 
-            // Build Mini-Leaderboard for Scouter Dashboard
             if (assignments) {
                 const compCounts = {};
                 assignments.filter(a => a.completed).forEach(a => {
@@ -2377,16 +2373,24 @@
         }
 
         async function processPayloadUpload(payload) {
-            if (payload.image_base64) {
-                const blob = dataURItoBlob(payload.image_base64);
-                const storagePath = `robot-photos/frc${payload.team_number}_${payload.event_key}_${Date.now()}.jpg`;
+            let table = payload.payload_type === 'match' ? 'match_scouting' : 'pit_scouting';
+            let dataToInsert = { ...payload };
+            delete dataToInsert.payload_type;
+
+            if (dataToInsert.image_base64) {
+                const blob = dataURItoBlob(dataToInsert.image_base64);
+                const storagePath = `robot-photos/frc${dataToInsert.team_number}_${dataToInsert.event_key}_${Date.now()}.jpg`;
                 const { error: uploadError } = await sbClient.storage.from('scouting-data').upload(storagePath, blob, { contentType: 'image/jpeg' });
-                if (!uploadError) payload.image_url = sbClient.storage.from('scouting-data').getPublicUrl(storagePath).data.publicUrl;
-                delete payload.image_base64;
+                if (!uploadError) dataToInsert.image_url = sbClient.storage.from('scouting-data').getPublicUrl(storagePath).data.publicUrl;
+                delete dataToInsert.image_base64;
             }
-            const { error: dbError } = await sbClient.from('pit_scouting').insert([payload]);
+
+            const { error: dbError } = await sbClient.from(table).insert([dataToInsert]);
             if (dbError) throw dbError;
-            await sbClient.from('scout_assignments').update({ completed: true }).eq('scouter_email', payload.scouter_name).eq('team_number', payload.team_number).eq('event_key', payload.event_key);
+
+            if (table === 'pit_scouting') {
+                await sbClient.from('scout_assignments').update({ completed: true }).eq('scouter_email', dataToInsert.scouter_name).eq('team_number', dataToInsert.team_number).eq('event_key', dataToInsert.event_key);
+            }
         }
 
         async function uploadOfflineData() {
@@ -2410,8 +2414,10 @@
             }
         }
 
-        function getFormData() {
+        /* --- PIT SCOUTING LOGIC --- */
+        function getPitFormData() {
             return {
+                payload_type: 'pit',
                 team_number: document.getElementById('f-team').value,
                 event_key: activeEventKey,
                 team_nickname: document.getElementById('f-nickname').value,
@@ -2436,17 +2442,25 @@
             };
         }
 
-        function saveDraft() {
-            const draftData = getFormData();
-            draftData.is_draft = true;
-            saveToOfflineQueue(draftData);
-            showToast("Draft saved locally.");
+        function saveDraft(type) {
+            if (type === 'pit') {
+                const draftData = getPitFormData();
+                draftData.is_draft = true;
+                saveToOfflineQueue(draftData);
+                showToast("Pit Draft saved locally.");
+            } else if (type === 'match') {
+                const draftData = getMatchFormData();
+                saveToOfflineQueue(draftData);
+                showToast("Evaluation Draft saved locally.");
+                resetMatchForm();
+                switchView('view-tasks');
+            }
         }
 
         async function handleScoutSubmit(event) {
             event.preventDefault();
             const submitBtn = document.getElementById('sub-btn');
-            const payload = getFormData();
+            const payload = getPitFormData();
 
             if (!isOnline) {
                 saveToOfflineQueue(payload);
@@ -2475,6 +2489,66 @@
                 document.getElementById('f-photo-base64').value = "";
                 document.getElementById('robot-photo-preview').classList.add('hidden');
                 document.getElementById('img-placeholder').classList.remove('hidden');
+                refreshApplicationData();
+                switchView('view-tasks');
+            }
+        }
+
+        /* --- MATCH EVALUATION LOGIC --- */
+        function getMatchFormData() {
+            return {
+                payload_type: 'match',
+                event_key: activeEventKey,
+                match_number: document.getElementById('m-match').value.trim(),
+                team_number: document.getElementById('m-team').value,
+                scouter_name: currentUser,
+                auto_fuel: 0,
+                teleop_fuel: 0,
+                endgame_climb: 'None',
+                driver_skill: parseInt(document.getElementById('m-driver-skill').value) || 3,
+                broke_down: document.getElementById('m-broke-down').checked,
+                notes: document.getElementById('m-notes').value,
+                created_at: new Date().toISOString()
+            };
+        }
+
+        function resetMatchForm() {
+            document.getElementById('m-match').value = "";
+            document.getElementById('m-team').value = "";
+            document.getElementById('m-driver-skill').value = "3";
+            document.getElementById('m-broke-down').checked = false;
+            document.getElementById('m-notes').value = "";
+        }
+
+        async function handleMatchScoutSubmit() {
+            const submitBtn = document.getElementById('sub-match-btn');
+            const payload = getMatchFormData();
+
+            if (!payload.match_number || !payload.team_number) return showToast("Match Number and Team Number are required.");
+
+            if (!isOnline) {
+                saveToOfflineQueue(payload);
+                showToast("Evaluation saved to device memory.");
+                resetMatchForm();
+                switchView('view-tasks');
+                return;
+            }
+
+            submitBtn.innerText = "SUBMITTING...";
+            submitBtn.disabled = true;
+            setSyncState(true);
+
+            try {
+                await processPayloadUpload(payload);
+                showToast("Evaluation submitted successfully.");
+            } catch (err) {
+                showToast(`Submission error: ${err.message}`);
+                saveToOfflineQueue(payload);
+            } finally {
+                setSyncState(false);
+                submitBtn.innerText = "SUBMIT EVALUATION";
+                submitBtn.disabled = false;
+                resetMatchForm();
                 refreshApplicationData();
                 switchView('view-tasks');
             }
@@ -2664,6 +2738,7 @@
             });
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
         }
+
         async function launchDrillDownProfile(teamData) {
             activeProfileTeam = teamData.team_number;
             switchView('view-detail');
@@ -2717,69 +2792,126 @@
             }
 
             if (matchTableInstance) matchTableInstance.destroy();
-            let rawMatches = lovatMatchCache[teamData.team_number] || [];
+            let finalMatchLog = [];
 
-            // TBA API FALLBACK LOGIC WITH FUZZY MATCHER
-            if (rawMatches.length === 0) {
-                document.getElementById('match-history-table').innerHTML = "<div style='padding:30px; text-align:center; color:var(--text-muted); font-weight:bold;'>Fetching TBA Fallback Data...</div>";
+            document.getElementById('match-history-table').innerHTML = "<div style='padding:30px; text-align:center; color:var(--text-muted); font-weight:bold;'>Syncing WOBOT, Lovat, & TBA Data...</div>";
+
+            try {
+                // Pull raw data
+                let localEvals = wobotMatchData.filter(m => parseInt(m.team_number) === parseInt(teamData.team_number));
+                let cloudMatches = lovatMatchCache[teamData.team_number] || [];
+                let tbaMatches = [];
+
+                // Attempt to fetch TBA Data (Silent fail if empty)
                 try {
                     const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
-                    const res = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamData.team_number}/event/${activeEventKey}/matches`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-
-                    if (res.ok) {
-                        const tbaMatches = await res.json();
-                        rawMatches = tbaMatches.filter(m => m.score_breakdown).map(m => {
-                            let isRed = m.alliances.red.team_keys.includes('frc' + teamData.team_number);
-                            let alliance = isRed ? 'red' : 'blue';
-                            let bd = m.score_breakdown[alliance];
-
-                            const findVal = (b, keywords) => {
-                                if (!b) return '-';
-                                for (let kw of keywords) { if (b[kw] !== undefined && b[kw] !== null) return b[kw]; }
-                                let keys = Object.keys(b);
-                                for (let kw of keywords) {
-                                    let match = keys.find(k => k.toLowerCase().includes(kw.toLowerCase()));
-                                    if (match) return b[match];
-                                }
-                                return '-';
-                            };
-
-                            let robotIndex = m.alliances[alliance].team_keys.indexOf('frc' + teamData.team_number) + 1;
-
-                            let climbStat = findVal(bd, [`endgameRobot${robotIndex}`, `robot${robotIndex}Endgame`, `endgameStatus${robotIndex}`]);
-                            let autoPts = findVal(bd, ['totalAuto', 'autoPoints', 'autoScore']);
-                            let teleopPts = findVal(bd, ['totalTeleop', 'teleopPoints', 'teleopHub', 'teleopFuel']);
-                            let rpPts = findVal(bd, ['rp', 'rankingPoints']);
-
-                            return {
-                                match: m.comp_level + m.match_number,
-                                totalPoints: m.alliances[alliance].score,
-                                autoPoints: autoPts,
-                                teleopPoints: teleopPts,
-                                endgameClimb: climbStat,
-                                accuracy: "TBA Fallback",
-                                driverAbility: "-",
-                                scouter: "TBA API",
-                                notes: `RP Earned: +${rpPts}`
-                            };
-                        });
-
-                        const levelOrder = { 'qm': 1, 'ef': 2, 'qf': 3, 'sf': 4, 'f': 5 };
-                        rawMatches.sort((a, b) => {
-                            let aLvl = a.match.replace(/[0-9]/g, ''); let bLvl = b.match.replace(/[0-9]/g, '');
-                            let aNum = parseInt(a.match.replace(/[^0-9]/g, '')); let bNum = parseInt(b.match.replace(/[^0-9]/g, ''));
-                            if (levelOrder[aLvl] !== levelOrder[bLvl]) return levelOrder[aLvl] - levelOrder[bLvl];
-                            return aNum - bNum;
-                        });
+                    if (tbaKey && tbaKey.key_value) {
+                        const res = await fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamData.team_number}/event/${activeEventKey}/matches`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
+                        if (res.ok) tbaMatches = await res.json();
                     }
-                } catch (e) {
-                    console.error("TBA fallback failed", e);
-                }
+                } catch (e) { console.warn("TBA fetch skipped or failed."); }
+
+                // Standardize Match Strings (QM, SF, F)
+                const standardizeMatchKey = (rawStr) => {
+                    if (!rawStr) return "unknown";
+                    let s = rawStr.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (/^\d+$/.test(s)) s = 'qm' + s; // If just a number, assume QM
+                    if (s.startsWith('q') && !s.startsWith('qm') && !s.startsWith('qf')) s = s.replace('q', 'qm');
+                    if (s.startsWith('qf') || s.startsWith('ef')) s = s.replace(/^(qf|ef)/, 'sf');
+                    return s;
+                };
+
+                // Create a master set of all unique matches from ALL sources
+                let uniqueMatchKeys = new Set();
+                tbaMatches.forEach(m => uniqueMatchKeys.add(standardizeMatchKey(m.comp_level + m.match_number)));
+                localEvals.forEach(w => uniqueMatchKeys.add(standardizeMatchKey(w.match_number)));
+                cloudMatches.forEach(c => uniqueMatchKeys.add(standardizeMatchKey(c.match)));
+
+                // Build the table rows by iterating over the unique keys, NOT TBA
+                finalMatchLog = Array.from(uniqueMatchKeys).map(matchKey => {
+
+                    let tMatch = tbaMatches.find(m => standardizeMatchKey(m.comp_level + m.match_number) === matchKey);
+                    let wEval = localEvals.find(w => standardizeMatchKey(w.match_number) === matchKey);
+                    let lMatch = cloudMatches.find(l => standardizeMatchKey(l.match) === matchKey);
+
+                    let isRed = tMatch && tMatch.alliances && tMatch.alliances.red && tMatch.alliances.red.team_keys.includes('frc' + teamData.team_number);
+                    let alliance = isRed ? 'red' : 'blue';
+                    let bd = (tMatch && tMatch.score_breakdown && tMatch.score_breakdown[alliance]) ? tMatch.score_breakdown[alliance] : null;
+                    let robotIndex = (tMatch && tMatch.alliances && tMatch.alliances[alliance]) ? tMatch.alliances[alliance].team_keys.indexOf('frc' + teamData.team_number) + 1 : 1;
+                    let totalPts = (tMatch && tMatch.alliances && tMatch.alliances[alliance]) ? tMatch.alliances[alliance].score : -1;
+
+                    const findVal = (b, keywords) => {
+                        if (!b) return '-';
+                        for (let kw of keywords) { if (b[kw] !== undefined && b[kw] !== null) return b[kw]; }
+                        let keys = Object.keys(b);
+                        for (let kw of keywords) {
+                            let match = keys.find(k => k.toLowerCase().includes(kw.toLowerCase()));
+                            if (match) return b[match];
+                        }
+                        return '-';
+                    };
+
+                    // QUANTITATIVE 
+                    let autoPts = lMatch ? (lMatch.autoPoints || '-') : findVal(bd, ['totalAuto', 'autoPoints', 'autoScore']);
+                    let telePts = lMatch ? (lMatch.teleopPoints || '-') : findVal(bd, ['totalTeleop', 'teleopPoints', 'teleopHub', 'teleopFuel']);
+                    let climb = lMatch ? (lMatch.endgameClimb || '-') : findVal(bd, [`endgameRobot${robotIndex}`, `robot${robotIndex}Endgame`, `endgameStatus${robotIndex}`]);
+
+                    // QUALITATIVE 
+                    let accuracy = bd ? "TBA Data" : "Unscored/Pending";
+                    let driverAbility = "-";
+                    let scouter = bd ? "TBA API" : "TBA Schedule";
+                    let combinedNotes = "No manual scouting data recorded for this match.";
+
+                    if (!tMatch && !lMatch && wEval) {
+                        accuracy = "Manual Entry";
+                        scouter = "★ WOBOT";
+                    }
+
+                    if (wEval || lMatch) {
+                        if (wEval) {
+                            scouter = "★ " + wEval.scouter_name.split('@')[0];
+                            accuracy = wEval.broke_down ? "BROKEN" : "Active";
+                            driverAbility = wEval.driver_skill + "/5";
+                            combinedNotes = wEval.notes ? `★ WOBOT: ${wEval.notes}` : "No WOBOT notes.";
+                            if (lMatch && lMatch.notes) combinedNotes += `\n☁ Lovat: ${lMatch.notes}`;
+                        } else if (lMatch) {
+                            scouter = "☁ Lovat";
+                            accuracy = lMatch.accuracy ? lMatch.accuracy + "%" : "-";
+                            driverAbility = lMatch.driverAbility || "-";
+                            combinedNotes = lMatch.notes ? `☁ Lovat: ${lMatch.notes}` : "No notes.";
+                        }
+                    }
+
+                    return {
+                        match: matchKey.toUpperCase(),
+                        totalPoints: totalPts, autoPoints: autoPts, teleopPoints: telePts,
+                        endgameClimb: climb, accuracy: accuracy, driverAbility: driverAbility,
+                        scouter: scouter, notes: combinedNotes
+                    };
+                });
+
+                // STRICT SORTING (qm -> sf -> f)
+                const levelOrder = { 'qm': 1, 'sf': 2, 'f': 3 };
+                finalMatchLog.sort((a, b) => {
+                    let aLvl = a.match.toLowerCase().replace(/[0-9]/g, '');
+                    let bLvl = b.match.toLowerCase().replace(/[0-9]/g, '');
+                    let aNum = parseInt(a.match.replace(/[^0-9]/g, '')) || 0;
+                    let bNum = parseInt(b.match.replace(/[^0-9]/g, '')) || 0;
+
+                    let aOrder = levelOrder[aLvl] || 99;
+                    let bOrder = levelOrder[bLvl] || 99;
+
+                    if (aOrder !== bOrder) return aOrder - bOrder;
+                    return aNum - bNum;
+                });
+
+            } catch (e) {
+                console.error("Hybrid merge failed", e);
             }
 
             // MOBILE RESPONSIVE MATCH HISTORY
             matchTableInstance = new Tabulator("#match-history-table", {
-                data: rawMatches,
+                data: finalMatchLog,
                 layout: "fitColumns",
                 responsiveLayout: "collapse",
                 responsiveLayoutCollapseStartOpen: false,
@@ -2791,7 +2923,6 @@
                             const matchStr = cell.getValue();
                             if (!matchStr) return "-";
                             let formattedMatchCode = matchStr.trim().toLowerCase().replace(/\s+/g, '');
-                            formattedMatchCode = formattedMatchCode.replace(/^q(\d+)/, 'qm$1');
                             const matchKey = `${activeEventKey}_${formattedMatchCode}`;
                             return `<div style="display:flex; gap: 8px; align-items:center; justify-content:center;">
                                         <a href="https://www.thebluealliance.com/match/${matchKey}" target="_blank" style="color:var(--text-white); font-weight:bold; text-decoration:none;">${matchStr.toUpperCase()} 🔗</a>
@@ -2805,7 +2936,7 @@
                     { title: "CLIMB", field: "endgameClimb", width: 90, hozAlign: "center", responsive: 3 },
                     { title: "ACCURACY", field: "accuracy", width: 100, hozAlign: "center", responsive: 4 },
                     { title: "DRIVER", field: "driverAbility", width: 80, hozAlign: "center", responsive: 4 },
-                    { title: "SCOUTER", field: "scouter", width: 100, hozAlign: "center", responsive: 5 },
+                    { title: "SCOUTER", field: "scouter", width: 120, hozAlign: "center", responsive: 5 },
                     {
                         title: "SCOUTER NOTES", field: "notes", widthGrow: 3, minWidth: 280, responsive: 1,
                         formatter: (cell) => {
@@ -2815,11 +2946,13 @@
                                 return `<span style="color:var(--text-muted); font-style:italic;">No notes recorded</span>`;
                             }
 
+                            let isWarning = val.includes("⚠️") || val.includes("BROKEN");
+
                             return `
-                                <div style="background: rgba(243, 156, 18, 0.1); 
+                                <div style="background: ${isWarning ? 'rgba(220, 53, 69, 0.1)' : 'rgba(243, 156, 18, 0.1)'}; 
                                             padding: 12px; 
                                             border-radius: 6px; 
-                                            border-left: 4px solid var(--accent-color); 
+                                            border-left: 4px solid ${isWarning ? 'var(--danger-color)' : 'var(--accent-color)'}; 
                                             white-space: pre-wrap; 
                                             font-size: 0.95rem; 
                                             line-height: 1.5; 
@@ -2832,6 +2965,9 @@
                 ],
             });
         }
+
+
+
         function saveStrategistNote() {
             if (!activeProfileTeam) return;
             const note = document.getElementById('strategist-notes-input').value;
@@ -2948,7 +3084,7 @@
                 columns: [
                     { rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 },
                     { title: "Team", field: "team_number", width: 80 },
-                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue()).toFixed(1), width: 80 },
+                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1) },
                     { title: "Rank", field: "rank", width: 70 }
                 ]
             });
@@ -3236,6 +3372,73 @@
             if (!confirm("Reset all user permissions?")) return;
             await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK);
             loadUserAdminTable();
+        }
+
+        async function exportMergedLovatData() {
+            if (Object.keys(lovatTeamCache).length === 0) return showToast("No Lovat data to export.");
+
+            try {
+                const { data: pitData } = await sbClient.from('pit_scouting').select('*').eq('event_key', activeEventKey);
+
+                let csvContent = "data:text/csv;charset=utf-8,";
+
+                // Get Lovat headers dynamically
+                let sampleTeam = Object.keys(lovatTeamCache)[0];
+                let lovatHeaders = Object.keys(lovatTeamCache[sampleTeam]);
+
+                // Define Pit headers
+                let pitHeaders = ["Wobot_Nickname", "Wobot_Drivetrain", "Wobot_Motor", "Wobot_Terrain", "Wobot_Intake", "Wobot_Capacity", "Wobot_Scoring", "Wobot_Auton_Start", "Wobot_Auton_Fuel", "Wobot_Auton_Climb", "Wobot_Max_Climb", "Wobot_Climb_Speed", "Wobot_Proud_Features", "Wobot_Pitch", "Wobot_Vulnerabilities", "Wobot_Scouter"];
+
+                csvContent += lovatHeaders.join(",") + "," + pitHeaders.join(",") + "\r\n";
+
+                // Iterate through Lovat teams and append Pit data
+                Object.keys(lovatTeamCache).forEach(teamNum => {
+                    let row = [];
+                    let lData = lovatTeamCache[teamNum];
+
+                    // Add Lovat columns
+                    lovatHeaders.forEach(h => row.push(`"${(lData[h] || '').replace(/"/g, '""')}"`));
+
+                    // Find WOBOT pit data
+                    let pData = (pitData || []).find(p => p.team_number === parseInt(teamNum));
+
+                    if (pData) {
+                        row.push(`"${(pData.team_nickname || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.drivetrain || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.drive_motor || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.terrain_nav || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.intake_loc || '').replace(/"/g, '""')}"`);
+                        row.push(`"${pData.fuel_capacity || 0}"`);
+                        row.push(`"${(pData.scoring_method || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.auton_start || '').replace(/"/g, '""')}"`);
+                        row.push(`"${pData.auton_fuel || 0}"`);
+                        row.push(`"${(pData.auton_climb || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.max_climb || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.climb_speed || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.proud_features || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.strategic_pitch || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.vulnerabilities || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.scouter_name || '').replace(/"/g, '""')}"`);
+                    } else {
+                        pitHeaders.forEach(() => row.push('""'));
+                    }
+
+                    csvContent += row.join(",") + "\r\n";
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `WOBOT_Merged_Lovat_Data_${activeEventKey}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast("Merged Data Exported Successfully.");
+            } catch (e) {
+                console.error("Export failed", e);
+                showToast("Failed to generate export.");
+            }
         }
 
         function downloadRosterCSV() {
