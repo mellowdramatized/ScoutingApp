@@ -1918,7 +1918,7 @@
             errDiv.innerText = "";
 
             // SCENARIO 1: Returning User (No Team Code)
-            if (teamCode === "") {
+            if (teamCode.toLowerCase() === "") {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
                 if (error) {
                     errDiv.innerText = "Login failed: Account not found or invalid password.";
@@ -1930,7 +1930,7 @@
             }
             // SCENARIO 2: New User Creation (Team Code Provided)
             else {
-                if (teamCode !== APP_CONFIG.teamSignupCode) {
+                if (teamCode.toLowerCase() !== APP_CONFIG.teamSignupCode) {
                     errDiv.innerText = "Signup failed: Invalid Team Code.";
                     btn.innerText = "ENTER DASHBOARD";
                     return showToast("Invalid Team Code.");
@@ -2576,9 +2576,6 @@
             }
         }
 
-        /* ==========================================================================
-           MATCH PREDICTOR (LOVAT DRIVEN)
-           ========================================================================== */
         function predictAllianceScore(allianceTeamKeys) {
             let score = 0; let auto = 0; let tele = 0;
             allianceTeamKeys.forEach(teamKey => {
@@ -2736,15 +2733,15 @@
                 responsiveLayout: "collapse",
                 responsiveLayoutCollapseStartOpen: false,
                 pagination: "local",
-                paginationSize: 15,
+                paginationSize: 24,
                 columns: [
                     { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
                     { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 0, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
                     { title: "TEAM", field: "team_number", headerFilter: "input", width: 80, sorter: "number", hozAlign: "center", responsive: 0 },
                     { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 0 },
-                    { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 2 },
+                    { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 1 },
                     {
-                        title: "LOVAT", field: "lovat_points", width: 90, hozAlign: "center", sorter: "number", responsive: 1,
+                        title: "LOVAT", field: "lovat_points", width: 90, hozAlign: "center", sorter: "number", responsive: 2,
                         formatter: (cell) => {
                             const val = cell.getValue();
                             if (val === undefined || val === null || val === "" || val == 0) return "-";
@@ -3122,8 +3119,8 @@
                     { rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 },
                     { title: "#", formatter: "rownum", width: 50, hozAlign: "center" },
                     { title: "Team", field: "team_number", width: 80 },
-                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1) },
-                    { title: "Climb", field: "pit_climb" }
+                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1), width: 80 },
+                    { title: "Climb", field: "pit_climb", width: 80  }
                 ]
             });
 
