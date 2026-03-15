@@ -1304,7 +1304,7 @@
         <div id="view-detail" class="view-section hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                 <h1 id="detail-team-name" style="border:none; margin:0;">TEAM PROFILE</h1>
-                <button class="nav-btn" onclick="switchView('view-roster')">RETURN</button>
+                <button class="nav-btn" onclick="handleProfileReturn()">RETURN</button>
             </div>
 
             <div style="margin-bottom: 35px; border-bottom: 2px solid var(--border-grey); display: flex; gap: 15px;">
@@ -1351,7 +1351,7 @@
                             <h2 class="sub-title" style="color: var(--danger-color);">Strategist Overrides</h2>
                             <textarea id="strategist-notes-input" rows="3"
                                 style="width:100%; padding:15px; border-radius:8px; background:var(--field-bg); border:1px solid var(--danger-color); color:var(--text-white); font-weight:bold; font-size:1.1rem;"
-                                placeholder="Add custom War Room notes here (e.g. Broken intake, do not pick)"></textarea>
+                                placeholder="Add notes here (e.g. Broken intake, do not pick)"></textarea>
                             <button onclick="saveStrategistNote()" class="submit-btn"
                                 style="width:auto; margin-top:10px; background:var(--danger-color); padding:10px 20px; font-size:0.85rem;">SAVE
                                 OVERRIDE</button>
@@ -2591,7 +2591,6 @@
         }
 
         let currentScheduleMatches = [];
-
         async function loadTeamSchedule() {
             let targetTeam = document.getElementById('predictor-team-input').value || APP_CONFIG.teamNumber;
             const container = document.getElementById('schedule-container');
@@ -2654,11 +2653,28 @@
                     let redWinProj = parseFloat(redPred.score) > parseFloat(bluePred.score);
                     let blueWinProj = parseFloat(bluePred.score) > parseFloat(redPred.score);
 
+                    // UPDATED: Make team numbers clickable for Drill-Down
                     const getContribStr = (keys) => keys.map(t => {
                         let num = t.replace('frc', '');
                         let pts = lovatTeamCache[num] ? Number(lovatTeamCache[num].avgTotalPoints || 0).toFixed(1) : '-';
                         let isTarget = num === targetTeam.toString();
-                        return `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid var(--border-grey); padding-bottom:4px; ${isTarget ? 'color:var(--text-white); font-weight:900;' : 'color:var(--text-muted);'}"><span>${isTarget ? '► ' : ''}Team ${num}</span><span style="color:var(--accent-color); font-weight:bold;">${pts} pts</span></div>`;
+
+                        let cachedTeam = globalDataCache.find(d => d.team_number === parseInt(num));
+                        let teamObjStr = "null";
+
+                        if (cachedTeam) {
+                            teamObjStr = JSON.stringify(cachedTeam).replace(/"/g, '&quot;');
+                        } else {
+                            // Provide fallback struct if team hasn't been pit scouted
+                            teamObjStr = JSON.stringify({ team_number: num, team_nickname: "Unknown", rank: "-", lovat_points: pts }).replace(/"/g, '&quot;');
+                        }
+
+                        return `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid var(--border-grey); padding-bottom:4px; ${isTarget ? 'color:var(--text-white); font-weight:900;' : 'color:var(--text-muted);'}">
+                            <span onclick="triggerScheduleDrillDown(${teamObjStr})" style="cursor:pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-color)'" onmouseout="this.style.color='${isTarget ? 'var(--text-white)' : 'var(--text-muted)'}'">
+                                ${isTarget ? '► ' : ''}Team ${num}
+                            </span>
+                            <span style="color:var(--accent-color); font-weight:bold;">${pts} pts</span>
+                        </div>`;
                     }).join('');
 
                     let rStr = getContribStr(redTeams);
@@ -2736,10 +2752,10 @@
                 paginationSize: 24,
                 columns: [
                     { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
-                    { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 0, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
+                    { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 1, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
                     { title: "TEAM", field: "team_number", headerFilter: "input", width: 80, sorter: "number", hozAlign: "center", responsive: 0 },
-                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 0 },
-                    { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 1 },
+                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 2 },
+                    { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 0 },
                     {
                         title: "LOVAT", field: "lovat_points", width: 90, hozAlign: "center", sorter: "number", responsive: 2,
                         formatter: (cell) => {
@@ -2756,6 +2772,30 @@
                 ],
             });
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
+        }
+
+        function triggerScheduleDrillDown(teamData) {
+            if (!teamData) return showToast("Team data not fully loaded yet.");
+
+            // Save our current view and scroll position so we can return exactly here
+            returnViewOverride = 'view-schedule';
+            returnScrollPos = window.scrollY;
+
+            // Use existing drill-down function
+            launchDrillDownProfile(teamData);
+        }
+
+        function handleProfileReturn() {
+            if (returnViewOverride === 'view-schedule') {
+                switchView('view-schedule');
+                // Restore scroll position slightly after rendering
+                setTimeout(() => {
+                    window.scrollTo({ top: returnScrollPos, behavior: 'instant' });
+                    returnViewOverride = null; // Reset it
+                }, 50);
+            } else {
+                switchView('view-roster'); // Default behavior
+            }
         }
 
         async function launchDrillDownProfile(teamData) {
@@ -3120,7 +3160,7 @@
                     { title: "#", formatter: "rownum", width: 50, hozAlign: "center" },
                     { title: "Team", field: "team_number", width: 80 },
                     { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1), width: 80 },
-                    { title: "Climb", field: "pit_climb", width: 80  }
+                    { title: "Climb", field: "pit_climb", width: 80 }
                 ]
             });
 
