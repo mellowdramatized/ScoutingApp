@@ -1162,6 +1162,12 @@
                     </div>
 
                     <div class="form-section-header">SECTION 6: QUALITATIVE & STRATEGY (SCOUTER EYES ONLY)</div>
+                    <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>
+                            Does the team use a kitbot chassis?
+                        </label>
+                        <input type="checkbox" id="m-is-Kitbot"
+                            style="width:25px; height:25px; cursor:pointer; position:relative; z-index:999; pointer-events:all;">
+                    </div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>Interview: "what are the features
                             your team is particularly proud of?"</label><textarea id="f-proud" rows="3"
                             placeholder="Record their response here..."></textarea></div>
@@ -1534,7 +1540,7 @@
         function applyTeamBranding() {
             document.getElementById('app-window-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber} - ${APP_CONFIG.appTitle}`;
             document.getElementById('auth-team-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber}`;
-            document.getElementById('email').placeholder = `email@team${APP_CONFIG.teamNumber}.com`;
+            document.getElementById('email').placeholder = `email@${APP_CONFIG.teamName}${APP_CONFIG.teamNumber}.com`;
 
             document.querySelectorAll('.dynamic-year-form-title').forEach(el => {
                 el.innerText = `${APP_CONFIG.defaultEventYear} Pit Scouting Form`;
@@ -2458,6 +2464,7 @@
                 proud_features: document.getElementById('f-proud').value,
                 strategic_pitch: document.getElementById('f-pitch').value,
                 vulnerabilities: document.getElementById('f-vulnerabilities').value,
+                isKitbot: document.getElementById('m-is-Kitbot').checked,
                 scouter_name: currentUser,
                 created_at: new Date().toISOString(),
                 image_base64: document.getElementById('f-photo-base64').value
@@ -2768,7 +2775,8 @@
                     },
                     { title: "MATCH CLIMB", field: "match_climb", width: 130, hozAlign: "center", responsive: 3 },
                     { title: "PIT CLIMB", field: "pit_climb", width: 100, hozAlign: "center", responsive: 4 },
-                    { title: "DONE", field: "id", hozAlign: "center", width: 70, responsive: 2, formatter: "tickCross" }
+                    { title: "DONE", field: "id", hozAlign: "center", width: 70, responsive: 2, formatter: "tickCross" },
+                    {title : "IS KITBOT", field:"isKitbot", hozAlign: "center", width: 70, responsive: 1, formatter: "tickCross"}
                 ],
             });
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
@@ -2786,16 +2794,7 @@
         }
 
         function handleProfileReturn() {
-            if (returnViewOverride === 'view-schedule') {
-                switchView('view-schedule');
-                // Restore scroll position slightly after rendering
-                setTimeout(() => {
-                    window.scrollTo({ top: returnScrollPos, behavior: 'instant' });
-                    returnViewOverride = null; // Reset it
-                }, 50);
-            } else {
                 switchView('view-roster'); // Default behavior
-            }
         }
 
         async function launchDrillDownProfile(teamData) {
@@ -2815,6 +2814,7 @@
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">SCORING METHOD: ${teamData.scoring_method || 'N/A'}</div>
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">AUTON FUEL: ${teamData.auton_fuel || '0'}</div>
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">MAX CLIMB: ${teamData.max_climb || 'N/A'} (${teamData.climb_speed || 'N/A'})</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">MAX CLIMB: ${teamData.isKitbot || 'No'} </div>
                 <div>INSPECTED BY: ${teamData.scouter_initials || 'Not Scouted Yet'}</div>
             `;
 
