@@ -1069,8 +1069,9 @@
                     <div style="display:flex; gap:20px;">
                         <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>Team
                                 Number</label><input type="number" id="f-team" placeholder="e.g. 141" required></div>
-                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Team Name / Robot
+                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Robot
                                 Nickname</label><input type="text" id="f-nickname" placeholder="e.g. Wobot"></div>
+                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Team Name</label><input type="text" id="f-teamname" placeholder="e.g. Wobot"></div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>Scouter Initials</label><input
                             type="text" id="f-initials" placeholder="e.g. CK" required></div>
@@ -1080,7 +1081,7 @@
                         <label>What kind of drivetrain does this robot use?</label>
                         <select id="f-drive">
                             <option value="Swerve">Swerve Drive</option>
-                            <option value="Tank">Tank (West Coast)</option>
+                            <option value="Tank">Tank</option>
                             <option value="Mecanum">Mecanum</option>
                             <option value="Other">Other / Specialty</option>
                         </select>
@@ -1088,7 +1089,7 @@
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>What is the primary drive motor?</label>
                         <select id="f-motor">
-                            <option value="Kraken X60">Kraken X60</option>
+                            <option value="Kraken X60">Kraken X60/X44</option>
                             <option value="Falcon 500">Falcon 500</option>
                             <option value="NEO">NEO / NEO Vortex</option>
                             <option value="CIM">CIM</option>
@@ -1118,8 +1119,9 @@
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>What is your maximum FUEL holding
                             capacity?</label><input type="number" id="f-capacity" placeholder="e.g. 15"></div>
-                    <div style ="display:flex; flex-direction:column; gap:8px;"><label>What is your accuracy when scoring?</label>
-                    <input type="number" id="f-fuel-accuracy" placeholder="e.g 70 for 70%">
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label>What is your accuracy when
+                            scoring?</label>
+                        <input type="number" id="f-fuel-accuracy" placeholder="e.g 70 for 70%">
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>How does the robot score FUEL into the HUB?</label>
@@ -2451,6 +2453,7 @@
                 team_number: document.getElementById('f-team').value,
                 event_key: activeEventKey,
                 team_nickname: document.getElementById('f-nickname').value,
+                team_name: document.getElementById('f-teamname').value,
                 scouter_initials: document.getElementById('f-initials').value,
                 drivetrain: document.getElementById('f-drive').value,
                 drive_motor: document.getElementById('f-motor').value,
@@ -2764,7 +2767,8 @@
                     { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
                     { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 1, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
                     { title: "TEAM", field: "team_number", headerFilter: "input", width: 80, sorter: "number", hozAlign: "center", responsive: 0 },
-                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 2 },
+                    { title: "Name", field: "team_name", headerFilter: "input", widthGrow: 2, responsive: 2 },
+                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 1 },
                     { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 0 },
                     {
                         title: "LOVAT", field: "lovat_points", width: 90, hozAlign: "center", sorter: "number", responsive: 2,
@@ -2779,7 +2783,7 @@
                     { title: "MATCH CLIMB", field: "match_climb", width: 130, hozAlign: "center", responsive: 3 },
                     { title: "PIT CLIMB", field: "pit_climb", width: 100, hozAlign: "center", responsive: 4 },
                     { title: "DONE", field: "id", hozAlign: "center", width: 70, responsive: 2, formatter: "tickCross" },
-                    {title : "IS KITBOT", field:"isKitbot", hozAlign: "center", width: 70, responsive: 1, formatter: "tickCross"}
+                    { title: "IS KITBOT", field: "isKitbot", hozAlign: "center", width: 70, responsive: 1, formatter: "tickCross" }
                 ],
             });
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
@@ -2797,12 +2801,12 @@
         }
 
         function handleProfileReturn() {
-                switchView('view-roster'); // Default behavior
+            switchView('view-roster'); // Default behavior
         }
 
         async function launchDrillDownProfile(teamData) {
             var feulAccuracy = teamData.feulaccuracy;
-            if(feulAccuracy==null){
+            if (feulAccuracy == null) {
                 feulAccuracy = 0
             }
             activeProfileTeam = teamData.team_number;
