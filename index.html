@@ -1071,7 +1071,8 @@
                                 Number</label><input type="number" id="f-team" placeholder="e.g. 141" required></div>
                         <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Robot
                                 Nickname</label><input type="text" id="f-nickname" placeholder="e.g. Wobot"></div>
-                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Team Name</label><input type="text" id="f-teamname" placeholder="e.g. Wobot"></div>
+                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Team
+                                Name</label><input type="text" id="f-teamname" placeholder="e.g. Wobot"></div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>Scouter Initials</label><input
                             type="text" id="f-initials" placeholder="e.g. CK" required></div>
@@ -1172,13 +1173,21 @@
                         <input type="checkbox" id="m-is-Kitbot"
                             style="width:25px; height:25px; cursor:pointer; position:relative; z-index:999; pointer-events:all;">
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Interview: "what are the features
+                    <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>
+                            what is the teams range of fuel scoring?
+                        </label>
+                        <input type="text" id="f-feulRange">
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Interview: "what are the
+                            features
                             your team is particularly proud of?"</label><textarea id="f-proud" rows="3"
                             placeholder="Record their response here..."></textarea></div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>Interview: "What is your main
                             strategic pitch to an alliance captain?"</label><textarea id="f-pitch" rows="3"
                             placeholder="e.g. Massive fuel capacity..."></textarea></div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Scouter Private Note: Areas where
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Scouter Private Note: Areas
+                            where
                             their robot may fall short</label><textarea id="f-vulnerabilities" rows="4"
                             placeholder="e.g. Slow lift, exposed wiring..."></textarea></div>
 
@@ -2471,6 +2480,7 @@
                 vulnerabilities: document.getElementById('f-vulnerabilities').value,
                 isKitbot: document.getElementById('m-is-Kitbot').checked,
                 fuelaccuracy: document.getElementById('f-fuel-accuracy').value,
+                feulRange: document.getElementById('f-feulRange').value,
                 scouter_name: currentUser,
                 created_at: new Date().toISOString(),
                 image_base64: document.getElementById('f-photo-base64').value
@@ -2826,7 +2836,8 @@
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">AUTON FUEL: ${teamData.auton_fuel || '0'}</div>
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">MAX CLIMB: ${teamData.max_climb || 'N/A'} (${teamData.climb_speed || 'N/A'})</div>
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">Is Kitbot: ${teamData.isKitbot || 'No'} </div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">FUEL ACCURACY: ${teamData.fuelaccuracy || 'No'} </div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">FUEL ACCURACY: ${teamData.fuelaccuracy || 'N/A'} </div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">FUEL Range: ${teamData.feulRange || 'N/A'} </div>
                 <div>INSPECTED BY: ${teamData.scouter_initials || 'Not Scouted Yet'}</div>
             `;
 
