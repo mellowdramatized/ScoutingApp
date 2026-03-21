@@ -1110,21 +1110,23 @@
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>Where does this robot intake FUEL?</label>
                         <select id="f-intake">
-                            <option value="Floor Sweep">Floor Sweep</option>
-                            <option value="CHUTE & OUTPOST (Human Player)">CHUTE & OUTPOST (Human Player Station)
+                            <option value="Floor Sweep">Floor Intake</option>
+                            <option value="CHUTE & OUTPOST (Human Player)">OUTPOST (Human Player Station)
                             </option>
                             <option value="Both">Both</option>
                         </select>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>What is your maximum FUEL holding
                             capacity?</label><input type="number" id="f-capacity" placeholder="e.g. 15"></div>
+                    <div style ="display:flex; flex-direction:column; gap:8px;"><label>What is your accuracy when scoring?</label>
+                    <input type="number" id="f-fuel-accuracy" placeholder="e.g 70 for 70%">
+                    </div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>How does the robot score FUEL into the HUB?</label>
                         <select id="f-scoring">
                             <option value="High-speed Shooter">High-speed Shooter</option>
-                            <option value="High-volume Dumper">High-volume Dumper</option>
-                            <option value="Push & Low Score">Push & Low Score</option>
-                            <option value="Do not score FUEL">Do not score FUEL</option>
+                            <option value="High-volume Dumper">Human Player Loader</option>
+                            <option value="Do not score FUEL">Does not score FUEL</option>
                         </select>
                     </div>
 
@@ -2465,6 +2467,7 @@
                 strategic_pitch: document.getElementById('f-pitch').value,
                 vulnerabilities: document.getElementById('f-vulnerabilities').value,
                 isKitbot: document.getElementById('m-is-Kitbot').checked,
+                fuelaccuracy: document.getElementById('f-fuel-accuracy').value,
                 scouter_name: currentUser,
                 created_at: new Date().toISOString(),
                 image_base64: document.getElementById('f-photo-base64').value
@@ -2798,6 +2801,10 @@
         }
 
         async function launchDrillDownProfile(teamData) {
+            var feulAccuracy = teamData.feulaccuracy;
+            if(feulAccuracy==null){
+                feulAccuracy = 0
+            }
             activeProfileTeam = teamData.team_number;
             switchView('view-detail');
             switchDetailTab('overview');
@@ -2814,7 +2821,8 @@
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">SCORING METHOD: ${teamData.scoring_method || 'N/A'}</div>
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">AUTON FUEL: ${teamData.auton_fuel || '0'}</div>
                 <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">MAX CLIMB: ${teamData.max_climb || 'N/A'} (${teamData.climb_speed || 'N/A'})</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">MAX CLIMB: ${teamData.isKitbot || 'No'} </div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">Is Kitbot: ${teamData.isKitbot || 'No'} </div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">FUEL ACCURACY: ${teamData.fuelaccuracy || 'No'} </div>
                 <div>INSPECTED BY: ${teamData.scouter_initials || 'Not Scouted Yet'}</div>
             `;
 
