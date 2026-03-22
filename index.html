@@ -1192,6 +1192,8 @@
                                 type="number" id="f-team" placeholder="e.g. 141" required></div>
                         <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Robot Name /
                                 Nickname</label><input type="text" id="f-nickname" placeholder="e.g. Wobot"></div>
+                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Team
+                                Name</label><input type="text" id="f-teamname" placeholder="e.g. Wobot"></div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px;"><label>Your Initials
                             (Scouter)</label><input type="text" id="f-initials" placeholder="e.g. CK" required></div>
@@ -1200,8 +1202,8 @@
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <label>What drivetrain are you running?</label>
                         <select id="f-drive">
-                            <option value="Swerve">Swerve</option>
-                            <option value="Tank">Tank / West Coast</option>
+                            <option value="Swerve">Swerve Drive</option>
+                            <option value="Tank">Tank</option>
                             <option value="Mecanum">Mecanum</option>
                             <option value="Other">Custom / Other</option>
                         </select>
@@ -2699,6 +2701,7 @@
                 team_number: document.getElementById('f-team').value,
                 event_key: activeEventKey,
                 team_nickname: document.getElementById('f-nickname').value,
+                team_name: document.getElementById('f-teamname').value,
                 scouter_initials: document.getElementById('f-initials').value,
 
                 tag_static_auton: document.getElementById('tag-static-auton').checked,
@@ -2728,6 +2731,9 @@
                 proud_features: document.getElementById('f-proud').value,
                 strategic_pitch: document.getElementById('f-pitch').value,
                 vulnerabilities: document.getElementById('f-vulnerabilities').value,
+                isKitbot: document.getElementById('m-is-Kitbot').checked,
+                fuelaccuracy: document.getElementById('f-fuel-accuracy').value,
+                feulRange: document.getElementById('f-feulRange').value,
                 scouter_name: currentUser,
                 created_at: new Date().toISOString(),
                 image_base64: document.getElementById('f-photo-base64').value
@@ -3056,15 +3062,14 @@
         }
 
         function handleProfileReturn() {
-            if (returnViewOverride) {
-                switchView(returnViewOverride);
-                setTimeout(() => { window.scrollTo(0, returnScrollPos); returnViewOverride = null; }, 50);
-            } else {
-                switchView('view-roster');
-            }
+            switchView('view-roster'); // Default behavior
         }
 
         async function launchDrillDownProfile(teamData) {
+            var feulAccuracy = teamData.feulaccuracy;
+            if (feulAccuracy == null) {
+                feulAccuracy = 0
+            }
             activeProfileTeam = teamData.team_number;
             switchView('view-detail');
             switchDetailTab('overview');
