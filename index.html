@@ -133,9 +133,7 @@
             transition: var(--transition-smooth);
         }
 
-        #main-table,
-        #pool-table,
-        #picklist-table {
+        #main-table {
             min-height: 400px;
             background: var(--card-grey);
             border-radius: var(--border-radius-md);
@@ -159,12 +157,6 @@
             white-space: normal !important;
             word-wrap: break-word !important;
             min-width: 40px !important;
-        }
-
-        .tabulator-row.tabulator-moving {
-            border: 2px solid var(--accent-color) !important;
-            background: #222 !important;
-            opacity: 0.9;
         }
 
         /* ==========================================================================
@@ -300,6 +292,10 @@
             letter-spacing: 1.5px;
         }
 
+        .nav-btn span.icon {
+            display: none;
+        }
+
         .nav-btn:hover {
             background: var(--border-grey);
             color: var(--text-white);
@@ -373,7 +369,10 @@
             display: block;
         }
 
-        .scout-form input,
+        .scout-form input[type="text"],
+        .scout-form input[type="number"],
+        .scout-form input[type="email"],
+        .scout-form input[type="password"],
         .scout-form select,
         .scout-form textarea {
             padding: 20px;
@@ -402,6 +401,153 @@
             outline: none;
             background: var(--bg-black);
             box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
+        }
+
+        /* CHECKBOX GRID FOR TAGS */
+        .tag-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .tag-checkbox-wrapper {
+            background: var(--field-bg);
+            border: 1px solid var(--border-grey);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .tag-checkbox-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+
+        .tag-checkbox-wrapper input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        .tag-checkbox-wrapper label {
+            cursor: pointer;
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-white);
+            user-select: none;
+        }
+
+        /* COMPARE DRAFT ROOM STYLES */
+        .compare-layout {
+            display: flex;
+            height: calc(100vh - 250px);
+            min-height: 600px;
+            gap: 25px;
+        }
+
+        .compare-sidebar {
+            flex: 0 0 350px;
+            background: var(--card-grey);
+            border: 1px solid var(--border-grey);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-float);
+        }
+
+        .compare-main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            overflow: hidden;
+        }
+
+        .compare-card {
+            background: var(--card-grey);
+            border: 1px solid var(--border-grey);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: var(--shadow-float);
+            position: relative;
+        }
+
+        .compare-img-header {
+            width: 100%;
+            height: 220px;
+            background: var(--bg-black);
+            border-bottom: 3px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .filter-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: 1px solid var(--border-grey);
+            background: var(--bg-black);
+            color: var(--text-muted);
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .filter-pill.active {
+            border-color: currentColor;
+            box-shadow: 0 0 10px currentColor;
+            opacity: 1;
+        }
+
+        .compare-lr-btn {
+            background: var(--field-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-white);
+            font-weight: 900;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .compare-lr-btn:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .stat-box {
+            background: var(--field-bg);
+            border: 1px solid var(--border-grey);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-box-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-box-val {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text-white);
         }
 
         /* ==========================================================================
@@ -542,9 +688,8 @@
             transition: width 0.5s ease;
         }
 
-        /* YOUTUBE CINEMA & FIELD MODALS */
-        #video-modal,
-        #field-view-modal {
+        /* YOUTUBE CINEMA MODAL */
+        #video-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -561,14 +706,12 @@
             transition: opacity 0.3s ease;
         }
 
-        #video-modal.show,
-        #field-view-modal.show {
+        #video-modal.show {
             opacity: 1;
             pointer-events: all;
         }
 
-        .match-detail-card,
-        .field-view-card {
+        .match-detail-card {
             background: var(--bg-black);
             width: 95%;
             max-width: 1400px;
@@ -581,8 +724,7 @@
             overflow: hidden;
         }
 
-        .match-detail-header,
-        .field-view-header {
+        .match-detail-header {
             padding: 20px 30px;
             background: var(--card-grey);
             border-bottom: 1px solid var(--border-grey);
@@ -599,14 +741,6 @@
             overflow-y: auto;
         }
 
-        .field-view-body {
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .video-wrapper {
             width: 100%;
             aspect-ratio: 16/9;
@@ -620,54 +754,6 @@
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        .field-picklist-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 2px solid var(--border-grey);
-            font-size: 2rem;
-            font-weight: 900;
-            background: var(--card-grey);
-            border-radius: 8px;
-        }
-
-        .field-checkbox {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--primary-color);
-            border-radius: 8px;
-            appearance: none;
-            cursor: pointer;
-            outline: none;
-            background: transparent;
-        }
-
-        .field-checkbox:checked {
-            background: var(--primary-color);
-            position: relative;
-        }
-
-        input[type="checkbox"] {
-            appearance: auto !important;
-            -webkit-appearance: checkbox !important;
-            accent-color: var(--primary-color);
-            cursor: pointer;
-            z-index: 10;
-            position: relative;
-        }
-
-
-        .field-checkbox:checked::after {
-            content: '✓';
-            color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 20px;
         }
 
         /* TOAST NOTIFICATIONS */
@@ -777,6 +863,16 @@
             .match-detail-body {
                 grid-template-columns: 1fr;
             }
+
+            .compare-layout {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .compare-sidebar {
+                flex: none;
+                height: 300px;
+            }
         }
 
         @media (max-width: 1024px) {
@@ -797,6 +893,10 @@
             .nav-btn {
                 padding: 14px 20px;
                 font-size: 0.85rem;
+            }
+
+            .compare-main {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -819,18 +919,66 @@
             }
         }
 
+        /* NATIVE MOBILE BOTTOM NAV INJECTION */
         @media (max-width: 600px) {
             .nav-tabs {
-                margin-bottom: 25px;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: var(--bg-black);
+                border-top: 1px solid var(--border-grey);
+                margin: 0;
+                padding: 10px 5px 25px 5px;
+                display: flex;
+                justify-content: space-around;
+                z-index: 10000;
+                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
                 border-bottom: none;
             }
 
             .nav-btn {
                 flex: 1;
-                text-align: center;
-                padding: 12px 10px;
-                font-size: 0.75rem;
+                background: transparent;
+                border: none;
+                padding: 8px 4px;
+                font-size: 0.65rem;
+                border-radius: 8px;
+                color: var(--text-muted);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
                 letter-spacing: 0.5px;
+                white-space: normal;
+                text-align: center;
+            }
+
+            .nav-btn span.icon {
+                display: block;
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+
+            .nav-btn.active {
+                background: rgba(230, 32, 32, 0.1);
+                color: var(--primary-color);
+                box-shadow: none;
+                transform: none;
+            }
+
+            #app-container {
+                padding: 15px 15px 90px 15px;
+            }
+
+            .tabulator-row {
+                margin-bottom: 8px;
+                border-radius: 8px;
+                border: 1px solid var(--border-grey) !important;
+            }
+
+            .tabulator-responsive-collapse {
+                background: #111 !important;
             }
 
             .submit-btn {
@@ -840,25 +988,6 @@
 
             .scout-form label {
                 font-size: 0.75rem;
-            }
-
-            .responsive-pick-container {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 10px !important;
-            }
-
-            .responsive-pick-container .pick-slot {
-                width: 100% !important;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .responsive-pick-container .pick-slot label {
-                writing-mode: horizontal-tb !important;
-                width: 50px;
-                margin-bottom: 0 !important;
             }
         }
 
@@ -905,18 +1034,6 @@
                     <div class="video-wrapper" id="video-frame-container"></div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="field-view-modal">
-        <div class="field-view-card">
-            <div class="field-view-header">
-                <h2 style="margin:0; border:none; letter-spacing: 2px; font-size: 1.5rem; color:var(--primary-color);">
-                    FIELD PICKLIST</h2>
-                <button onclick="closeFieldView()"
-                    style="background:transparent; border:none; color:var(--text-muted); font-size: 2.5rem; cursor:pointer; line-height:1;">&times;</button>
-            </div>
-            <div class="field-view-body" id="field-view-content"></div>
         </div>
     </div>
 
@@ -989,12 +1106,10 @@
                         style="background:var(--accent-color); color:black; font-weight:900; padding:10px 20px; border-radius:8px; border:none;">
                         UPLOAD SAVED DATA (<span id="queue-count">0</span>)</button>
                 </div>
-
                 <a href="guide.html" target="_blank"
                     style="background:transparent; border:2px solid var(--accent-color); color:var(--text-white); padding:12px 28px; border-radius:10px; font-weight:950; text-transform: uppercase; font-size: 0.85rem; text-decoration: none; display: flex; align-items: center; transition: var(--transition-smooth);"
                     onmouseover="this.style.background='var(--accent-color)'; this.style.color='black';"
                     onmouseout="this.style.background='transparent'; this.style.color='var(--text-white)';">TRAINING</a>
-
                 <button onclick="handleLogout()"
                     style="background:transparent; border:2px solid var(--border-light); color:var(--text-white); padding:12px 28px; cursor:pointer; border-radius:10px; font-weight:950; text-transform: uppercase; font-size: 0.85rem;">LOG
                     OUT</button>
@@ -1002,15 +1117,20 @@
         </div>
 
         <div class="nav-tabs">
-            <button id="btn-tasks" class="nav-btn active" onclick="switchView('view-tasks')">My Teams</button>
-            <button id="btn-scout" class="nav-btn" onclick="switchView('view-scout')">Pit Scouting</button>
-            <button id="btn-match-eval" class="nav-btn" onclick="switchView('view-match-eval')">Post-Match Eval</button>
-            <button id="btn-roster" class="nav-btn hidden" onclick="switchView('view-roster')">Team Data</button>
-            <button id="btn-schedule" class="nav-btn hidden" onclick="switchView('view-schedule')">Match
-                Predictor</button>
-            <button id="btn-picklist" class="nav-btn hidden" onclick="switchView('view-picklist')">Alliance
-                Picklist</button>
-            <button id="btn-admin" class="nav-btn hidden" onclick="switchView('view-admin')">Admin Dashboard</button>
+            <button id="btn-tasks" class="nav-btn active" onclick="switchView('view-tasks')"><span
+                    class="icon">📋</span>My Teams</button>
+            <button id="btn-scout" class="nav-btn" onclick="switchView('view-scout')"><span class="icon">🔍</span>Pit
+                Scouting</button>
+            <button id="btn-match-eval" class="nav-btn" onclick="switchView('view-match-eval')"><span
+                    class="icon">⏱️</span>Post-Match</button>
+            <button id="btn-roster" class="nav-btn hidden" onclick="switchView('view-roster')"><span
+                    class="icon">📊</span>Team Data</button>
+            <button id="btn-schedule" class="nav-btn hidden" onclick="switchView('view-schedule')"><span
+                    class="icon">📅</span>Predictor</button>
+            <button id="btn-compare" class="nav-btn hidden" onclick="switchView('view-compare')"><span
+                    class="icon">🏆</span>Draft Room</button>
+            <button id="btn-admin" class="nav-btn hidden" onclick="switchView('view-admin')"><span
+                    class="icon">⚙️</span>Admin</button>
         </div>
 
         <div id="view-tasks" class="view-section">
@@ -1049,8 +1169,8 @@
 
                 <div class="card" style="height: fit-content;">
                     <h2 class="sub-title">Robot Photo</h2>
-                    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Photos are automatically
-                        compressed to save data.</p>
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Snap a clear shot of the
+                        chassis and mechanisms.</p>
                     <div class="image-container" id="robot-image-container">
                         <span id="img-placeholder">NO PHOTO SELECTED</span>
                         <img id="robot-photo-preview" class="robot-photo hidden"
@@ -1059,120 +1179,187 @@
                     </div>
                     <input type="file" id="f-photo" accept="image/*" capture="environment"
                         onchange="previewRobotImage(this)" style="display:none;">
-                    <button onclick="document.getElementById('f-photo').click()" class="submit-btn"
+                    <button type="button" onclick="document.getElementById('f-photo').click()" class="submit-btn"
                         style="width:100%; background:var(--field-bg); margin-bottom:15px; color:var(--text-white); border:1px solid var(--border-grey);">TAKE
                         PICTURE</button>
                 </div>
 
                 <form class="scout-form" id="scout-form" onsubmit="handleScoutSubmit(event)">
-                    <div class="form-section-header">SECTION 1: BASICS</div>
+
+                    <div class="form-section-header" style="margin-top: 0;">SECTION 1: THE BASICS</div>
                     <div style="display:flex; gap:20px;">
-                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>Team
-                                Number</label><input type="number" id="f-team" placeholder="e.g. 141" required></div>
-                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Team Name / Robot
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>Team #</label><input
+                                type="number" id="f-team" placeholder="e.g. 141" required></div>
+                        <div style="flex:2; display:flex; flex-direction:column; gap:8px;"><label>Robot Name /
                                 Nickname</label><input type="text" id="f-nickname" placeholder="e.g. Wobot"></div>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Scouter Initials</label><input
-                            type="text" id="f-initials" placeholder="e.g. CK" required></div>
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Your Initials
+                            (Scouter)</label><input type="text" id="f-initials" placeholder="e.g. CK" required></div>
 
-                    <div class="form-section-header">SECTION 2: DRIVE & FIELD NAVIGATION</div>
+                    <div class="form-section-header">SECTION 2: CHASSIS & NAV</div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>What kind of drivetrain does this robot use?</label>
+                        <label>What drivetrain are you running?</label>
                         <select id="f-drive">
-                            <option value="Swerve">Swerve Drive</option>
-                            <option value="Tank">Tank (West Coast)</option>
+                            <option value="Swerve">Swerve</option>
+                            <option value="Tank">Tank / West Coast</option>
                             <option value="Mecanum">Mecanum</option>
-                            <option value="Other">Other / Specialty</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>What is the primary drive motor?</label>
-                        <select id="f-motor">
-                            <option value="Kraken X60">Kraken X60</option>
-                            <option value="Falcon 500">Falcon 500</option>
-                            <option value="NEO">NEO / NEO Vortex</option>
-                            <option value="CIM">CIM</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>How does the robot navigate field terrain?</label>
-                        <select id="f-terrain">
-                            <option value="Easily drives OVER the BUMP">Easily drives OVER the BUMP (6.5" tall)</option>
-                            <option value="Easily drives UNDER the TRENCH">Easily drives UNDER the TRENCH (22.25"
-                                clearance)</option>
-                            <option value="Can do BOTH seamlessly">Can do BOTH seamlessly</option>
-                            <option value="Flat ground only">Flat ground only</option>
+                            <option value="Other">Custom / Other</option>
                         </select>
                     </div>
 
-                    <div class="form-section-header">SECTION 3: FUEL ACQUISITION & SCORING (THE HUB)</div>
+                    <div style="display:flex; gap:20px;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>Drive Motors?</label>
+                            <select id="f-motor">
+                                <option value="Kraken X60">Kraken X60 / X44</option>
+                                <option value="Falcon 500">Falcon 500</option>
+                                <option value="NEO">NEO / Vortex</option>
+                                <option value="CIM">CIM / MiniCIM</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>Obstacle Clearance?</label>
+                            <select id="f-terrain">
+                                <option value="Easily drives OVER the BUMP">Can clear the Bump</option>
+                                <option value="Easily drives UNDER the TRENCH">Can fit under Trench</option>
+                                <option value="Can do BOTH seamlessly">Can do BOTH</option>
+                                <option value="Flat ground only">Flat ground only (Avoids obstacles)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tag-checkbox-wrapper" style="margin-top: 10px;">
+                        <input type="checkbox" id="m-is-Kitbot">
+                        <label for="m-is-Kitbot"><strong style="color:var(--text-white);">[Kitbot Chassis]</strong> -
+                            Standard AndyMark setup</label>
+                    </div>
+
+                    <div class="form-section-header">SECTION 3: TELEOP & SCORING</div>
                     <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>Where does this robot intake FUEL?</label>
+                        <label>Ground intake or station only?</label>
                         <select id="f-intake">
-                            <option value="Floor Sweep">Floor Sweep</option>
-                            <option value="CHUTE & OUTPOST (Human Player)">CHUTE & OUTPOST (Human Player Station)
-                            </option>
+                            <option value="Floor Sweep">Ground / Floor Intake</option>
+                            <option value="CHUTE & OUTPOST (Human Player)">Human Player Station Only</option>
                             <option value="Both">Both</option>
                         </select>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>What is your maximum FUEL holding
-                            capacity?</label><input type="number" id="f-capacity" placeholder="e.g. 15"></div>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>How does the robot score FUEL into the HUB?</label>
-                        <select id="f-scoring">
-                            <option value="High-speed Shooter">High-speed Shooter</option>
-                            <option value="High-volume Dumper">High-volume Dumper</option>
-                            <option value="Push & Low Score">Push & Low Score</option>
-                            <option value="Do not score FUEL">Do not score FUEL</option>
-                        </select>
+
+                    <div style="display:flex; gap:20px;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>Max Fuel
+                                Capacity?</label><input type="number" id="f-capacity" placeholder="e.g. 15"></div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>Rough Shooting
+                                %?</label><input type="number" id="f-fuel-accuracy" placeholder="e.g 70"></div>
                     </div>
 
-                    <div class="form-section-header">SECTION 4: AUTONOMOUS CAPABILITIES</div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Where do you prefer to start your
-                            Auton routine?</label><input type="text" id="f-auton-start"
-                            placeholder="e.g. Left side, Center aligned with HUB"></div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>How many FUEL can you consistently
-                            score during Auton?</label><input type="number" id="f-auton-fuel"
-                            placeholder="Factoring 8 preload max"></div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Does your Auton routine include a
-                            Level 1 TOWER Climb?</label><select id="f-auton-climb">
-                            <option value="No">No</option>
-                            <option value="Yes">Yes</option>
-                        </select></div>
-
-                    <div class="form-section-header">SECTION 5: ENDGAME (THE TOWER)</div>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>What is the maximum TOWER level this robot can climb?</label>
-                        <select id="f-max-climb">
-                            <option value="Cannot Climb">Cannot Climb</option>
-                            <option value="Level 1 (Low Rung - 27 inch)">Level 1 (Low Rung - 27")</option>
-                            <option value="Level 2 (Mid Rung - 45 inch)">Level 2 (Mid Rung - 45")</option>
-                            <option value="Level 3 (High Rung - 63 inch)">Level 3 (High Rung - 63")</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>Roughly how fast is your climb sequence?</label>
-                        <select id="f-climb-speed">
-                            <option value="N/A">N/A</option>
-                            <option value="Under 5 Seconds">Under 5 Seconds</option>
-                            <option value="5-10 Seconds">5-10 Seconds</option>
-                            <option value="10+ Seconds">10+ Seconds</option>
-                        </select>
+                    <div style="display:flex; gap:20px;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>Where do you normally shoot from?</label>
+                            <input type="text" id="f-fuel_range" placeholder="e.g. Fender, anywhere, protected zone">
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>Shooter or Dumper?</label>
+                            <select id="f-scoring">
+                                <option value="High-speed Shooter">Shooter</option>
+                                <option value="High-volume Dumper">Dumper</option>
+                                <option value="Do not score FUEL">We don't score fuel</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-section-header">SECTION 6: QUALITATIVE & STRATEGY (SCOUTER EYES ONLY)</div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Interview: "what are the features
-                            your team is particularly proud of?"</label><textarea id="f-proud" rows="3"
+                    <p
+                        style="color:var(--text-muted); font-size:0.85rem; margin-top:15px; margin-bottom: -5px; font-weight:bold; text-transform:uppercase;">
+                        Primary Role Tags (Check all that apply):</p>
+                    <div class="tag-grid">
+                        <div class="tag-checkbox-wrapper">
+                            <input type="checkbox" id="tag-feeder-floor">
+                            <label for="tag-feeder-floor"><strong style="color:var(--success-color);">[Floor
+                                    Sweeper]</strong> - Fast ground cycles</label>
+                        </div>
+                        <div class="tag-checkbox-wrapper">
+                            <input type="checkbox" id="tag-feeder-human">
+                            <label for="tag-feeder-human"><strong style="color:var(--success-color);">[Human
+                                    Feeder]</strong> - Cycles To the chute</label>
+                        </div>
+                        <div class="tag-checkbox-wrapper" style="grid-column: 1 / -1;">
+                            <input type="checkbox" id="tag-defense-main">
+                            <label for="tag-defense-main"><strong style="color:var(--danger-color);">[Dedicated
+                                    Defense]</strong> - Built to play physical D</label>
+                        </div>
+                    </div>
+
+                    <div class="form-section-header">SECTION 4: AUTON</div>
+                    <div style="display:flex; gap:20px;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>Preferred Starting Spot?</label>
+                            <select id="f-auton-start-pos">
+                                <option value="Any">Flexible / Any</option>
+                                <option value="Left Only">Left Only</option>
+                                <option value="Center Only">Center Only</option>
+                                <option value="Right Only">Right Only</option>
+                            </select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;"><label>Avg Auton Fuel
+                                Scored?</label><input type="number" id="f-auton-fuel" placeholder="e.g. 3"></div>
+                    </div>
+
+                    <p
+                        style="color:var(--text-muted); font-size:0.85rem; margin-top:15px; margin-bottom: -5px; font-weight:bold; text-transform:uppercase;">
+                        Auton Pathing Tags (Select their main routine):</p>
+                    <div class="tag-grid">
+                        <div class="tag-checkbox-wrapper">
+                            <input type="checkbox" id="tag-static-auton">
+                            <label for="tag-static-auton"><strong style="color:var(--accent-color);">[Static
+                                    Auton]</strong> - Shoots and stays put</label>
+                        </div>
+                        <div class="tag-checkbox-wrapper">
+                            <input type="checkbox" id="tag-center-half">
+                            <label for="tag-center-half"><strong style="color:var(--blue-alliance);">[Center
+                                    Half]</strong> - Sweeps their side of the field</label>
+                        </div>
+                        <div class="tag-checkbox-wrapper">
+                            <input type="checkbox" id="tag-center-full">
+                            <label for="tag-center-full"><strong style="color:var(--blue-alliance);">[Center
+                                    Full]</strong> - Crosses the whole width of the field</label>
+                        </div>
+                    </div>
+
+                    <div class="form-section-header">SECTION 5: ENDGAME</div>
+                    <div style="display:flex; gap:20px;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>How high can you climb?</label>
+                            <select id="f-max-climb">
+                                <option value="Cannot Climb">No Climb</option>
+                                <option value="Level 1 (Low Rung - 27 inch)">L1 (Low)</option>
+                                <option value="Level 2 (Mid Rung - 45 inch)">L2 (Mid)</option>
+                                <option value="Level 3 (High Rung - 63 inch)">L3 (High)</option>
+                            </select>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <label>Roughly how fast is the climb?</label>
+                            <select id="f-climb-speed">
+                                <option value="N/A">N/A</option>
+                                <option value="Under 5 Seconds">Under 5 Seconds</option>
+                                <option value="5-10 Seconds">5-10 Seconds</option>
+                                <option value="10+ Seconds">10+ Seconds</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section-header">SECTION 6: STRATEGY & NOTES</div>
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Anything cool or unique on the bot
+                            we should know about?</label><textarea id="f-proud" rows="2"
                             placeholder="Record their response here..."></textarea></div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Interview: "What is your main
-                            strategic pitch to an alliance captain?"</label><textarea id="f-pitch" rows="3"
-                            placeholder="e.g. Massive fuel capacity..."></textarea></div>
-                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Scouter Private Note: Areas where
-                            their robot may fall short</label><textarea id="f-vulnerabilities" rows="4"
-                            placeholder="e.g. Slow lift, exposed wiring..."></textarea></div>
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label>Why should we pick you for
+                            elims?</label><textarea id="f-pitch" rows="2"
+                            placeholder="e.g. Very reliable, never breaks down, heavy defense..."></textarea></div>
+                    <div style="display:flex; flex-direction:column; gap:8px;"><label
+                            style="color:var(--danger-color);">Scouter Note: Any obvious red flags?</label><textarea
+                            id="f-vulnerabilities" rows="3"
+                            placeholder="e.g. Looks super tippy, messy wiring, sketchy bumpers, untested intake..."></textarea>
+                    </div>
 
-                    <div style="display:flex; gap:15px; margin-top: 20px;">
+                    <div style="display:flex; gap:15px; margin-top: 30px;">
                         <button type="submit" class="submit-btn" id="sub-btn" style="flex: 2;">SUBMIT PIT
                             REPORT</button>
                         <button type="button" onclick="saveDraft('pit')" class="submit-btn"
@@ -1185,7 +1372,7 @@
         <div id="view-match-eval" class="view-section hidden">
             <h1>Post-Match Evaluation</h1>
             <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Qualitative scouting. We rely on
-                Lovat Cloud for fuel/climb counts. Use this to record driver skill, breakdowns, and strategy notes.</p>
+                Statbotics for points. Use this to record driver skill, breakdowns, and strategy notes.</p>
 
             <div class="scout-form" style="max-width: 800px; padding: 30px;">
                 <div style="display:flex; gap:15px; margin-bottom: 20px;">
@@ -1194,7 +1381,6 @@
                     <div style="flex:1;"><label>Team #</label><input type="number" id="m-team" placeholder="e.g. 141"
                             style="font-size:1.5rem; text-align:center; font-weight:900;" required></div>
                 </div>
-
 
                 <div style="display:flex; flex-direction:column; gap:8px;">
                     <label>Driver Skill / Field Awareness</label>
@@ -1238,8 +1424,8 @@
                     style="background:var(--success-color); color:white; border:none; padding:15px 35px; border-radius:12px; font-weight:950; cursor:pointer; text-transform: uppercase; font-size: 0.9rem;">EXPORT
                     DATA</button>
             </div>
-            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Displaying teams verified for the
-                active global event.</p>
+            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Displaying teams verified by
+                Statbotics for the active event.</p>
             <div id="main-table"></div>
         </div>
 
@@ -1260,43 +1446,44 @@
                 </div>
             </div>
             <p style="color:var(--text-muted); font-weight: 800; margin-bottom: 30px;">Live match schedule augmented
-                with Lovat Cloud average scoring data.</p>
+                with Statbotics Expected Points Added (EPA).</p>
             <div id="schedule-container" style="display:flex; flex-direction:column; gap:20px;"></div>
         </div>
 
-        <div id="view-picklist" class="view-section hidden">
+        <div id="view-compare" class="view-section hidden h-full">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                <h1 style="color: var(--admin-color); border-color: var(--admin-color); margin-bottom: 0;">Alliance
-                    Picklist</h1>
-                <div style="display: flex; gap: 15px;">
-                    <button onclick="openFieldView()" class="submit-btn"
-                        style="width:auto; background:var(--success-color); padding: 12px 25px; font-size:0.85rem;">FIELD
-                        VIEW 🖨️</button>
-                    <button onclick="clearDraft()" class="submit-btn"
-                        style="width:auto; background:var(--danger-color); padding: 12px 25px; font-size:0.85rem;">RESET
-                        DRAFT</button>
-                </div>
+                <h1 style="color: var(--admin-color); border-color: var(--admin-color); margin-bottom: 0;">Draft Room
+                </h1>
             </div>
-            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Assign picks to pull them from
-                the pool and shift remaining captains up.</p>
+            <p style="color:var(--text-muted); margin-bottom: 25px; font-weight: 800;">Filter the Master Roster on the
+                left, and push teams to the comparison slots on the right to build your alliance.</p>
 
-            <div class="card" style="border-top: 5px solid var(--admin-color); margin-bottom: 20px;">
-                <h2 class="sub-title" style="color: var(--admin-color);">Alliance Selection Board</h2>
-                <div style="display: flex; flex-direction: column; gap: 15px;" id="draft-board-container"></div>
-            </div>
-
-            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-top: 30px;">
-                <div class="card">
-                    <h2 class="sub-title" style="color:var(--accent-color);">Available Pool</h2>
-                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Drag teams to the right
-                        to rank them.</p>
-                    <div id="pool-table"></div>
+            <div class="compare-layout">
+                <div class="compare-sidebar">
+                    <div
+                        style="padding: 15px; border-bottom: 1px solid var(--border-grey); background: var(--field-bg);">
+                        <h2 class="sub-title" style="margin-bottom: 10px; font-size: 0.9rem;">Filter by Tags</h2>
+                        <div id="compare-filters" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        </div>
+                    </div>
+                    <div id="compare-sidebar-list" style="flex: 1; overflow-y: auto; padding: 10px;">
+                    </div>
                 </div>
-                <div class="card">
-                    <h2 class="sub-title" style="color:var(--success-color);">Ranked Picklist</h2>
-                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Double-click any row to
-                        view full profile.</p>
-                    <div id="picklist-table"></div>
+
+                <div class="compare-main">
+                    <div id="compare-slot-left" class="compare-card">
+                        <div
+                            style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-weight:900;">
+                            Select a team from the sidebar [L]
+                        </div>
+                    </div>
+
+                    <div id="compare-slot-right" class="compare-card">
+                        <div
+                            style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-weight:900;">
+                            Select a team from the sidebar [R]
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1309,7 +1496,7 @@
 
             <div style="margin-bottom: 35px; border-bottom: 2px solid var(--border-grey); display: flex; gap: 15px;">
                 <button class="sub-nav-btn active" id="tab-overview-btn" onclick="switchDetailTab('overview')">OVERVIEW
-                    & AVERAGES</button>
+                    & STATBOTICS</button>
                 <button class="sub-nav-btn" id="tab-matches-btn" onclick="switchDetailTab('matches')">RAW MATCH
                     LOG</button>
             </div>
@@ -1341,7 +1528,7 @@
                                 style="flex:2; min-width:250px; background:var(--field-bg); padding: 20px; border-radius: 8px; border: 2px solid var(--accent-color); text-align:center; box-shadow: inset 0 0 20px rgba(0,0,0,0.2);">
                                 <div
                                     style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; font-weight:bold;">
-                                    Expected Match Contribution</div>
+                                    Expected Match Contribution (EPA)</div>
                                 <div style="font-size: 2.5rem; font-weight:900; color:var(--accent-color); line-height: 1.2;"
                                     id="detail-expected-pts"></div>
                             </div>
@@ -1356,18 +1543,22 @@
                                 style="width:auto; margin-top:10px; background:var(--danger-color); padding:10px 20px; font-size:0.85rem;">SAVE
                                 OVERRIDE</button>
 
-                            <h2 class="sub-title" style="margin-top:30px;">Strategic Pitch & Features</h2>
-                            <div id="detail-notes-block"
-                                style="font-size: 1.2rem; line-height: 1.8; margin-bottom: 30px;"></div>
-                            <h2 class="sub-title" style="margin-top:20px; color: var(--primary-color);">Scouter
-                                Identified Vulnerabilities</h2>
-                            <div id="detail-vulnerabilities-block"
-                                style="font-size: 1.1rem; line-height: 1.8; color: var(--accent-color);"></div>
+                            <div style="margin-top:30px;">
+                                <h2 class="sub-title" style="color: var(--primary-color);">Strategic Profile</h2>
+                                <div id="detail-notes-block"
+                                    style="font-size: 1.1rem; line-height: 1.8; color: var(--text-white);"></div>
+
+                                <h2 class="sub-title" style="margin-top:20px; color: var(--danger-color);">Scouter
+                                    Identified Vulnerabilities</h2>
+                                <div id="detail-vulnerabilities-block"
+                                    style="font-size: 1.1rem; line-height: 1.8; color: var(--accent-color);"></div>
+                            </div>
                         </div>
 
                         <div class="card" style="margin-bottom: 0; border-top: 5px solid var(--admin-color);">
-                            <h2 class="sub-title" style="color: var(--admin-color);">Lovat Match Averages</h2>
-                            <div id="lovat-team-content" style="font-size: 1.1rem; line-height: 1.8; overflow-x: auto;">
+                            <h2 class="sub-title" style="color: var(--admin-color);">Statbotics EPA Breakdown</h2>
+                            <div id="statbotics-team-content"
+                                style="font-size: 1.1rem; line-height: 1.8; overflow-x: auto;">
                             </div>
                         </div>
                     </div>
@@ -1405,11 +1596,11 @@
             <div class="card" style="border: 2px solid var(--accent-color);">
                 <h2 class="sub-title" style="color: var(--accent-color);">Event Settings</h2>
                 <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">Set the active competition.
-                    This updates TBA rosters and internal databases.</p>
+                    This updates TBA rosters, Statbotics EPA data, and internal databases.</p>
                 <div style="display:flex; gap:15px; align-items:flex-end; flex-wrap: wrap;">
                     <div style="flex:1; min-width: 250px;">
                         <label
-                            style="color:var(--accent-color); font-weight:900; font-size:0.8rem; text-transform:uppercase;">TBA
+                            style="color:var(--accent-color); font-weight:900; font-size:0.8rem; text-transform:uppercase;">TBA/Statbotics
                             Event Key</label>
                         <input type="text" id="admin-event-input" placeholder="e.g. 2026micmp"
                             style="width:100%; padding:15px; border-radius:8px; border:1px solid var(--border-grey); background:var(--field-bg); color:var(--text-white); font-size:1.1rem; margin-top:5px;">
@@ -1458,39 +1649,12 @@
                     ASSIGNMENTS</button>
             </div>
 
-            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
-                <div class="card" style="border-top: 4px solid var(--admin-color);">
-                    <h2 class="sub-title" style="color: var(--admin-color);">Lovat Cloud Sync</h2>
-                    <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Pull existing data from
-                        Supabase, or manually upload new Lovat exports.</p>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 10px;">
-                        <button onclick="syncLovatFromStorage()" class="submit-btn"
-                            style="background:var(--primary-color); width:100%; padding:12px 25px;">PULL ALL CLOUD LOVAT
-                            DATA</button>
-                    </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <input type="file" id="f-lovat-team" accept=".csv"
-                            onchange="uploadLovatToStorage(this, 'lovat_team_data.csv')" style="display:none;">
-                        <button onclick="document.getElementById('f-lovat-team').click()" class="submit-btn"
-                            style="background:var(--border-light); border: 1px solid #666; flex:1; padding:12px;">UPLOAD
-                            TEAM AVGS</button>
-                        <input type="file" id="f-lovat-match" accept=".csv"
-                            onchange="uploadLovatToStorage(this, 'lovat_match_data.csv')" style="display:none;">
-                        <button onclick="document.getElementById('f-lovat-match').click()" class="submit-btn"
-                            style="background:var(--border-light); border: 1px solid #666; flex:1; padding:12px;">UPLOAD
-                            MATCH LOG</button>
-                    </div>
-                </div>
-
-                <div class="card" style="border: 2px solid var(--success-color);">
-                    <h2 class="sub-title" style="color: var(--success-color);">Smart Data Export</h2>
-                    <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Generates a CSV by
-                        merging the cloud <strong>lovat_team_data.csv</strong> with all current <strong>Pit
-                            Scouting</strong> entries.</p>
-                    <button onclick="exportMergedLovatData()" class="submit-btn"
-                        style="background:var(--success-color); width:auto; padding:12px 25px;">GENERATE MERGED
-                        CSV</button>
-                </div>
+            <div class="card" style="border: 2px solid var(--success-color);">
+                <h2 class="sub-title" style="color: var(--success-color);">Smart Data Export</h2>
+                <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Generates a CSV by merging
+                    the <strong>Statbotics API</strong> data with all current <strong>Pit Scouting</strong> entries.</p>
+                <button onclick="exportMergedStatboticsData()" class="submit-btn"
+                    style="background:var(--success-color); width:auto; padding:12px 25px;">GENERATE MERGED CSV</button>
             </div>
 
             <div id="owner-only-tools" class="owner-section hidden">
@@ -1517,9 +1681,10 @@
             localStorage.setItem('wobot_has_visited', 'true');
             window.location.href = 'guide.html';
         }
+
         /* ==========================================================================
-                   GLOBAL APP CONFIGURATION
-                   ========================================================================== */
+           GLOBAL APP CONFIGURATION
+           ========================================================================== */
         const APP_CONFIG = {
             teamNumber: "141",
             teamName: "WOBOT",
@@ -1528,13 +1693,23 @@
             supabaseAnonKey: 'sb_publishable_h6UZTcvyYUhJ6x4OeNwk8Q_ML3lPmRw',
             ownerEmailLock: "carmelokyles@gmail.com",
             defaultEventYear: "2026",
-            teamSignupCode: "wobot2026" // The secret code to authorize new accounts
+            teamSignupCode: "wobot2026"
         };
+
+        const STRATEGIC_TAGS = [
+            { id: 'tag_static_auton', label: 'Static Auton', color: 'var(--accent-color)' },
+            { id: 'tag_center_half', label: 'Center Half', color: 'var(--blue-alliance)' },
+            { id: 'tag_center_full', label: 'Center Full', color: 'var(--blue-alliance)' },
+            { id: 'tag_defense_main', label: 'Primary Defense', color: 'var(--danger-color)' },
+            { id: 'tag_feeder_human', label: 'Human Feeder', color: 'var(--success-color)' },
+            { id: 'tag_feeder_floor', label: 'Floor Sweeper', color: 'var(--success-color)' },
+            { id: 'isKitbot', label: 'Kitbot Chassis', color: 'var(--text-muted)' }
+        ];
 
         function applyTeamBranding() {
             document.getElementById('app-window-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber} - ${APP_CONFIG.appTitle}`;
             document.getElementById('auth-team-title').innerText = `${APP_CONFIG.teamName} ${APP_CONFIG.teamNumber}`;
-            document.getElementById('email').placeholder = `email@team${APP_CONFIG.teamNumber}.com`;
+            document.getElementById('email').placeholder = `email@${APP_CONFIG.teamName}${APP_CONFIG.teamNumber}.com`;
 
             document.querySelectorAll('.dynamic-year-form-title').forEach(el => {
                 el.innerText = `${APP_CONFIG.defaultEventYear} Pit Scouting Form`;
@@ -1564,23 +1739,20 @@
         if (localStorage.getItem('wobot_theme') === 'light') toggleTheme();
 
         /* ==========================================================================
-           LOCAL CACHE RECOVERY
+           LOCAL CACHE & DATA STATE
            ========================================================================== */
-        let lovatTeamCache = {};
-        let lovatMatchCache = {};
+        let statboticsCache = {};
         let wobotMatchData = [];
-
-        let draftPicks = {
-            1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" },
-            5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" }
-        };
 
         let activeProfileTeam = null;
 
+        // DRAFT ROOM STATE
+        let activeCompareFilters = [];
+        let compareSlotData = { left: null, right: null };
+
         function loadCachesFromStorage() {
             try {
-                lovatTeamCache = JSON.parse(localStorage.getItem('lovatTeamCache') || '{}');
-                lovatMatchCache = JSON.parse(localStorage.getItem('lovatMatchCache') || '{}');
+                statboticsCache = JSON.parse(localStorage.getItem('statbotics_event_cache') || '{}');
             } catch (e) {
                 console.warn("Cache load failed, starting fresh.");
             }
@@ -1605,14 +1777,12 @@
         let isOnline = true;
         let currentUser = null;
         let currentUserRole = "scouter";
-        let globalDataCache = [];
+        let globalDataCache = []; // Powering the Roster Table
         let activeEventKey = "Pending...";
 
         let mainTableInstance = null;
         let adminTableInstance = null;
         let matchTableInstance = null;
-        let poolTableInstance = null;
-        let picklistTableInstance = null;
 
         let previousAssignmentCount = 0;
         let syncProcesses = 0;
@@ -1653,207 +1823,6 @@
                 icon.innerText = 'SHOW';
             }
         }
-
-        /* ==========================================================================
-           YOUTUBE CINEMA MODAL ENGINE (TBA STYLE)
-           ========================================================================== */
-        async function openMatchVideo(matchKey) {
-            const modal = document.getElementById('video-modal');
-            const statsContainer = document.getElementById('video-stats-container');
-            const videoContainer = document.getElementById('video-frame-container');
-            const title = document.getElementById('video-title');
-
-            modal.classList.add('show');
-            statsContainer.innerHTML = '<div style="color:var(--text-muted); font-weight:bold; font-size:1.2rem; text-align:center; padding: 40px;">Fetching match data from TBA...</div>';
-            videoContainer.innerHTML = '<div style="color:var(--text-muted); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%;">Loading video...</div>';
-            title.innerText = `MATCH: ${matchKey.toUpperCase()}`;
-
-            try {
-                const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
-                const res = await fetch(`https://www.thebluealliance.com/api/v3/match/${matchKey}`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-                if (!res.ok) throw new Error("Match not found on TBA");
-
-                const matchData = await res.json();
-                let compLevel = matchData.comp_level.toUpperCase();
-                let matchNum = matchData.match_number;
-                title.innerText = `${compLevel} ${matchNum} - EVENT ${matchData.event_key.toUpperCase()}`;
-
-                let rTeamsKeys = matchData.alliances.red.team_keys;
-                let bTeamsKeys = matchData.alliances.blue.team_keys;
-                let rTeams = rTeamsKeys.map(t => t.replace('frc', ''));
-                let bTeams = bTeamsKeys.map(t => t.replace('frc', ''));
-
-                let redPred = predictAllianceScore(rTeamsKeys);
-                let bluePred = predictAllianceScore(bTeamsKeys);
-
-                let redBd = matchData.score_breakdown?.red || {};
-                let blueBd = matchData.score_breakdown?.blue || {};
-
-                const findVal = (bd, keywords) => {
-                    if (!bd) return '-';
-                    for (let kw of keywords) { if (bd[kw] !== undefined && bd[kw] !== null) return bd[kw]; }
-                    let keys = Object.keys(bd);
-                    for (let kw of keywords) {
-                        let match = keys.find(k => k.toLowerCase().includes(kw.toLowerCase()));
-                        if (match) return bd[match];
-                    }
-                    return '-';
-                };
-
-                const makeRow = (redVal, label, blueVal, isBold = false) => `
-                    <tr style="border-bottom: 1px solid var(--border-grey);">
-                        <td style="padding: 10px; background: rgba(230, 32, 32, ${isBold ? '0.2' : '0.05'}); color: ${isBold ? '#fff' : '#ff6b6b'}; font-weight: ${isBold ? '900' : 'normal'}; text-align: center; width: 30%; border-right: 1px solid var(--border-grey);">${redVal}</td>
-                        <td style="padding: 10px; text-align: center; color: var(--text-muted); font-size: 0.85rem; width: 40%; ${isBold ? 'font-weight: 900; color: var(--text-white); background: var(--card-grey);' : ''}">${label}</td>
-                        <td style="padding: 10px; background: rgba(59, 130, 246, ${isBold ? '0.2' : '0.05'}); color: ${isBold ? '#fff' : '#60a5fa'}; font-weight: ${isBold ? '900' : 'normal'}; text-align: center; width: 30%; border-left: 1px solid var(--border-grey);">${blueVal}</td>
-                    </tr>
-                `;
-
-                let rAutoTower = findVal(redBd, ['autoTowerPoints', 'autoTower']); let bAutoTower = findVal(blueBd, ['autoTowerPoints', 'autoTower']);
-                let rAutoFuel = findVal(redBd, ['autoFuel', 'autoFuelPoints']); let bAutoFuel = findVal(blueBd, ['autoFuel', 'autoFuelPoints']);
-                let rAuto = findVal(redBd, ['totalAuto', 'autoPoints', 'autoScore']); let bAuto = findVal(blueBd, ['totalAuto', 'autoPoints', 'autoScore']);
-
-                let rTeleFuel = findVal(redBd, ['teleopFuelPoints', 'teleopFuel']); let bTeleFuel = findVal(blueBd, ['teleopFuelPoints', 'teleopFuel']);
-                let rTeleop = findVal(redBd, ['totalTeleop', 'teleopPoints', 'teleopHub']); let bTeleop = findVal(blueBd, ['totalTeleop', 'teleopPoints', 'teleopHub']);
-
-                let rEnd1 = findVal(redBd, ['endgameRobot1', 'robot1Endgame']); let bEnd1 = findVal(blueBd, ['endgameRobot1', 'robot1Endgame']);
-                let rEnd2 = findVal(redBd, ['endgameRobot2', 'robot2Endgame']); let bEnd2 = findVal(blueBd, ['endgameRobot2', 'robot2Endgame']);
-                let rEnd3 = findVal(redBd, ['endgameRobot3', 'robot3Endgame']); let bEnd3 = findVal(blueBd, ['endgameRobot3', 'robot3Endgame']);
-                let rEndTower = findVal(redBd, ['endgameTowerPoints', 'endgamePoints']); let bEndTower = findVal(blueBd, ['endgameTowerPoints', 'endgamePoints']);
-
-                let rFoulStr = `${findVal(redBd, ['foulCount'])} / ${findVal(redBd, ['techFoulCount'])}`;
-                let bFoulStr = `${findVal(blueBd, ['foulCount'])} / ${findVal(blueBd, ['techFoulCount'])}`;
-                if (rFoulStr === '- / -') rFoulStr = '-'; if (bFoulStr === '- / -') bFoulStr = '-';
-
-                let rFoulPts = findVal(redBd, ['foulPoints']); let bFoulPts = findVal(blueBd, ['foulPoints']);
-                let rTotal = matchData.alliances?.red?.score || '-'; let bTotal = matchData.alliances?.blue?.score || '-';
-                let rRp = findVal(redBd, ['rp', 'rankingPoints']); let bRp = findVal(blueBd, ['rp', 'rankingPoints']);
-
-                let breakdownTableHtml = '';
-                if (matchData.score_breakdown) {
-                    breakdownTableHtml = `
-                        <div style="border-radius: 8px; overflow-x: auto; border: 1px solid var(--border-grey); margin-top: 20px; background: var(--field-bg); -webkit-overflow-scrolling: touch;">
-                            <table style="width: 100%; min-width: 350px; border-collapse: collapse;">
-                                <thead>
-                                    <tr style="background: var(--card-grey); border-bottom: 2px solid var(--border-grey);">
-                                        <th style="padding: 12px; color: #ff6b6b; width: 30%; text-align: center; border-right: 1px solid var(--border-grey);">RED</th>
-                                        <th style="padding: 12px; color: var(--text-white); width: 40%; text-align: center; font-size: 0.8rem; letter-spacing: 2px;">OFFICIAL BREAKDOWN</th>
-                                        <th style="padding: 12px; color: #60a5fa; width: 30%; text-align: center; border-left: 1px solid var(--border-grey);">BLUE</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${rAutoTower !== '-' ? makeRow(rAutoTower, 'Auto Tower Points', bAutoTower) : ''}
-                                    ${rAutoFuel !== '-' ? makeRow(rAutoFuel, 'Auto Fuel', bAutoFuel) : ''}
-                                    ${makeRow(rAuto, 'Total Auto', bAuto, true)}
-                                    
-                                    ${rTeleFuel !== '-' ? makeRow(rTeleFuel, 'Teleop Fuel Points', bTeleFuel) : ''}
-                                    ${makeRow(rTeleop, 'Total Teleop', bTeleop, true)}
-                                    
-                                    ${makeRow(rEnd1, 'Robot 1 Endgame', bEnd1)}
-                                    ${makeRow(rEnd2, 'Robot 2 Endgame', bEnd2)}
-                                    ${makeRow(rEnd3, 'Robot 3 Endgame', bEnd3)}
-                                    ${rEndTower !== '-' ? makeRow(rEndTower, 'Endgame Total', bEndTower) : ''}
-                                    
-                                    ${makeRow(rFoulStr, 'Fouls / Major Fouls', bFoulStr)}
-                                    ${makeRow(rFoulPts, 'Foul Points', bFoulPts)}
-                                    
-                                    ${makeRow(rTotal, 'Total Score', bTotal, true)}
-                                    ${makeRow(`+${rRp} RP`, 'Ranking Points', `+${bRp} RP`, true)}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                }
-
-                statsContainer.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 10px;">
-                        <h2 class="sub-title" style="margin:0; border:none;">Official Match Results</h2>
-                    </div>
-                    
-                    <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-grey); background: #111; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
-                        <div style="display:flex; border-bottom: 1px solid var(--border-grey);">
-                            <div style="flex:3; display:flex; background: rgba(230, 32, 32, 0.1);">
-                                ${rTeams.map(t => `<div style="flex:1; padding: 15px 5px; color: #ff6b6b; font-weight: 900; text-align: center; border-right: 1px solid rgba(255,255,255,0.05); font-size:1.1rem;">${t}</div>`).join('')}
-                            </div>
-                        </div>
-                        <div style="display:flex;">
-                            <div style="flex:3; display:flex; background: rgba(59, 130, 246, 0.1);">
-                                ${bTeams.map(t => `<div style="flex:1; padding: 15px 5px; color: #60a5fa; font-weight: 900; text-align: center; border-right: 1px solid rgba(255,255,255,0.05); font-size:1.1rem;">${t}</div>`).join('')}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${breakdownTableHtml}
-
-                    <h2 class="sub-title" style="margin:20px 0 10px 0; color:var(--admin-color); border:none;">Lovat Cloud Predictions</h2>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div style="background:var(--field-bg); padding:15px; border-radius:8px; border-left: 4px solid var(--primary-color);">
-                            <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:5px;">Red Expected</div>
-                            <div style="font-size:1.8rem; font-weight:900; color:var(--text-white);">${redPred.score} <span style="font-size:0.9rem; color:var(--text-muted);">PTS</span></div>
-                        </div>
-                        <div style="background:var(--field-bg); padding:15px; border-radius:8px; border-left: 4px solid var(--blue-alliance);">
-                            <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:5px;">Blue Expected</div>
-                            <div style="font-size:1.8rem; font-weight:900; color:var(--text-white);">${bluePred.score} <span style="font-size:0.9rem; color:var(--text-muted);">PTS</span></div>
-                        </div>
-                    </div>
-                `;
-
-                if (matchData.videos && matchData.videos.length > 0) {
-                    const ytVideo = matchData.videos.find(v => v.type === 'youtube');
-                    if (ytVideo) {
-                        videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytVideo.key}?autoplay=1" allow="autoplay; encrypted-media; fullscreen"></iframe>`;
-                    } else {
-                        videoContainer.innerHTML = '<div style="color:var(--accent-color); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%; text-align:center; padding: 20px;">No YouTube video available for this match.</div>';
-                    }
-                } else {
-                    videoContainer.innerHTML = '<div style="color:var(--accent-color); font-weight:bold; font-size:1.2rem; display:flex; justify-content:center; align-items:center; height:100%; text-align:center; padding: 20px;">No video uploaded to TBA yet.</div>';
-                }
-            } catch (e) {
-                statsContainer.innerHTML = '<div style="color:var(--danger-color); font-weight:bold; text-align:center; padding: 40px;">Failed to load match data. Ensure your TBA Key is valid.</div>';
-                videoContainer.innerHTML = '';
-            }
-        }
-
-        /* ==========================================================================
-           MODAL CLOSING LOGIC (BUTTON & BACKGROUND CLICK)
-           ========================================================================== */
-        function closeMatchVideo() {
-            document.getElementById('video-modal').classList.remove('show');
-            document.getElementById('video-frame-container').innerHTML = '';
-        }
-
-        document.getElementById('video-modal').addEventListener('mousedown', function (event) {
-            if (event.target === this) closeMatchVideo();
-        });
-
-        /* ==========================================================================
-           FIELD VIEW PICKLIST MODAL
-           ========================================================================== */
-        function openFieldView() {
-            if (!picklistTableInstance) return;
-            const data = picklistTableInstance.getData();
-            if (data.length === 0) return showToast("Picklist is empty.");
-
-            let html = data.map((t, idx) => `
-                <div class="field-picklist-item">
-                    <div style="display:flex; align-items:center; gap:20px;">
-                        <span style="color:var(--text-muted); font-size:1.5rem; width:30px;">${idx + 1}.</span>
-                        <span style="color:var(--primary-color);">Team ${t.team_number}</span>
-                    </div>
-                    <input type="checkbox" class="field-checkbox">
-                </div>
-            `).join('');
-
-            document.getElementById('field-view-content').innerHTML = html;
-            document.getElementById('field-view-modal').classList.add('show');
-        }
-
-        function closeFieldView() {
-            document.getElementById('field-view-modal').classList.remove('show');
-        }
-
-        document.getElementById('field-view-modal').addEventListener('mousedown', function (event) {
-            if (event.target === this) closeFieldView();
-        });
 
         /* ==========================================================================
            NETWORK SENSING
@@ -1917,7 +1886,6 @@
             btn.innerText = "AUTHENTICATING...";
             errDiv.innerText = "";
 
-            // SCENARIO 1: Returning User (No Team Code)
             if (teamCode.toLowerCase() === "") {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
                 if (error) {
@@ -1927,20 +1895,16 @@
                 } else {
                     await bootApplication();
                 }
-            }
-            // SCENARIO 2: New User Creation (Team Code Provided)
-            else {
+            } else {
                 if (teamCode.toLowerCase() !== APP_CONFIG.teamSignupCode) {
                     errDiv.innerText = "Signup failed: Invalid Team Code.";
                     btn.innerText = "ENTER DASHBOARD";
                     return showToast("Invalid Team Code.");
                 }
 
-                // Try to create the new account
                 const { data, error } = await sbClient.auth.signUp({ email, password });
 
                 if (error) {
-                    // Graceful Fallback: If they accidentally typed the code but already have an account, just log them in!
                     if (error.message.toLowerCase().includes("already registered")) {
                         const loginAttempt = await sbClient.auth.signInWithPassword({ email, password });
                         if (!loginAttempt.error) return await bootApplication();
@@ -1962,19 +1926,15 @@
             } catch (e) {
                 console.error(e);
             } finally {
-                // 1. Rescue the persistent UI flags before the nuke
                 const hasVisited = localStorage.getItem('wobot_has_visited');
                 const savedTheme = localStorage.getItem('wobot_theme');
 
-                // 2. Nuke all sensitive data and cached databases
                 localStorage.clear();
                 sessionStorage.clear();
 
-                // 3. Put the UI flags back
                 if (hasVisited) localStorage.setItem('wobot_has_visited', hasVisited);
                 if (savedTheme) localStorage.setItem('wobot_theme', savedTheme);
 
-                // 4. Reload to the clean login screen
                 window.location.href = 'index.html';
             }
         }
@@ -2036,6 +1996,33 @@
         });
 
         /* ==========================================================================
+           STATBOTICS FAST FETCH (MASTER ROSTER)
+           ========================================================================== */
+        async function fetchStatboticsRoster() {
+            if (!activeEventKey || activeEventKey === "Pending...") return;
+            try {
+                const res = await fetch(`https://api.statbotics.io/v3/team_events?event=${activeEventKey}`);
+                if (!res.ok) throw new Error("Statbotics fetch failed");
+                const statboticsData = await res.json();
+
+                let fastEpaDict = {};
+                statboticsData.forEach(team => {
+                    fastEpaDict[team.team] = {
+                        team_name: team.team_name,
+                        epa_total: team.epa?.breakdown?.total_points || 0,
+                        epa_auto: team.epa?.breakdown?.auto_points || 0,
+                        rank: team.record?.qual?.rank || '-'
+                    };
+                });
+
+                localStorage.setItem('statbotics_event_cache', JSON.stringify(fastEpaDict));
+                statboticsCache = fastEpaDict;
+            } catch (err) {
+                console.warn("Could not reach Statbotics API. Using offline cache if available.");
+            }
+        }
+
+        /* ==========================================================================
            SYNC & DATA
            ========================================================================== */
         async function performBackgroundSync() {
@@ -2045,26 +2032,17 @@
             showToast("Syncing data in background...");
 
             try {
+                await fetchStatboticsRoster();
+
                 const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                 if (tbaKey) {
                     const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${activeEventKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-                    const teams = await res.json();
-                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
-                    let tbaMap = {};
-                    teams.forEach(t => tbaMap[t.team_number] = t.nickname);
-                    localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
-
-                    const rankRes = await fetch(`https://www.thebluealliance.com/api/v3/event/${activeEventKey}/rankings`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-                    if (rankRes.ok) {
-                        const rankData = await rankRes.json();
-                        let rankMap = {};
-                        if (rankData && rankData.rankings) {
-                            rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank);
-                        }
-                        localStorage.setItem('tbaRankCache', JSON.stringify(rankMap));
+                    if (res.ok) {
+                        const teams = await res.json();
+                        localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
                     }
                 }
-                await syncLovatFromStorage();
+
                 await refreshApplicationData();
                 showToast("Background sync complete.");
             } catch (err) {
@@ -2082,17 +2060,6 @@
 
                 const adminInput = document.getElementById('admin-event-input');
                 if (adminInput) adminInput.value = activeEventKey;
-
-                let savedDraft = localStorage.getItem(`wobot_draft_${activeEventKey}`);
-                if (savedDraft) {
-                    try {
-                        draftPicks = JSON.parse(savedDraft);
-                    } catch (e) {
-                        localStorage.removeItem(`wobot_draft_${activeEventKey}`);
-                    }
-                } else {
-                    draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } };
-                }
             } catch (err) { }
         }
 
@@ -2102,7 +2069,7 @@
             if (['strategist', 'drive_coach', 'admin', 'owner'].includes(currentUserRole)) {
                 document.getElementById('btn-roster').classList.remove('hidden');
                 document.getElementById('btn-schedule').classList.remove('hidden');
-                document.getElementById('btn-picklist').classList.remove('hidden');
+                document.getElementById('btn-compare').classList.remove('hidden');
             }
             if (['admin', 'owner'].includes(currentUserRole)) {
                 document.getElementById('btn-admin').classList.remove('hidden');
@@ -2112,78 +2079,120 @@
             }
         }
 
+        /* THE NEW O(1) ROSTER OVERLAY */
         async function refreshApplicationData() {
             setSyncState(true);
             try {
-                // Fetch Pit Data
-                const { data, error } = await sbClient.from('pit_scouting').select('*').eq('event_key', activeEventKey);
-                if (error) {
-                    if (error.code === 'PGRST301' || error.message.toLowerCase().includes('jwt')) return;
-                    throw error;
-                }
+                const [pitRes, matchRes] = await Promise.all([
+                    sbClient.from('pit_scouting').select('*').eq('event_key', activeEventKey),
+                    sbClient.from('match_scouting').select('*').eq('event_key', activeEventKey)
+                ]);
 
-                // Fetch Match Eval Data
-                const { data: matchDataRes } = await sbClient.from('match_scouting').select('*').eq('event_key', activeEventKey);
-                if (matchDataRes) wobotMatchData = matchDataRes;
+                const pitData = pitRes.data || [];
+                wobotMatchData = matchRes.data || [];
 
+                const pitDict = {};
+                pitData.forEach(p => { pitDict[parseInt(p.team_number)] = p; });
+
+                // Pull the official names from The Blue Alliance cache
                 const tbaMap = JSON.parse(localStorage.getItem('tbaCache') || '{}');
-                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
-                const tbaRankCache = JSON.parse(localStorage.getItem('tbaRankCache') || '{}');
 
                 globalDataCache = [];
-                cachedTeams.forEach(teamNum => {
-                    try {
-                        const pit = (data || []).find(p => parseInt(p.team_number) === teamNum) || {};
-                        const avgs = lovatTeamCache[teamNum] || {};
 
-                        let l3 = parseFloat(avgs.percClimbThree) || 0;
-                        let l2 = parseFloat(avgs.percClimbTwo) || 0;
-                        let l1 = parseFloat(avgs.percClimbOne) || 0;
-                        let matchClimbStr = "N/A";
+                const teamKeys = Object.keys(statboticsCache);
 
-                        if (avgs.numMatches && parseInt(avgs.numMatches) > 0) {
-                            matchClimbStr = "None";
-                            if (l3 > 0) matchClimbStr = `L3 (${l3.toFixed(0)}%)`;
-                            else if (l2 > 0) matchClimbStr = `L2 (${l2.toFixed(0)}%)`;
-                            else if (l1 > 0) matchClimbStr = `L1 (${l1.toFixed(0)}%)`;
+                if (teamKeys.length > 0) {
+                    teamKeys.forEach(tNumStr => {
+                        const teamNum = parseInt(tNumStr);
+                        const stData = statboticsCache[teamNum];
+                        const pit = pitDict[teamNum] || {};
+
+                        // RESTORED COMBINED NAME LOGIC
+                        let officialName = tbaMap[teamNum] || stData.team_name || pit.team_name || `Team ${teamNum}`;
+                        let botName = pit.team_nickname ? pit.team_nickname.trim() : "";
+                        let combinedName = botName ? `${officialName} / ${botName}` : officialName;
+
+                        let pitClimbStr = "Unknown";
+                        if (pit.max_climb) {
+                            if (pit.max_climb.includes("Level 3")) pitClimbStr = "L3";
+                            else if (pit.max_climb.includes("Level 2")) pitClimbStr = "L2";
+                            else if (pit.max_climb.includes("Level 1")) pitClimbStr = "L1";
+                            else if (pit.max_climb.includes("Cannot")) pitClimbStr = "None";
                         }
 
-                        let pitClimbRaw = pit.max_climb || "Unknown";
-                        let pitClimbStr = "Unknown";
-                        if (pitClimbRaw.includes("Level 3")) pitClimbStr = "L3";
-                        else if (pitClimbRaw.includes("Level 2")) pitClimbStr = "L2";
-                        else if (pitClimbRaw.includes("Level 1")) pitClimbStr = "L1";
-                        else if (pitClimbRaw.includes("Cannot")) pitClimbStr = "None";
+                        let teamMatches = wobotMatchData.filter(m => parseInt(m.team_number) === teamNum);
+                        let avgSkill = 0;
+                        if (teamMatches.length > 0) {
+                            let total = 0;
+                            teamMatches.forEach(m => total += m.driver_skill);
+                            avgSkill = total / teamMatches.length;
+                        }
 
                         globalDataCache.push({
                             team_number: teamNum,
-                            team_nickname: pit.team_nickname || tbaMap[teamNum] || "Unknown",
-                            lovat_points: avgs.avgTotalPoints ? parseFloat(avgs.avgTotalPoints).toFixed(1) : 0,
-                            lovat_role: avgs.mainRole || "N/A",
-                            match_climb: matchClimbStr,
+                            team_nickname: combinedName,
+                            statbotics_total_epa: Number(stData.epa_total).toFixed(1),
+                            statbotics_auto_epa: Number(stData.epa_auto).toFixed(1),
                             pit_climb: pitClimbStr,
-                            rank: tbaRankCache[teamNum] || '-',
+                            rank: stData.rank,
+                            driver_skill: avgSkill,
                             ...pit
                         });
-                    } catch (err) { }
-                });
+                    });
+                } else {
+                    pitData.forEach(pit => {
+
+                        // RESTORED COMBINED NAME LOGIC (FALLBACK)
+                        let officialName = tbaMap[pit.team_number] || pit.team_name || `Team ${pit.team_number}`;
+                        let botName = pit.team_nickname ? pit.team_nickname.trim() : "";
+                        let combinedName = botName ? `${officialName} / ${botName}` : officialName;
+
+                        let teamMatches = wobotMatchData.filter(m => parseInt(m.team_number) === parseInt(pit.team_number));
+                        let avgSkill = 0;
+                        if (teamMatches.length > 0) {
+                            let total = 0;
+                            teamMatches.forEach(m => total += m.driver_skill);
+                            avgSkill = total / teamMatches.length;
+                        }
+
+                        globalDataCache.push({
+                            team_number: parseInt(pit.team_number),
+                            team_nickname: combinedName,
+                            statbotics_total_epa: "0.0",
+                            statbotics_auto_epa: "0.0",
+                            pit_climb: pit.max_climb ? pit.max_climb.split(" ")[0] : "Unknown",
+                            rank: "-",
+                            driver_skill: avgSkill,
+                            ...pit
+                        });
+                    });
+                }
 
                 renderActiveAssignments();
                 if (['admin', 'owner'].includes(currentUserRole)) {
                     populateManualDispatchDropdowns();
-                    loadAdminTelemetry(data || []);
+                    loadAdminTelemetry(pitData);
                 }
-                if (!document.getElementById('view-picklist').classList.contains('hidden')) {
-                    renderAlliancePickRoom();
-                    initRankingTool();
+
+                // Re-render Views if they are active
+                if (!document.getElementById('view-roster').classList.contains('hidden')) {
+                    renderMasterRoster();
                 }
+                if (!document.getElementById('view-compare').classList.contains('hidden')) {
+                    renderCompareSidebar();
+                    if (compareSlotData.left) setCompareSlot('left', compareSlotData.left.team_number);
+                    if (compareSlotData.right) setCompareSlot('right', compareSlotData.right.team_number);
+                }
+
             } catch (err) {
                 console.warn(err);
             } finally {
                 setSyncState(false);
             }
         }
-
+        /* ==========================================================================
+           ADMIN TOOLSET
+           ========================================================================== */
         async function loadAdminTelemetry(pitData) {
             const scouterCounts = {};
             pitData.forEach(report => {
@@ -2239,6 +2248,250 @@
             }
         }
 
+        async function autoAssign() {
+            setSyncState(true);
+            try {
+                const { data: scouters } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
+                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
+
+                const { data: existingAssignments } = await sbClient.from('scout_assignments').select('team_number').eq('event_key', activeEventKey);
+                const assignedNumbers = existingAssignments ? existingAssignments.map(a => parseInt(a.team_number)) : [];
+
+                const unscoutedList = cachedTeams.filter(num =>
+                    !globalDataCache.find(d => d.team_number === num && d.id) &&
+                    !assignedNumbers.includes(num)
+                ).sort((a, b) => a - b);
+
+                if (unscoutedList.length === 0) {
+                    showToast("No unscouted or unassigned teams left!");
+                    return;
+                }
+
+                if (!scouters || scouters.length === 0) {
+                    showToast("Error: No scouter accounts found.");
+                    return;
+                }
+
+                const uniqueScouters = scouters.filter((value, index, self) =>
+                    index === self.findIndex((t) => (
+                        t.email.split('@')[0] === value.email.split('@')[0]
+                    ))
+                );
+
+                let finalAssignments = [];
+
+                unscoutedList.forEach((teamNum, index) => {
+                    const scouterIndex = index % uniqueScouters.length;
+                    finalAssignments.push({
+                        scouter_email: uniqueScouters[scouterIndex].email,
+                        team_number: teamNum,
+                        event_key: activeEventKey
+                    });
+                });
+
+                const { error } = await sbClient.from('scout_assignments').insert(finalAssignments);
+                if (error) throw error;
+
+                showToast(`Auto-assigned ${finalAssignments.length} teams across ${uniqueScouters.length} scouters.`);
+                await refreshApplicationData();
+            } catch (err) {
+                showToast(`Auto-assign error: ${err.message}`);
+            } finally {
+                setSyncState(false);
+            }
+        }
+
+        async function populateManualDispatchDropdowns() {
+            try {
+                const { data: profiles } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
+                const scouterSelect = document.getElementById('manual-scout-select');
+
+                if (profiles && profiles.length > 0) {
+                    scouterSelect.innerHTML = `<option value="">-- Select Target Scouter --</option>` +
+                        profiles.map(p => `<option value="${p.email}">${p.email}</option>`).join('');
+                } else {
+                    scouterSelect.innerHTML = `<option value="">No Active Scouters Available</option>`;
+                }
+
+                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
+                const teamSelect = document.getElementById('manual-team-select');
+
+                if (cachedTeams.length > 0) {
+                    const sortedTeams = cachedTeams.sort((a, b) => a - b);
+                    teamSelect.innerHTML = `<option value="">-- Select Target Team --</option>` +
+                        sortedTeams.map(teamNum => `<option value="${teamNum}">Team ${teamNum}</option>`).join('');
+                } else {
+                    teamSelect.innerHTML = `<option value="">No Teams Cached (Sync Event first)</option>`;
+                }
+            } catch (err) {
+                console.error("Dropdown population error", err);
+            }
+        }
+
+        async function manualAssign() {
+            const targetScouter = document.getElementById('manual-scout-select').value;
+            const targetTeam = document.getElementById('manual-team-select').value;
+
+            if (!targetScouter || !targetTeam) {
+                return showToast("Error: Please select both a Scouter and a Team.");
+            }
+
+            setSyncState(true);
+            try {
+                const payload = [{
+                    scouter_email: targetScouter,
+                    team_number: parseInt(targetTeam),
+                    event_key: activeEventKey,
+                    completed: false
+                }];
+
+                const { error } = await sbClient.from('scout_assignments').insert(payload);
+                if (error) throw error;
+
+                showToast(`Success: Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
+
+                document.getElementById('manual-scout-select').value = "";
+                document.getElementById('manual-team-select').value = "";
+
+                await refreshApplicationData();
+            } catch (err) {
+                showToast(`Assignment Failed: ${err.message}`);
+            } finally {
+                setSyncState(false);
+            }
+        }
+
+        async function loadUserAdminTable() {
+            try {
+                const { data: users } = await sbClient.from('profiles').select('*').order('email', { ascending: true });
+                if (adminTableInstance) adminTableInstance.setData(users);
+                else {
+                    adminTableInstance = new Tabulator("#user-admin-table", {
+                        data: users,
+                        layout: "fitColumns",
+                        columns: [
+                            { title: "USER EMAIL", field: "email", widthGrow: 2 },
+                            {
+                                title: "ROLE", field: "role", editor: "list", widthGrow: 1, editorParams: { values: ["scouter", "strategist", "drive_coach", "admin"] },
+                                cellEdited: async (cell) => {
+                                    const record = cell.getData();
+                                    if (record.email.toLowerCase() === OWNER_ID_LOCK) return loadUserAdminTable();
+                                    await sbClient.from('profiles').update({ role: record.role }).eq('id', record.id);
+                                }
+                            }
+                        ],
+                    });
+                }
+            } catch (err) { }
+        }
+
+        async function assignAllToScouter() {
+            if (!confirm("Reset all user permissions?")) return;
+            await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK);
+            loadUserAdminTable();
+        }
+
+        /* ==========================================================================
+           ADMIN TOOLSET (RESTORED)
+           ========================================================================== */
+        async function setGlobalEvent() {
+            setSyncState(true);
+            const inputKey = document.getElementById('admin-event-input').value.trim();
+            if (!inputKey) {
+                setSyncState(false);
+                return showToast("Please enter an event key.");
+            }
+
+            try {
+                // 1. Update the Supabase key for the whole team
+                await sbClient.from('api_keys').update({ key_value: inputKey }).eq('name', 'active_event');
+
+                // 2. Refresh Statbotics Roster
+                await fetchStatboticsRoster();
+
+                // 3. Refresh TBA Cache for Team Names
+                const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
+                if (tbaKey) {
+                    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
+                    if (res.ok) {
+                        const teams = await res.json();
+                        localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
+
+                        let tbaMap = {};
+                        teams.forEach(t => tbaMap[t.team_number] = t.nickname);
+                        localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
+                    }
+
+                    // Pull rankings while we are at it
+                    const rankRes = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/rankings`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
+                    if (rankRes.ok) {
+                        const rankData = await rankRes.json();
+                        let rankMap = {};
+                        if (rankData && rankData.rankings) {
+                            rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank);
+                        }
+                        localStorage.setItem('tbaRankCache', JSON.stringify(rankMap));
+                    }
+                }
+
+                showToast(`Event updated to ${inputKey.toUpperCase()}`);
+
+                // 4. Force a hard refresh of the local data cache
+                await fetchGlobalEventKey();
+                await refreshApplicationData();
+
+            } catch (err) {
+                console.error("Event update failed", err);
+                showToast("Sync Error: Check your TBA API Key.");
+            } finally {
+                setSyncState(false);
+            }
+        }
+
+        async function loadAdminTelemetry(pitData) {
+            const scouterCounts = {};
+            pitData.forEach(report => {
+                const name = report.scouter_name || 'Unknown';
+                scouterCounts[name] = (scouterCounts[name] || 0) + 1;
+            });
+            const sortedLeaderboard = Object.entries(scouterCounts).sort((a, b) => b[1] - a[1]);
+            let leaderHTML = sortedLeaderboard.map((entry, index) => `
+                <div style="display:flex; justify-content:space-between; padding: 12px; border-bottom: 1px solid var(--border-grey);">
+                    <span style="font-weight:bold; color:var(--text-white);"><span style="color:var(--text-muted); margin-right:10px;">#${index + 1}</span>${entry[0].split('@')[0].toUpperCase()}</span>
+                    <span style="color:var(--primary-color); font-weight:900;">${entry[1]}</span>
+                </div>
+            `).join('');
+
+            if (!leaderHTML) leaderHTML = "<p style='color:var(--text-muted); text-align:center; padding: 20px;'>Awaiting data collection for this event.</p>";
+            document.getElementById('admin-leaderboard').innerHTML = leaderHTML;
+
+            try {
+                const { data: allAssignments } = await sbClient.from('scout_assignments').select('*').eq('event_key', activeEventKey).eq('completed', false);
+                let pendingHTML = "";
+
+                if (allAssignments && allAssignments.length > 0) {
+                    const grouped = {};
+                    allAssignments.forEach(a => {
+                        const name = a.scouter_email.split('@')[0].toUpperCase();
+                        if (!grouped[name]) grouped[name] = [];
+                        grouped[name].push(a.team_number);
+                    });
+                    pendingHTML = Object.entries(grouped).map(entry => `
+                        <div style="padding: 12px; border-bottom: 1px solid var(--border-grey);">
+                            <strong style="color:var(--accent-color); display:block; margin-bottom:5px;">${entry[0]}</strong>
+                            <div style="font-size: 0.9rem; color:var(--text-muted); font-weight: bold;">TEAMS PENDING: ${entry[1].join(', ')}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    pendingHTML = "<p style='color:var(--success-color); text-align:center; padding: 20px; font-weight: bold;'>All assigned tasks completed.</p>";
+                }
+                document.getElementById('admin-pending-assignments').innerHTML = pendingHTML;
+            } catch (err) { }
+        }
+
+        /* ==========================================================================
+           VIEW ROUTING
+           ========================================================================== */
         function switchView(targetId) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2251,7 +2504,8 @@
             if (document.getElementById(activeBtnId)) document.getElementById(activeBtnId).classList.add('active');
 
             if (targetId === 'view-roster') setTimeout(() => { renderMasterRoster(); }, 50);
-            if (targetId === 'view-picklist') setTimeout(() => { renderAlliancePickRoom(); initRankingTool(); }, 50);
+            if (targetId === 'view-compare') setTimeout(() => { renderCompareSidebar(); }, 50);
+
             if (targetId === 'view-schedule') {
                 const container = document.getElementById('schedule-container');
                 if (container.innerHTML.trim() === '') loadTeamSchedule();
@@ -2436,7 +2690,9 @@
             }
         }
 
-        /* --- PIT SCOUTING LOGIC --- */
+        /* ==========================================================================
+           FORMS LOGIC
+           ========================================================================== */
         function getPitFormData() {
             return {
                 payload_type: 'pit',
@@ -2444,15 +2700,29 @@
                 event_key: activeEventKey,
                 team_nickname: document.getElementById('f-nickname').value,
                 scouter_initials: document.getElementById('f-initials').value,
+
+                tag_static_auton: document.getElementById('tag-static-auton').checked,
+                tag_center_half: document.getElementById('tag-center-half').checked,
+                tag_center_full: document.getElementById('tag-center-full').checked,
+                tag_defense_main: document.getElementById('tag-defense-main').checked,
+                tag_feeder_human: document.getElementById('tag-feeder-human').checked,
+                tag_feeder_floor: document.getElementById('tag-feeder-floor').checked,
+                isKitbot: document.getElementById('m-is-Kitbot').checked,
+
                 drivetrain: document.getElementById('f-drive').value,
                 drive_motor: document.getElementById('f-motor').value,
                 terrain_nav: document.getElementById('f-terrain').value,
                 intake_loc: document.getElementById('f-intake').value,
                 fuel_capacity: document.getElementById('f-capacity').value || 0,
+                fuelaccuracy: document.getElementById('f-fuel-accuracy').value,
+                fuel_range: document.getElementById('f-fuel_range').value,
                 scoring_method: document.getElementById('f-scoring').value,
-                auton_start: document.getElementById('f-auton-start').value,
+                auton_start_pos: document.getElementById('f-auton-start-pos').value,
                 auton_fuel: document.getElementById('f-auton-fuel').value || 0,
-                auton_climb: document.getElementById('f-auton-climb').value,
+
+                // FIXED: Safely checks if the dropdown exists, defaults to 'No' if it was removed from HTML
+                auton_climb: document.getElementById('f-auton-climb') ? document.getElementById('f-auton-climb').value : 'No',
+
                 max_climb: document.getElementById('f-max-climb').value,
                 climb_speed: document.getElementById('f-climb-speed').value,
                 proud_features: document.getElementById('f-proud').value,
@@ -2516,7 +2786,6 @@
             }
         }
 
-        /* --- MATCH EVALUATION LOGIC --- */
         function getMatchFormData() {
             return {
                 payload_type: 'match',
@@ -2576,15 +2845,18 @@
             }
         }
 
+        /* ==========================================================================
+           MATCH PREDICTOR LOGIC
+           ========================================================================== */
         function predictAllianceScore(allianceTeamKeys) {
             let score = 0; let auto = 0; let tele = 0;
             allianceTeamKeys.forEach(teamKey => {
                 let tNum = parseInt(teamKey.replace('frc', ''));
-                let avgs = lovatTeamCache[tNum];
-                if (avgs) {
-                    score += parseFloat(avgs.avgTotalPoints || 0);
-                    auto += parseFloat(avgs.avgAutoPoints || 0);
-                    tele += parseFloat(avgs.avgTeleopPoints || 0);
+                let stData = statboticsCache[tNum];
+                if (stData) {
+                    score += parseFloat(stData.epa_total || 0);
+                    auto += parseFloat(stData.epa_auto || 0);
+                    tele += (parseFloat(stData.epa_total || 0) - parseFloat(stData.epa_auto || 0));
                 }
             });
             return { score: score.toFixed(1), auto: auto.toFixed(1), tele: tele.toFixed(1) };
@@ -2653,10 +2925,9 @@
                     let redWinProj = parseFloat(redPred.score) > parseFloat(bluePred.score);
                     let blueWinProj = parseFloat(bluePred.score) > parseFloat(redPred.score);
 
-                    // UPDATED: Make team numbers clickable for Drill-Down
                     const getContribStr = (keys) => keys.map(t => {
                         let num = t.replace('frc', '');
-                        let pts = lovatTeamCache[num] ? Number(lovatTeamCache[num].avgTotalPoints || 0).toFixed(1) : '-';
+                        let pts = statboticsCache[num] ? Number(statboticsCache[num].epa_total || 0).toFixed(1) : '-';
                         let isTarget = num === targetTeam.toString();
 
                         let cachedTeam = globalDataCache.find(d => d.team_number === parseInt(num));
@@ -2665,8 +2936,7 @@
                         if (cachedTeam) {
                             teamObjStr = JSON.stringify(cachedTeam).replace(/"/g, '&quot;');
                         } else {
-                            // Provide fallback struct if team hasn't been pit scouted
-                            teamObjStr = JSON.stringify({ team_number: num, team_nickname: "Unknown", rank: "-", lovat_points: pts }).replace(/"/g, '&quot;');
+                            teamObjStr = JSON.stringify({ team_number: num, team_nickname: "Unknown", rank: "-", statbotics_total_epa: pts }).replace(/"/g, '&quot;');
                         }
 
                         return `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid var(--border-grey); padding-bottom:4px; ${isTarget ? 'color:var(--text-white); font-weight:900;' : 'color:var(--text-muted);'}">
@@ -2754,10 +3024,10 @@
                     { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
                     { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 1, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
                     { title: "TEAM", field: "team_number", headerFilter: "input", width: 80, sorter: "number", hozAlign: "center", responsive: 0 },
-                    { title: "NICKNAME", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 2 },
+                    { title: "TEAM / ROBOT", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 1 },
                     { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 0 },
                     {
-                        title: "LOVAT", field: "lovat_points", width: 90, hozAlign: "center", sorter: "number", responsive: 2,
+                        title: "TOTAL EPA", field: "statbotics_total_epa", width: 120, hozAlign: "center", sorter: "number", responsive: 2,
                         formatter: (cell) => {
                             const val = cell.getValue();
                             if (val === undefined || val === null || val === "" || val == 0) return "-";
@@ -2766,35 +3036,31 @@
                             return `<span class="status-pill ${cls}">${numVal.toFixed(1)}</span>`;
                         }
                     },
-                    { title: "MATCH CLIMB", field: "match_climb", width: 130, hozAlign: "center", responsive: 3 },
+                    { title: "AUTO EPA", field: "statbotics_auto_epa", width: 110, hozAlign: "center", sorter: "number", responsive: 3 },
                     { title: "PIT CLIMB", field: "pit_climb", width: 100, hozAlign: "center", responsive: 4 },
-                    { title: "DONE", field: "id", hozAlign: "center", width: 70, responsive: 2, formatter: "tickCross" }
+                    { title: "DONE", field: "id", hozAlign: "center", width: 70, responsive: 2, formatter: "tickCross" },
+                    { title: "IS KITBOT", field: "isKitbot", hozAlign: "center", width: 100, responsive: 1, formatter: "tickCross" }
                 ],
             });
             mainTableInstance.on("rowClick", (e, row) => launchDrillDownProfile(row.getData()));
         }
 
+        let returnViewOverride = null;
+        let returnScrollPos = 0;
+
         function triggerScheduleDrillDown(teamData) {
             if (!teamData) return showToast("Team data not fully loaded yet.");
-
-            // Save our current view and scroll position so we can return exactly here
             returnViewOverride = 'view-schedule';
             returnScrollPos = window.scrollY;
-
-            // Use existing drill-down function
             launchDrillDownProfile(teamData);
         }
 
         function handleProfileReturn() {
-            if (returnViewOverride === 'view-schedule') {
-                switchView('view-schedule');
-                // Restore scroll position slightly after rendering
-                setTimeout(() => {
-                    window.scrollTo({ top: returnScrollPos, behavior: 'instant' });
-                    returnViewOverride = null; // Reset it
-                }, 50);
+            if (returnViewOverride) {
+                switchView(returnViewOverride);
+                setTimeout(() => { window.scrollTo(0, returnScrollPos); returnViewOverride = null; }, 50);
             } else {
-                switchView('view-roster'); // Default behavior
+                switchView('view-roster');
             }
         }
 
@@ -2807,15 +3073,26 @@
             const mediaBox = document.getElementById('detail-image-box');
             mediaBox.innerHTML = teamData.image_url ? `<img src="${teamData.image_url}" class="robot-photo" alt="Robot Photo">` : `<div id="img-placeholder">NO PHOTO AVAILABLE</div>`;
 
+            let pillsHTML = "";
+            STRATEGIC_TAGS.forEach(tag => {
+                if (teamData[tag.id] === true || teamData[tag.id] === "true") {
+                    pillsHTML += `<span class="stat-badge" style="border:1px solid ${tag.color}; color:${tag.color}; margin-right: 5px; margin-bottom: 5px;">${tag.label}</span>`;
+                }
+            });
+            if (pillsHTML === "") pillsHTML = `<span style="color:var(--text-muted); font-size:0.85rem; font-style:italic;">No strategic tags recorded.</span>`;
+
             document.getElementById('pit-stats-content').innerHTML = `
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">DRIVETRAIN: ${teamData.drivetrain || 'N/A'} (${teamData.drive_motor || 'N/A'})</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">TERRAIN NAV: ${teamData.terrain_nav || 'N/A'}</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">INTAKE: ${teamData.intake_loc || 'N/A'}</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">FUEL CAPACITY: ${teamData.fuel_capacity || '0'}</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">SCORING METHOD: ${teamData.scoring_method || 'N/A'}</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">AUTON FUEL: ${teamData.auton_fuel || '0'}</div>
-                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px;">MAX CLIMB: ${teamData.max_climb || 'N/A'} (${teamData.climb_speed || 'N/A'})</div>
-                <div>INSPECTED BY: ${teamData.scouter_initials || 'Not Scouted Yet'}</div>
+                <div style="margin-bottom: 15px;">${pillsHTML}</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">DRIVETRAIN: ${teamData.drivetrain || 'N/A'} (${teamData.drive_motor || 'N/A'})</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">TERRAIN NAV: ${teamData.terrain_nav || 'N/A'}</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">INTAKE: ${teamData.intake_loc || 'N/A'}</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">FUEL CAPACITY: ${teamData.fuel_capacity || '0'}</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">SCORING METHOD: ${teamData.scoring_method || 'N/A'}</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">AUTON FUEL: ${teamData.auton_fuel || '0'}</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">MAX CLIMB: ${teamData.max_climb || 'N/A'} (${teamData.climb_speed || 'N/A'})</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">FUEL ACCURACY: ${teamData.fuelaccuracy || 'N/A'}%</div>
+                <div style="border-bottom:1px solid var(--border-grey); padding-bottom:10px; margin-bottom:10px;">FUEL RANGE: ${teamData.fuel_range || 'N/A'}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">INSPECTED BY: ${teamData.scouter_initials || 'Not Scouted Yet'}</div>
             `;
 
             const tbaLinkContainer = document.getElementById('TBA-team-link');
@@ -2825,43 +3102,37 @@
                 tbaLinkContainer.innerHTML = `<a href="${tbaUrl}" target="_blank" style="color:var(--accent-color); font-weight:900; text-decoration:none; display:inline-block; margin-top:15px; padding: 10px 15px; background: var(--field-bg); border-radius: 8px; border: 1px solid var(--border-grey); transition: var(--transition-smooth);">View on The Blue Alliance 🔗</a>`;
             }
 
-            document.getElementById('detail-notes-block').innerHTML = `<p><strong style="color:var(--primary-color);">PROUD FEATURES:</strong> ${teamData.proud_features || 'N/A'}</p><p><strong style="color:var(--primary-color);">STRATEGIC PITCH:</strong> ${teamData.strategic_pitch || 'N/A'}</p>`;
+            document.getElementById('detail-notes-block').innerHTML = `<p><strong style="color:var(--primary-color);">PROUD FEATURES:</strong> ${teamData.proud_features || 'N/A'}</p><p style="margin-top: 10px;"><strong style="color:var(--primary-color);">STRATEGIC PITCH:</strong> ${teamData.strategic_pitch || 'N/A'}</p>`;
             document.getElementById('detail-vulnerabilities-block').innerText = teamData.vulnerabilities || "No vulnerabilities identified/recorded.";
 
             const savedNote = localStorage.getItem(`wobot_note_${activeEventKey}_${teamData.team_number}`);
             document.getElementById('strategist-notes-input').value = savedNote || '';
 
-            const teamAvgs = lovatTeamCache[teamData.team_number];
-            if (teamAvgs) {
+            const stData = statboticsCache[teamData.team_number];
+            if (stData) {
                 document.getElementById('detail-rank-val').innerText = `#${teamData.rank || '-'}`;
-                document.getElementById('detail-expected-pts').innerHTML = `${Number(teamAvgs['avgTotalPoints'] || 0).toFixed(1)} <span style="font-size:1.2rem; color:var(--text-white);">PTS</span>`;
-                document.getElementById('lovat-team-content').innerHTML = `
+                document.getElementById('detail-expected-pts').innerHTML = `${Number(stData.epa_total || 0).toFixed(1)} <span style="font-size:1.2rem; color:var(--text-white);">PTS</span>`;
+                document.getElementById('statbotics-team-content').innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">MAIN ROLE: <strong style="color:var(--admin-color);">${teamAvgs['mainRole'] || 'N/A'}</strong></div>
-                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">AVG AUTO PTS: <strong>${teamAvgs['avgAutoPoints'] || 'N/A'}</strong></div>
-                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">AVG TELEOP PTS: <strong>${teamAvgs['avgTeleopPoints'] || 'N/A'}</strong></div>
-                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">AVG ACCURACY: <strong>${teamAvgs['avgAccuracy'] || 'N/A'}%</strong></div>
-                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">DRIVER ABILITY: <strong>${teamAvgs['avgDriverAbility'] || 'N/A'} / 5</strong></div>
-                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px; grid-column: 1/-1;">MATCHES SCOUTED: <strong>${teamAvgs['numMatches'] || '0'}</strong></div>
+                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">TOTAL EPA: <strong style="color:var(--admin-color);">${Number(stData.epa_total || 0).toFixed(1)}</strong></div>
+                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">AUTO EPA: <strong>${Number(stData.epa_auto || 0).toFixed(1)}</strong></div>
+                        <div style="background:var(--field-bg); padding: 15px; border-radius: 8px;">TELEOP EPA: <strong>${(Number(stData.epa_total || 0) - Number(stData.epa_auto || 0)).toFixed(1)}</strong></div>
                     </div>`;
             } else {
                 document.getElementById('detail-rank-val').innerText = `#${teamData.rank || '-'}`;
                 document.getElementById('detail-expected-pts').innerHTML = `N/A <span style="font-size:1.2rem; color:var(--text-white);">PTS</span>`;
-                document.getElementById('lovat-team-content').innerHTML = `<div style="padding: 15px; color: var(--text-muted);">No Lovat Averages available yet.</div>`;
+                document.getElementById('statbotics-team-content').innerHTML = `<div style="padding: 15px; color: var(--text-muted);">No Statbotics EPA available yet.</div>`;
             }
 
             if (matchTableInstance) matchTableInstance.destroy();
             let finalMatchLog = [];
 
-            document.getElementById('match-history-table').innerHTML = "<div style='padding:30px; text-align:center; color:var(--text-muted); font-weight:bold;'>Syncing WOBOT, Lovat, & TBA Data...</div>";
+            document.getElementById('match-history-table').innerHTML = "<div style='padding:30px; text-align:center; color:var(--text-muted); font-weight:bold;'>Syncing WOBOT & TBA Data...</div>";
 
             try {
-                // Pull raw data
                 let localEvals = wobotMatchData.filter(m => parseInt(m.team_number) === parseInt(teamData.team_number));
-                let cloudMatches = lovatMatchCache[teamData.team_number] || [];
                 let tbaMatches = [];
 
-                // Attempt to fetch TBA Data (Silent fail if empty)
                 try {
                     const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
                     if (tbaKey && tbaKey.key_value) {
@@ -2870,28 +3141,22 @@
                     }
                 } catch (e) { console.warn("TBA fetch skipped or failed."); }
 
-                // Standardize Match Strings (QM, SF, F)
                 const standardizeMatchKey = (rawStr) => {
                     if (!rawStr) return "unknown";
                     let s = rawStr.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    if (/^\d+$/.test(s)) s = 'qm' + s; // If just a number, assume QM
+                    if (/^\d+$/.test(s)) s = 'qm' + s;
                     if (s.startsWith('q') && !s.startsWith('qm') && !s.startsWith('qf')) s = s.replace('q', 'qm');
                     if (s.startsWith('qf') || s.startsWith('ef')) s = s.replace(/^(qf|ef)/, 'sf');
                     return s;
                 };
 
-                // Create a master set of all unique matches from ALL sources
                 let uniqueMatchKeys = new Set();
                 tbaMatches.forEach(m => uniqueMatchKeys.add(standardizeMatchKey(m.comp_level + m.match_number)));
                 localEvals.forEach(w => uniqueMatchKeys.add(standardizeMatchKey(w.match_number)));
-                cloudMatches.forEach(c => uniqueMatchKeys.add(standardizeMatchKey(c.match)));
 
-                // Build the table rows by iterating over the unique keys, NOT TBA
                 finalMatchLog = Array.from(uniqueMatchKeys).map(matchKey => {
-
                     let tMatch = tbaMatches.find(m => standardizeMatchKey(m.comp_level + m.match_number) === matchKey);
                     let wEval = localEvals.find(w => standardizeMatchKey(w.match_number) === matchKey);
-                    let lMatch = cloudMatches.find(l => standardizeMatchKey(l.match) === matchKey);
 
                     let isRed = tMatch && tMatch.alliances && tMatch.alliances.red && tMatch.alliances.red.team_keys.includes('frc' + teamData.team_number);
                     let alliance = isRed ? 'red' : 'blue';
@@ -2910,35 +3175,25 @@
                         return '-';
                     };
 
-                    // QUANTITATIVE 
-                    let autoPts = lMatch ? (lMatch.autoPoints || '-') : findVal(bd, ['totalAuto', 'autoPoints', 'autoScore']);
-                    let telePts = lMatch ? (lMatch.teleopPoints || '-') : findVal(bd, ['totalTeleop', 'teleopPoints', 'teleopHub', 'teleopFuel']);
-                    let climb = lMatch ? (lMatch.endgameClimb || '-') : findVal(bd, [`endgameRobot${robotIndex}`, `robot${robotIndex}Endgame`, `endgameStatus${robotIndex}`]);
+                    let autoPts = findVal(bd, ['totalAuto', 'autoPoints', 'autoScore']);
+                    let telePts = findVal(bd, ['totalTeleop', 'teleopPoints', 'teleopHub', 'teleopFuel']);
+                    let climb = findVal(bd, [`endgameRobot${robotIndex}`, `robot${robotIndex}Endgame`, `endgameStatus${robotIndex}`]);
 
-                    // QUALITATIVE 
                     let accuracy = bd ? "TBA Data" : "Unscored/Pending";
                     let driverAbility = "-";
                     let scouter = bd ? "TBA API" : "TBA Schedule";
                     let combinedNotes = "No manual scouting data recorded for this match.";
 
-                    if (!tMatch && !lMatch && wEval) {
+                    if (!tMatch && wEval) {
                         accuracy = "Manual Entry";
                         scouter = "★ WOBOT";
                     }
 
-                    if (wEval || lMatch) {
-                        if (wEval) {
-                            scouter = "★ " + wEval.scouter_name.split('@')[0];
-                            accuracy = wEval.broke_down ? "BROKEN" : "Active";
-                            driverAbility = wEval.driver_skill + "/5";
-                            combinedNotes = wEval.notes ? `★ WOBOT: ${wEval.notes}` : "No WOBOT notes.";
-                            if (lMatch && lMatch.notes) combinedNotes += `\n☁ Lovat: ${lMatch.notes}`;
-                        } else if (lMatch) {
-                            scouter = "☁ Lovat";
-                            accuracy = lMatch.accuracy ? lMatch.accuracy + "%" : "-";
-                            driverAbility = lMatch.driverAbility || "-";
-                            combinedNotes = lMatch.notes ? `☁ Lovat: ${lMatch.notes}` : "No notes.";
-                        }
+                    if (wEval) {
+                        scouter = "★ " + wEval.scouter_name.split('@')[0];
+                        accuracy = wEval.broke_down ? "BROKEN" : "Active";
+                        driverAbility = wEval.driver_skill + "/5";
+                        combinedNotes = wEval.notes ? `★ WOBOT: ${wEval.notes}` : "No WOBOT notes.";
                     }
 
                     return {
@@ -2949,7 +3204,6 @@
                     };
                 });
 
-                // STRICT SORTING (qm -> sf -> f)
                 const levelOrder = { 'qm': 1, 'sf': 2, 'f': 3 };
                 finalMatchLog.sort((a, b) => {
                     let aLvl = a.match.toLowerCase().replace(/[0-9]/g, '');
@@ -2968,7 +3222,6 @@
                 console.error("Hybrid merge failed", e);
             }
 
-            // MOBILE RESPONSIVE MATCH HISTORY
             matchTableInstance = new Tabulator("#match-history-table", {
                 data: finalMatchLog,
                 layout: "fitColumns",
@@ -2993,20 +3246,16 @@
                     { title: "AUTO", field: "autoPoints", width: 70, hozAlign: "center", responsive: 2 },
                     { title: "TELEOP", field: "teleopPoints", width: 80, hozAlign: "center", responsive: 2 },
                     { title: "CLIMB", field: "endgameClimb", width: 90, hozAlign: "center", responsive: 3 },
-                    { title: "ACCURACY", field: "accuracy", width: 100, hozAlign: "center", responsive: 4 },
                     { title: "DRIVER", field: "driverAbility", width: 80, hozAlign: "center", responsive: 4 },
                     { title: "SCOUTER", field: "scouter", width: 120, hozAlign: "center", responsive: 5 },
                     {
                         title: "SCOUTER NOTES", field: "notes", widthGrow: 3, minWidth: 280, responsive: 1,
                         formatter: (cell) => {
                             const val = cell.getValue();
-
                             if (!val || val.trim() === "" || val === "-" || val.includes("Total Shift Pts: N/A")) {
                                 return `<span style="color:var(--text-muted); font-style:italic;">No notes recorded</span>`;
                             }
-
                             let isWarning = val.includes("⚠️") || val.includes("BROKEN");
-
                             return `
                                 <div style="background: ${isWarning ? 'rgba(220, 53, 69, 0.1)' : 'rgba(243, 156, 18, 0.1)'}; 
                                             padding: 12px; 
@@ -3025,451 +3274,173 @@
             });
         }
 
-
-
-        function saveStrategistNote() {
-            if (!activeProfileTeam) return;
-            const note = document.getElementById('strategist-notes-input').value;
-            localStorage.setItem(`wobot_note_${activeEventKey}_${activeProfileTeam}`, note);
-            showToast("Strategist Override Saved Locally.");
-        }
-
         /* ==========================================================================
-           DRAFT BOARD & PICKLIST
+           DRAFT ROOM (COMPARE LOGIC)
            ========================================================================== */
-        function renderAlliancePickRoom() {
-            if (globalDataCache.length === 0) return;
-            const container = document.getElementById('draft-board-container');
-            container.innerHTML = "";
+        function toggleCompareFilter(tagId) {
+            if (activeCompareFilters.includes(tagId)) {
+                activeCompareFilters = activeCompareFilters.filter(id => id !== tagId);
+            } else {
+                activeCompareFilters.push(tagId);
+            }
+            renderCompareSidebar();
+        }
 
-            let pickedIds = [];
-            for (let a = 1; a <= 8; a++) {
-                if (draftPicks[a].p1) pickedIds.push(parseInt(draftPicks[a].p1));
-                if (draftPicks[a].p2) pickedIds.push(parseInt(draftPicks[a].p2));
+        function renderCompareSidebar() {
+            const filterContainer = document.getElementById('compare-filters');
+            filterContainer.innerHTML = STRATEGIC_TAGS.map(tag => {
+                const isActive = activeCompareFilters.includes(tag.id);
+                return `<div class="filter-pill ${isActive ? 'active' : ''}" 
+                             style="color: ${isActive ? tag.color : 'var(--text-muted)'}; border-color: ${isActive ? tag.color : 'var(--border-grey)'};" 
+                             onclick="toggleCompareFilter('${tag.id}')">
+                            ${tag.label}
+                        </div>`;
+            }).join('');
+
+            let filteredTeams = globalDataCache;
+            if (activeCompareFilters.length > 0) {
+                filteredTeams = globalDataCache.filter(team => {
+                    return activeCompareFilters.every(filterId => team[filterId] === true || team[filterId] === "true");
+                });
             }
 
-            let sortedTeams = [...globalDataCache].sort((a, b) => {
-                let rankA = parseInt(a.rank) || 9999;
-                let rankB = parseInt(b.rank) || 9999;
-                if (rankA !== rankB) return rankA - rankB;
-                let ptsA = parseFloat(a.lovat_points) || 0;
-                let ptsB = parseFloat(b.lovat_points) || 0;
-                return ptsB - ptsA;
-            });
+            filteredTeams.sort((a, b) => parseFloat(b.statbotics_total_epa) - parseFloat(a.statbotics_total_epa));
 
-            let captainPool = sortedTeams.filter(t => !pickedIds.includes(parseInt(t.team_number)));
-
-            for (let i = 1; i <= 8; i++) {
-                let capt = captainPool[i - 1] || { team_number: "???", rank: "-", lovat_points: 0, match_climb: "-" };
-                let year = activeEventKey.substring(0, 4) || new Date().getFullYear();
-                let displayPts = (capt.lovat_points && !isNaN(Number(capt.lovat_points))) ? Number(capt.lovat_points).toFixed(1) : "-";
-
-                container.innerHTML += `
-                    <div class="card responsive-pick-container" style="display:flex; align-items:center; gap:20px; padding:15px; margin-bottom:0;">
-                        <div class="alliance-number" style="font-size:2rem; font-weight:900; color:var(--primary-color); width:40px; text-align:center;">${i}</div>
-                        <div style="flex:1.5; width:100%; display:flex; align-items:center; gap:10px; background:var(--field-bg); padding:10px; border-radius:8px; border:1px solid var(--border-grey);">
-                            <img src="https://www.thebluealliance.com/avatar/${year}/frc${capt.team_number}.png" alt="Avatar" onerror="this.style.display='none'" style="height:35px; border-radius:4px;">
-                            <div>
-                                <div style="font-weight:900; font-size:1.1rem; color:var(--text-white);">Team ${capt.team_number} <span style="font-size:0.7rem; color:var(--accent-color); text-transform:uppercase;">(Captain)</span></div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);">Rank: ${capt.rank || '-'} | Lovat Pts: ${displayPts} | Climb: ${capt.match_climb || '-'}</div>
-                            </div>
-                        </div>
-                        <div class="pick-slot" style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 1</label>
-                            <select onchange="updateDraftPick(${i}, 'p1', this.value)" style="width:100%; padding:10px; background:var(--field-bg); border:1px solid var(--border-grey); color:var(--text-white); border-radius:6px; font-weight:bold;">${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p1)}</select>
-                        </div>
-                        <div class="pick-slot" style="flex:1;">
-                            <label style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px; display:block;">Pick 2</label>
-                            <select onchange="updateDraftPick(${i}, 'p2', this.value)" style="width:100%; padding:10px; background:var(--field-bg); border:1px solid var(--border-grey); color:var(--text-white); border-radius:6px; font-weight:bold;">${generateDraftOptions(sortedTeams, pickedIds, captainPool, i, draftPicks[i].p2)}</select>
-                        </div>
-                    </div>`;
-            }
-        }
-
-        function generateDraftOptions(sortedTeams, pickedIds, captainPool, allianceIndex, currentValue) {
-            let html = `<option value="">-- Available --</option>`;
-            let ineligibleCaptainIds = captainPool.slice(0, allianceIndex).map(c => parseInt(c.team_number));
-
-            sortedTeams.forEach(t => {
-                let num = parseInt(t.team_number);
-                let isSelected = (currentValue && parseInt(currentValue) === num);
-                let isEligible = !pickedIds.includes(num) && !ineligibleCaptainIds.includes(num);
-
-                if (isEligible || isSelected) {
-                    html += `<option value="${num}" ${isSelected ? 'selected' : ''}>${num} (Rk: ${t.rank || '-'})</option>`;
-                }
-            });
-            return html;
-        }
-
-        function updateDraftPick(allianceIdx, pickSlot, teamValue) {
-            draftPicks[allianceIdx][pickSlot] = teamValue;
-            localStorage.setItem(`wobot_draft_${activeEventKey}`, JSON.stringify(draftPicks));
-            renderAlliancePickRoom();
-        }
-
-        function clearDraft() {
-            if (!confirm("Are you sure you want to reset the draft board?")) return;
-            draftPicks = { 1: { p1: "", p2: "" }, 2: { p1: "", p2: "" }, 3: { p1: "", p2: "" }, 4: { p1: "", p2: "" }, 5: { p1: "", p2: "" }, 6: { p1: "", p2: "" }, 7: { p1: "", p2: "" }, 8: { p1: "", p2: "" } };
-            localStorage.removeItem(`wobot_draft_${activeEventKey}`);
-            renderAlliancePickRoom();
-        }
-
-        function initRankingTool() {
-            if (poolTableInstance) poolTableInstance.destroy();
-            if (picklistTableInstance) picklistTableInstance.destroy();
-
-            let poolData = [];
-            let pickedIds = [];
-
-            for (let a = 1; a <= 8; a++) {
-                if (draftPicks[a].p1) pickedIds.push(parseInt(draftPicks[a].p1));
-                if (draftPicks[a].p2) pickedIds.push(parseInt(draftPicks[a].p2));
-            }
-
-            globalDataCache.forEach(t => {
-                if (!pickedIds.includes(parseInt(t.team_number))) {
-                    poolData.push({ ...t });
-                }
-            });
-
-            poolTableInstance = new Tabulator("#pool-table", {
-                data: poolData,
-                layout: "fitColumns",
-                movableRows: true,
-                movableRowsConnectedTables: "#picklist-table",
-                movableRowsReceiver: "add",
-                movableRowsSender: "delete",
-                columns: [
-                    { rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 },
-                    { title: "Team", field: "team_number", width: 80 },
-                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1), width: 30, minWidth: 30 },
-                    { title: "Rank", field: "rank", width: 70 }
-                ]
-            });
-
-            picklistTableInstance = new Tabulator("#picklist-table", {
-                data: [],
-                layout: "fitColumns",
-                movableRows: true,
-                movableRowsConnectedTables: "#pool-table",
-                movableRowsReceiver: "add",
-                movableRowsSender: "delete",
-                columns: [
-                    { rowHandle: true, formatter: "handle", headerSort: false, frozen: true, width: 30, minWidth: 30 },
-                    { title: "#", formatter: "rownum", width: 50, hozAlign: "center" },
-                    { title: "Team", field: "team_number", width: 80 },
-                    { title: "LOVAT PTS", field: "lovat_points", formatter: (cell) => Number(cell.getValue() || 0).toFixed(1), width: 80 },
-                    { title: "Climb", field: "pit_climb", width: 80 }
-                ]
-            });
-
-            picklistTableInstance.on("rowDblClick", (e, row) => launchDrillDownProfile(row.getData()));
-        }
-
-        /* ==========================================================================
-           ADMIN & SYNC TOOLS
-           ========================================================================== */
-        async function setGlobalEvent() {
-            setSyncState(true);
-            const inputKey = document.getElementById('admin-event-input').value.trim();
-            if (!inputKey) {
-                setSyncState(false);
+            const listContainer = document.getElementById('compare-sidebar-list');
+            if (filteredTeams.length === 0) {
+                listContainer.innerHTML = `<div style="text-align:center; padding: 30px; color:var(--text-muted); font-weight:900;">No teams match these filters.</div>`;
                 return;
             }
 
-            try {
-                await sbClient.from('api_keys').update({ key_value: inputKey }).eq('name', 'active_event');
-                const { data: tbaKey } = await sbClient.from('api_keys').select('key_value').eq('name', 'tba').single();
-
-                if (tbaKey) {
-                    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/teams/simple`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-                    const teams = await res.json();
-                    localStorage.setItem('cachedEventTeams', JSON.stringify(teams.map(t => parseInt(t.team_number))));
-
-                    let tbaMap = {};
-                    teams.forEach(t => tbaMap[t.team_number] = t.nickname);
-                    localStorage.setItem('tbaCache', JSON.stringify(tbaMap));
-
-                    const rankRes = await fetch(`https://www.thebluealliance.com/api/v3/event/${inputKey}/rankings`, { headers: { 'X-TBA-Auth-Key': tbaKey.key_value } });
-
-                    if (rankRes.ok) {
-                        const rankData = await rankRes.json();
-                        let rankMap = {};
-                        if (rankData && rankData.rankings) {
-                            rankData.rankings.forEach(r => rankMap[r.team_key.replace('frc', '')] = r.rank);
-                        }
-                        localStorage.setItem('tbaRankCache', JSON.stringify(rankMap));
-                    }
-                }
-                await fetchGlobalEventKey();
-                await refreshApplicationData();
-
-                const scheduleContainer = document.getElementById('schedule-container');
-                if (scheduleContainer) scheduleContainer.innerHTML = '';
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setSyncState(false);
-            }
+            listContainer.innerHTML = filteredTeams.map(t => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 10px; border-bottom: 1px solid var(--border-grey);">
+                    <div style="cursor:pointer;" onclick="launchDrillDownProfile(${JSON.stringify(t).replace(/"/g, '&quot;')})">
+                        <div style="font-weight:900; color:var(--primary-color); font-size:1.1rem;">${t.team_number}</div>
+                        <div style="font-size:0.75rem; color:var(--text-white); font-weight:bold;">${t.team_nickname.substring(0, 15)}</div>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="compare-lr-btn" onclick="setCompareSlot('left', ${t.team_number})">[L]</button>
+                        <button class="compare-lr-btn" onclick="setCompareSlot('right', ${t.team_number})">[R]</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        async function syncLovatFromStorage() {
-            try {
-                const { data: teamData } = await sbClient.storage.from('scouting-data').download('lovat_team_data.csv');
-                if (teamData) parseLovatTeamData(await teamData.text());
-
-                const { data: matchData } = await sbClient.storage.from('scouting-data').download('lovat_match_data.csv');
-                if (matchData) parseLovatMatchData(await matchData.text());
-            } catch (err) { }
+        function setCompareSlot(slot, teamNum) {
+            const team = globalDataCache.find(t => parseInt(t.team_number) === parseInt(teamNum));
+            if (!team) return;
+            compareSlotData[slot] = team;
+            renderCompareSlot(slot);
         }
 
-        async function uploadLovatToStorage(input, fileName) {
-            const file = input.files[0];
-            if (!file) return;
+        function renderCompareSlot(slot) {
+            const team = compareSlotData[slot];
+            const container = document.getElementById(`compare-slot-${slot}`);
 
-            setSyncState(true);
-            try {
-                const { error } = await sbClient.storage.from('scouting-data').upload(fileName, file, { cacheControl: '3600', upsert: true });
-                if (!error) await syncLovatFromStorage();
-                showToast("Lovat Data Uploaded.");
-            } catch (err) {
-                showToast("Upload failed.");
-            } finally {
-                setSyncState(false);
-            }
-        }
-
-        function parseLovatTeamData(csvText) {
-            const lines = csvText.replace(/\r/g, '').split('\n').filter(r => r.trim() !== "");
-            if (lines.length < 2) return;
-
-            const headers = lines[0].split(',');
-            lovatTeamCache = {};
-
-            for (let i = 1; i < lines.length; i++) {
-                const columns = lines[i].split(',');
-                const teamNum = parseInt(columns[0]?.trim());
-                if (!isNaN(teamNum)) {
-                    let rowData = {};
-                    headers.forEach((h, idx) => rowData[h.trim()] = columns[idx]?.trim());
-                    lovatTeamCache[teamNum] = rowData;
-                }
-            }
-            localStorage.setItem('lovatTeamCache', JSON.stringify(lovatTeamCache));
-        }
-
-        function parseLovatMatchData(csvText) {
-            const lines = csvText.replace(/\r/g, '').split('\n').filter(r => r.trim() !== "");
-            if (lines.length < 2) return;
-
-            const headers = lines[0].split(',');
-            lovatMatchCache = {};
-            const teamIdx = headers.findIndex(h => h.trim() === 'teamNumber');
-
-            for (let i = 1; i < lines.length; i++) {
-                const cols = [];
-                let inQuotes = false, current = '';
-
-                for (let char of lines[i]) {
-                    if (char === '"') inQuotes = !inQuotes;
-                    else if (char === ',' && !inQuotes) { cols.push(current); current = ''; }
-                    else current += char;
-                }
-                cols.push(current);
-
-                const teamNum = parseInt(cols[teamIdx]?.trim());
-                if (!isNaN(teamNum)) {
-                    let rowData = {};
-                    headers.forEach((h, idx) => rowData[h.trim()] = cols[idx]?.trim().replace(/^"|"$/g, ''));
-                    if (!lovatMatchCache[teamNum]) lovatMatchCache[teamNum] = [];
-                    lovatMatchCache[teamNum].push(rowData);
-                }
-            }
-            localStorage.setItem('lovatMatchCache', JSON.stringify(lovatMatchCache));
-        }
-
-        async function autoAssign() {
-            setSyncState(true);
-            try {
-                const { data: scouters } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
-                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
-
-                const { data: existingAssignments } = await sbClient.from('scout_assignments').select('team_number').eq('event_key', activeEventKey);
-                const assignedNumbers = existingAssignments ? existingAssignments.map(a => parseInt(a.team_number)) : [];
-
-                const unscoutedList = cachedTeams.filter(num =>
-                    !globalDataCache.find(d => d.team_number === num && d.id) &&
-                    !assignedNumbers.includes(num)
-                ).sort((a, b) => a - b);
-
-                if (unscoutedList.length === 0) {
-                    showToast("No unscouted or unassigned teams left!");
-                    return;
-                }
-
-                if (!scouters || scouters.length === 0) {
-                    showToast("Error: No scouter accounts found.");
-                    return;
-                }
-
-                // Deduplicate scouters
-                const uniqueScouters = scouters.filter((value, index, self) =>
-                    index === self.findIndex((t) => (
-                        t.email.split('@')[0] === value.email.split('@')[0]
-                    ))
-                );
-
-                let finalAssignments = [];
-
-                unscoutedList.forEach((teamNum, index) => {
-                    const scouterIndex = index % uniqueScouters.length;
-                    finalAssignments.push({
-                        scouter_email: uniqueScouters[scouterIndex].email,
-                        team_number: teamNum,
-                        event_key: activeEventKey
-                    });
-                });
-
-                const { error } = await sbClient.from('scout_assignments').insert(finalAssignments);
-                if (error) throw error;
-
-                showToast(`Auto-assigned ${finalAssignments.length} teams across ${uniqueScouters.length} scouters.`);
-                await refreshApplicationData();
-            } catch (err) {
-                showToast(`Auto-assign error: ${err.message}`);
-            } finally {
-                setSyncState(false);
-            }
-        }
-
-        async function populateManualDispatchDropdowns() {
-            try {
-                const { data: profiles } = await sbClient.from('profiles').select('email').eq('role', 'scouter');
-                const scouterSelect = document.getElementById('manual-scout-select');
-
-                if (profiles && profiles.length > 0) {
-                    scouterSelect.innerHTML = `<option value="">-- Select Target Scouter --</option>` +
-                        profiles.map(p => `<option value="${p.email}">${p.email}</option>`).join('');
-                } else {
-                    scouterSelect.innerHTML = `<option value="">No Active Scouters Available</option>`;
-                }
-
-                const cachedTeams = JSON.parse(localStorage.getItem('cachedEventTeams') || '[]');
-                const teamSelect = document.getElementById('manual-team-select');
-
-                if (cachedTeams.length > 0) {
-                    const sortedTeams = cachedTeams.sort((a, b) => a - b);
-                    teamSelect.innerHTML = `<option value="">-- Select Target Team --</option>` +
-                        sortedTeams.map(teamNum => `<option value="${teamNum}">Team ${teamNum}</option>`).join('');
-                } else {
-                    teamSelect.innerHTML = `<option value="">No Teams Cached (Sync TBA first)</option>`;
-                }
-            } catch (err) {
-                console.error("Dropdown population error", err);
-            }
-        }
-
-        async function manualAssign() {
-            const targetScouter = document.getElementById('manual-scout-select').value;
-            const targetTeam = document.getElementById('manual-team-select').value;
-
-            if (!targetScouter || !targetTeam) {
-                return showToast("Error: Please select both a Scouter and a Team.");
+            if (!team) {
+                container.innerHTML = `<div style="flex:1; display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-weight:900;">Select a team from the sidebar [${slot === 'left' ? 'L' : 'R'}]</div>`;
+                return;
             }
 
-            setSyncState(true);
-            try {
-                const payload = [{
-                    scouter_email: targetScouter,
-                    team_number: parseInt(targetTeam),
-                    event_key: activeEventKey,
-                    completed: false
-                }];
-
-                const { error } = await sbClient.from('scout_assignments').insert(payload);
-                if (error) throw error;
-
-                showToast(`Success: Team ${targetTeam} assigned to ${targetScouter.split('@')[0]}`);
-
-                document.getElementById('manual-scout-select').value = "";
-                document.getElementById('manual-team-select').value = "";
-
-                await refreshApplicationData();
-            } catch (err) {
-                showToast(`Assignment Failed: ${err.message}`);
-            } finally {
-                setSyncState(false);
-            }
-        }
-
-        async function loadUserAdminTable() {
-            try {
-                const { data: users } = await sbClient.from('profiles').select('*').order('email', { ascending: true });
-                if (adminTableInstance) adminTableInstance.setData(users);
-                else {
-                    adminTableInstance = new Tabulator("#user-admin-table", {
-                        data: users,
-                        layout: "fitColumns",
-                        columns: [
-                            { title: "USER EMAIL", field: "email", widthGrow: 2 },
-                            {
-                                title: "ROLE", field: "role", editor: "list", widthGrow: 1, editorParams: { values: ["scouter", "strategist", "drive_coach", "admin"] },
-                                cellEdited: async (cell) => {
-                                    const record = cell.getData();
-                                    if (record.email.toLowerCase() === OWNER_ID_LOCK) return loadUserAdminTable();
-                                    await sbClient.from('profiles').update({ role: record.role }).eq('id', record.id);
-                                }
-                            }
-                        ],
-                    });
+            let pillsHTML = "";
+            STRATEGIC_TAGS.forEach(tag => {
+                if (team[tag.id] === true || team[tag.id] === "true") {
+                    pillsHTML += `<span class="stat-badge" style="border:1px solid ${tag.color}; color:${tag.color};">${tag.label}</span>`;
                 }
-            } catch (err) { }
+            });
+
+            if (pillsHTML === "") pillsHTML = `<span style="color:var(--text-muted); font-size:0.85rem; font-style:italic;">No strategic tags recorded.</span>`;
+
+            let imgHTML = team.image_url
+                ? `<img src="${team.image_url}" class="compare-img-header" alt="Robot Photo">`
+                : `<div class="compare-img-header" style="display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-weight:900;">NO PHOTO</div>`;
+
+            let isTippableWarning = (team.vulnerabilities && team.vulnerabilities.toLowerCase().includes('tip')) ? `<div style="background:var(--danger-color); color:white; font-weight:900; text-align:center; padding:5px; font-size:0.75rem; letter-spacing:2px;">⚠️ TOP HEAVY / TIPPABLE</div>` : "";
+
+            container.innerHTML = `
+                ${isTippableWarning}
+                ${imgHTML}
+                <div style="padding: 20px; display:flex; flex-direction:column; gap:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div>
+                            <h2 style="margin:0; font-size:2.2rem; line-height:1; color:var(--primary-color); cursor:pointer;" onclick="launchDrillDownProfile(${JSON.stringify(team).replace(/"/g, '&quot;')})">${team.team_number}</h2>
+                            <div style="color:var(--text-white); font-weight:bold;">${team.team_nickname}</div>
+                        </div>
+                        <div style="text-align:right; font-size:0.8rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Rank<br><span style="font-size:1.5rem; color:var(--text-white);">${team.rank}</span></div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div class="stat-box">
+                            <div class="stat-box-title">Total EPA</div>
+                            <div class="stat-box-val" style="color:var(--accent-color);">${team.statbotics_total_epa}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-title">Auto EPA</div>
+                            <div class="stat-box-val">${team.statbotics_auto_epa}</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="sub-title" style="font-size:0.85rem; margin-bottom:8px;">Strategic Tags</h2>
+                        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                            ${pillsHTML}
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:5px;">
+                        <div style="background:var(--bg-black); padding:10px; border-radius:6px; border:1px solid var(--border-grey);">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold;">Match Climb</div>
+                            <div style="font-weight:900; color:var(--text-white);">${team.pit_climb}</div>
+                        </div>
+                        <div style="background:var(--bg-black); padding:10px; border-radius:6px; border:1px solid var(--border-grey);">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold;">Driver Skill</div>
+                            <div style="font-weight:900; color:var(--text-white);">${team.driver_skill > 0 ? team.driver_skill.toFixed(1) + ' / 5' : '-'}</div>
+                        </div>
+                    </div>
+
+                    <div style="background:var(--bg-black); padding:10px; border-radius:6px; border:1px solid var(--border-grey);">
+                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold; margin-bottom:4px;">Drivetrain</div>
+                        <div style="font-weight:900; color:var(--text-white); font-size:0.9rem;">${team.drivetrain || 'Unknown'} (${team.drive_motor || '?'})</div>
+                    </div>
+                </div>
+            `;
         }
 
-        async function assignAllToScouter() {
-            if (!confirm("Reset all user permissions?")) return;
-            await sbClient.from('profiles').update({ role: 'scouter' }).neq('email', OWNER_ID_LOCK);
-            loadUserAdminTable();
-        }
-
-        async function exportMergedLovatData() {
-            if (Object.keys(lovatTeamCache).length === 0) return showToast("No Lovat data to export.");
+        /* ==========================================================================
+           ADMIN EXPORT FUNCTION
+           ========================================================================== */
+        async function exportMergedStatboticsData() {
+            if (Object.keys(statboticsCache).length === 0) return showToast("No Statbotics data to export.");
 
             try {
                 const { data: pitData } = await sbClient.from('pit_scouting').select('*').eq('event_key', activeEventKey);
-
                 let csvContent = "data:text/csv;charset=utf-8,";
 
-                // Get Lovat headers dynamically
-                let sampleTeam = Object.keys(lovatTeamCache)[0];
-                let lovatHeaders = Object.keys(lovatTeamCache[sampleTeam]);
+                let statboticsHeaders = ["Team_Number", "Team_Name", "Statbotics_Total_EPA", "Statbotics_Auto_EPA", "Statbotics_Rank"];
+                let pitHeaders = ["Wobot_Drivetrain", "Wobot_Motor", "Wobot_Terrain", "Wobot_Intake", "Wobot_Capacity", "Wobot_Scoring", "Wobot_Auton_Start", "Wobot_Auton_Fuel", "Wobot_Auton_Climb", "Wobot_Max_Climb", "Wobot_Climb_Speed", "Wobot_Proud_Features", "Wobot_Pitch", "Wobot_Vulnerabilities", "Wobot_Scouter", "Static_Auton", "Center_Half_Auton", "Center_Full_Auton", "Defense_Main", "Feeder_Human", "Feeder_Floor", "Is_Kitbot"];
 
-                // Define Pit headers
-                let pitHeaders = ["Wobot_Nickname", "Wobot_Drivetrain", "Wobot_Motor", "Wobot_Terrain", "Wobot_Intake", "Wobot_Capacity", "Wobot_Scoring", "Wobot_Auton_Start", "Wobot_Auton_Fuel", "Wobot_Auton_Climb", "Wobot_Max_Climb", "Wobot_Climb_Speed", "Wobot_Proud_Features", "Wobot_Pitch", "Wobot_Vulnerabilities", "Wobot_Scouter"];
+                csvContent += statboticsHeaders.join(",") + "," + pitHeaders.join(",") + "\r\n";
 
-                csvContent += lovatHeaders.join(",") + "," + pitHeaders.join(",") + "\r\n";
-
-                // Iterate through Lovat teams and append Pit data
-                Object.keys(lovatTeamCache).forEach(teamNum => {
+                Object.keys(statboticsCache).forEach(teamNum => {
                     let row = [];
-                    let lData = lovatTeamCache[teamNum];
+                    let stData = statboticsCache[teamNum];
 
-                    // Add Lovat columns
-                    lovatHeaders.forEach(h => row.push(`"${(lData[h] || '').replace(/"/g, '""')}"`));
+                    row.push(`"${teamNum}"`);
+                    row.push(`"${(stData.team_name || '').replace(/"/g, '""')}"`);
+                    row.push(`"${stData.epa_total || 0}"`);
+                    row.push(`"${stData.epa_auto || 0}"`);
+                    row.push(`"${stData.rank || '-'}"`);
 
-                    // Find WOBOT pit data
-                    let pData = (pitData || []).find(p => p.team_number === parseInt(teamNum));
+                    let pData = (pitData || []).find(p => parseInt(p.team_number) === parseInt(teamNum));
 
                     if (pData) {
-                        row.push(`"${(pData.team_nickname || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.drivetrain || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.drive_motor || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.terrain_nav || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.intake_loc || '').replace(/"/g, '""')}"`);
                         row.push(`"${pData.fuel_capacity || 0}"`);
                         row.push(`"${(pData.scoring_method || '').replace(/"/g, '""')}"`);
-                        row.push(`"${(pData.auton_start || '').replace(/"/g, '""')}"`);
+                        row.push(`"${(pData.auton_start_pos || '').replace(/"/g, '""')}"`);
                         row.push(`"${pData.auton_fuel || 0}"`);
                         row.push(`"${(pData.auton_climb || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.max_climb || '').replace(/"/g, '""')}"`);
@@ -3478,17 +3449,26 @@
                         row.push(`"${(pData.strategic_pitch || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.vulnerabilities || '').replace(/"/g, '""')}"`);
                         row.push(`"${(pData.scouter_name || '').replace(/"/g, '""')}"`);
+
+                        // Append the new boolean tags to the CSV export
+                        row.push(`"${pData.tag_static_auton || false}"`);
+                        row.push(`"${pData.tag_center_half || false}"`);
+                        row.push(`"${pData.tag_center_full || false}"`);
+                        row.push(`"${pData.tag_defense_main || false}"`);
+                        row.push(`"${pData.tag_feeder_human || false}"`);
+                        row.push(`"${pData.tag_feeder_floor || false}"`);
+                        row.push(`"${pData.isKitbot || false}"`);
+
                     } else {
                         pitHeaders.forEach(() => row.push('""'));
                     }
-
                     csvContent += row.join(",") + "\r\n";
                 });
 
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `WOBOT_Merged_Lovat_Data_${activeEventKey}.csv`);
+                link.setAttribute("download", `WOBOT_Merged_Statbotics_Data_${activeEventKey}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -3498,10 +3478,6 @@
                 console.error("Export failed", e);
                 showToast("Failed to generate export.");
             }
-        }
-
-        function downloadRosterCSV() {
-            if (mainTableInstance) mainTableInstance.download("csv", `${APP_CONFIG.teamName}_Scouting_Export.csv`);
         }
     </script>
 </body>
