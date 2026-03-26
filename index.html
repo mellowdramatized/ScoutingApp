@@ -1226,7 +1226,6 @@
                                 <option value="Easily drives OVER the BUMP">Can clear the Bump</option>
                                 <option value="Easily drives UNDER the TRENCH">Can fit under Trench</option>
                                 <option value="Can do BOTH seamlessly">Can do BOTH</option>
-                                <option value="Flat ground only">Flat ground only (Avoids obstacles)</option>
                             </select>
                         </div>
                     </div>
@@ -1256,7 +1255,7 @@
                     <div style="display:flex; gap:20px;">
                         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
                             <label>Where do you normally shoot from?</label>
-                            <input type="text" id="f-fuel_range" placeholder="e.g. Fender, anywhere, protected zone">
+                            <input type="text" id="f-fuel_range" placeholder="e.g. Against the HUB, TOWER, Anywhere?">
                         </div>
                         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
                             <label>Shooter or Feeder?</label>
@@ -1300,7 +1299,7 @@
 
                     <p
                         style="color:var(--text-muted); font-size:0.85rem; margin-top:15px; margin-bottom: -5px; font-weight:bold; text-transform:uppercase;">
-                        Auton Pathing Tags (Select their main routine):</p>
+                        Auton Pathing Tags (Select their Tested Autons):</p>
                     <div class="tag-grid">
                         <div class="tag-checkbox-wrapper">
                             <input type="checkbox" id="tag-static-auton">
@@ -2622,7 +2621,6 @@
                     preview.classList.remove('hidden');
                     document.getElementById('img-placeholder').classList.add('hidden');
                     document.getElementById('f-photo-base64').value = base64;
-                    showToast("Photo optimized and ready.");
                 });
             }
         }
@@ -2700,7 +2698,6 @@
                 tag_static_auton: document.getElementById('tag-static-auton').checked,
                 tag_center_half: document.getElementById('tag-center-half').checked,
                 tag_center_full: document.getElementById('tag-center-full').checked,
-                tag_defense_main: document.getElementById('tag-defense-main').checked,
                 tag_feeder_human: document.getElementById('tag-feeder-human').checked,
                 tag_feeder_floor: document.getElementById('tag-feeder-floor').checked,
                 isKitbot: document.getElementById('m-is-Kitbot').checked,
@@ -2716,7 +2713,6 @@
                 auton_start_pos: document.getElementById('f-auton-start-pos').value,
                 auton_fuel: document.getElementById('f-auton-fuel').value || 0,
 
-                // FIXED: Safely checks if the dropdown exists, defaults to 'No' if it was removed from HTML
                 auton_climb: document.getElementById('f-auton-climb') ? document.getElementById('f-auton-climb').value : 'No',
 
                 max_climb: document.getElementById('f-max-climb').value,
@@ -2726,7 +2722,6 @@
                 vulnerabilities: document.getElementById('f-vulnerabilities').value,
                 isKitbot: document.getElementById('m-is-Kitbot').checked,
                 fuelaccuracy: document.getElementById('f-fuel-accuracy').value,
-                feulRange: document.getElementById('f-feulRange').value,
                 scouter_name: currentUser,
                 created_at: new Date().toISOString(),
                 image_base64: document.getElementById('f-photo-base64').value
