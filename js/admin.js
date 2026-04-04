@@ -249,3 +249,25 @@ export async function setGlobalEvent() {
                 setSyncState(false);
             }
         }
+
+export function runAutoDNP() {
+    let brokenCounts = {};
+    State.wobotMatchData.forEach(match => {
+        if (match.broke_down === true) {
+            let num = parseInt(match.team_number);
+            brokenCounts[num] = (brokenCounts[num] || 0) + 1;
+        }
+    });
+    
+    let blacklistedCount = 0;
+    for (let teamNum in brokenCounts) {
+        if (brokenCounts[teamNum] >= 2) {
+            let num = parseInt(teamNum);
+            if (!State.dnpList.includes(num)) {
+                State.dnpList.push(num);
+                blacklistedCount++;
+            }
+        }
+    }
+    showToast(`Auto DNP applied: ${blacklistedCount} teams blacklisted.`);
+}

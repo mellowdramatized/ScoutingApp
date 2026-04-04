@@ -92,6 +92,7 @@
             cursor: pointer;
             font-weight: 900;
             white-space: nowrap;
+            flex-shrink: 0;
             transition: var(--transition-smooth);
             text-transform: uppercase;
             font-size: 0.95rem;
@@ -511,3 +512,70 @@
                 opacity: 1;
             }
         }
+
+/* ==========================================================================
+   RADIAL MENU
+   ========================================================================== */
+#radial-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    pointer-events: auto;
+}
+
+.radial-menu-item {
+    position: absolute;
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    background: var(--card-grey);
+    border: 2px solid var(--border-grey);
+    color: var(--text-white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%) scale(0);
+    animation: radialPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    padding: 5px;
+    text-align: center;
+}
+
+.radial-menu-item:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    background: var(--bg-black);
+    border-color: var(--primary-color);
+}
+
+.radial-menu-item.radial-return {
+    border-color: var(--accent-color);
+}
+
+.radial-menu-item.radial-return:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
+.radial-icon {
+    font-size: 1.6rem;
+    margin-bottom: 2px;
+}
+
+.radial-label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+@keyframes radialPop {
+    to {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

@@ -73,6 +73,7 @@ export function togglePasswordVisibility() {
         }
 
 export function switchView(targetId) {
+            State.currentNavContext = targetId;
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
@@ -85,6 +86,7 @@ export function switchView(targetId) {
 
             if (targetId === 'view-roster') setTimeout(() => { renderMasterRoster(); }, 50);
             if (targetId === 'view-compare') setTimeout(() => { renderCompareSidebar(); }, 50);
+            if (targetId === 'view-pitmap' && window.renderPitMap) setTimeout(() => { window.renderPitMap(); }, 50);
 
             if (targetId === 'view-schedule') {
                 const container = document.getElementById('schedule-container');

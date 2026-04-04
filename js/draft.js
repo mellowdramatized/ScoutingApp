@@ -37,11 +37,15 @@ export function renderCompareSidebar() {
                 return;
             }
 
-            listContainer.innerHTML = filteredTeams.map(t => `
-                <div class="draggable-team" draggable="true" ondragstart="drag(event)" data-team="${t.team_number}" style="display:flex; justify-content:space-between; align-items:center; padding: 12px 10px; border-bottom: 1px solid var(--border-grey);">
+            listContainer.innerHTML = filteredTeams.map(t => {
+                const isDNP = State.dnpList.includes(parseInt(t.team_number));
+                const inlineStyle = isDNP ? "opacity: 0.3; pointer-events: none;" : "";
+                const dnpBadge = isDNP ? `<span style="color:var(--danger-color); font-weight:bold; font-size:0.7rem; margin-left:5px;">[DNP]</span>` : "";
+                return `
+                <div class="draggable-team" draggable="true" ondragstart="drag(event)" data-team="${t.team_number}" style="display:flex; justify-content:space-between; align-items:center; padding: 12px 10px; border-bottom: 1px solid var(--border-grey); ${inlineStyle}">
                     <div style="cursor:pointer;" onclick="launchDrillDownProfile(${JSON.stringify(t).replace(/"/g, '&quot;')})">
                         <div style="font-weight:900; color:var(--primary-color); font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span style="color:var(--border-light); font-size:1rem;">⠿</span> ${t.team_number}</div>
-                        <div style="font-size:0.75rem; color:var(--text-white); font-weight:bold;">${t.team_nickname.substring(0, 15)}</div>
+                        <div style="font-size:0.75rem; color:var(--text-white); font-weight:bold;">${t.team_nickname.substring(0, 15)}${dnpBadge}</div>
                     </div>
                     <div style="display:flex; gap:5px;">
                         <button class="compare-lr-btn" onclick="setCompareSlot('left', ${t.team_number})">[L]</button>
@@ -49,7 +53,8 @@ export function renderCompareSidebar() {
                         <button class="compare-lr-btn" style="border-color:var(--success-color); color:var(--success-color);" onclick="addToPickList(1, ${t.team_number})">+</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
 export function setCompareSlot(slot, teamNum) {

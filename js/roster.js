@@ -17,7 +17,17 @@ export function renderMasterRoster() {
                     { formatter: "responsiveCollapse", width: 30, minWidth: 30, hozAlign: "center", resizable: false, headerSort: false },
                     { title: "AVATAR", field: "team_number", width: 70, hozAlign: "center", responsive: 1, formatter: (cell) => `<img src="https://www.thebluealliance.com/avatar/${State.activeEventKey.substring(0, 4)}/frc${cell.getValue()}.png" alt="Team Avatar" onerror="this.style.display='none'" style="height:30px;">` },
                     { title: "TEAM", field: "team_number", headerFilter: "input", width: 80, sorter: "number", hozAlign: "center", responsive: 0 },
-                    { title: "TEAM / ROBOT", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 1 },
+                    {
+                        title: "TEAM / ROBOT", field: "team_nickname", headerFilter: "input", widthGrow: 2, responsive: 1,
+                        formatter: (cell) => {
+                            const data = cell.getData();
+                            const nickname = cell.getValue();
+                            const matches = State.wobotMatchData.filter(m => parseInt(m.team_number) === parseInt(data.team_number));
+                            const hasBrokeDown = matches.some(m => m.broke_down === true);
+                            const isGlassCannon = parseFloat(data.statbotics_total_epa) > 30 && (parseFloat(data.driver_skill) < 2.5 || hasBrokeDown);
+                            return isGlassCannon ? `${nickname} <span style="color:var(--danger-color); font-weight:bold;">⚠️ GLASS CANNON</span>` : nickname;
+                        }
+                    },
                     { title: "RANK", field: "rank", width: 70, hozAlign: "center", sorter: "number", responsive: 0 },
                     {
                         title: "TOTAL EPA", field: "statbotics_total_epa", width: 120, hozAlign: "center", sorter: "number", responsive: 2,

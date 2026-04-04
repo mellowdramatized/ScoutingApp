@@ -1,17 +1,21 @@
 import { APP_CONFIG } from './config.js';
 import { State } from './state.js';
-import { sbClient, apiFetchStatbotics, apiFetchTBA } from './api.js';
+import { sbClient, apiFetchStatbotics, apiFetchTBA, getNexusPitLayout } from './api.js';
 import { applyTeamBranding, showToast, toggleTheme, togglePasswordVisibility, switchView, switchDetailTab } from './ui.js';
 import { setSyncState, updateConnectionUI, checkConnection, handleAuth, handleLogout, bootApplication, showAuthScreen, launchSecureSession } from './auth.js';
 import { getPitFormData, saveDraft, handleScoutSubmit, getMatchFormData, resetMatchForm, handleMatchScoutSubmit, compressImage, previewRobotImage, saveToOfflineQueue, dataURItoBlob, processPayloadUpload, uploadOfflineData, startDictation, resetDictationBtn } from './forms.js';
 import { toggleCompareFilter, renderCompareSidebar, setCompareSlot, renderCompareSlot, checkAutonSynergy, getNormalizeValue, updateRadarChart, allowDrop, dragLeave, drag, drop, addToPickList, removeFromPickList, savePickListsToStorage, loadPickListsFromStorage, clearPicklists, renderPickLists, exportPicklists } from './draft.js';
 import { renderMasterRoster, launchDrillDownProfile, triggerScheduleDrillDown, handleProfileReturn, exportMergedStatboticsData } from './roster.js';
 import { predictAllianceScore, loadTeamSchedule, jumpToNextMatch, openMatchVideo, closeMatchVideo, loadLiveStream } from './schedule.js';
-import { loadAdminTelemetry, wipeAssignments, autoAssign, manualAssign, populateManualDispatchDropdowns, loadUserAdminTable, assignAllToScouter, setGlobalEvent } from './admin.js';
+import { loadAdminTelemetry, wipeAssignments, autoAssign, manualAssign, populateManualDispatchDropdowns, loadUserAdminTable, assignAllToScouter, setGlobalEvent, runAutoDNP } from './admin.js';
+import { renderPitMap } from './pitmap.js';
+import { initRadialMenu } from './radial.js';
 
 export async function refreshApplicationData() {
             setSyncState(true);
             try {
+                State.currentPitMap = await getNexusPitLayout(State.activeEventKey);
+                
                 const [pitRes, matchRes] = await Promise.all([
                     sbClient.from('pit_scouting').select('*').eq('event_key', State.activeEventKey),
                     sbClient.from('match_scouting').select('*').eq('event_key', State.activeEventKey)
@@ -108,6 +112,9 @@ export async function refreshApplicationData() {
                     if (State.compareSlotData.left) setCompareSlot('left', State.compareSlotData.left.team_number);
                     if (State.compareSlotData.right) setCompareSlot('right', State.compareSlotData.right.team_number);
                 }
+                if (!document.getElementById('view-pitmap').classList.contains('hidden')) {
+                    renderPitMap();
+                }
 
             } catch (err) {
                 console.warn(err);
@@ -139,6 +146,15 @@ export async function renderActiveAssignments() {
             const myCompleted = myAssignments.filter(a => a.completed).length;
             const myTotal = myAssignments.length;
             const perc = myTotal === 0 ? 100 : Math.round((myCompleted / myTotal) * 100);
+
+            let title = "ROOKIE SCOUT";
+            if (myCompleted >= 11 && myCompleted <= 24) title = "DATA ANALYST";
+            else if (myCompleted >= 25) title = "MASTER SCOUT";
+
+            const userDisplay = document.getElementById('user-display');
+            if (userDisplay && State.currentUser) {
+                userDisplay.innerHTML = State.currentUser.split('@')[0].toUpperCase() + " <span style='color:var(--accent-color);'>[" + title + "]</span>";
+            }
 
             document.getElementById('scout-progress-text').innerText = `${myCompleted} / ${myTotal} Scouted`;
             document.getElementById('scout-progress-perc').innerText = `${perc}%`;
@@ -338,6 +354,7 @@ window.populateManualDispatchDropdowns = populateManualDispatchDropdowns;
 window.loadUserAdminTable = loadUserAdminTable;
 window.assignAllToScouter = assignAllToScouter;
 window.setGlobalEvent = setGlobalEvent;
+window.runAutoDNP = runAutoDNP;
 window.refreshApplicationData = refreshApplicationData;
 window.renderActiveAssignments = renderActiveAssignments;
 window.fetchStatboticsRoster = fetchStatboticsRoster;
@@ -346,3 +363,7 @@ window.fetchGlobalEventKey = fetchGlobalEventKey;
 window.initPermissionsUI = initPermissionsUI;
 window.launchScoutingSession = launchScoutingSession;
 window.loadCachesFromStorage = loadCachesFromStorage;
+window.renderPitMap = renderPitMap;
+window.initRadialMenu = initRadialMenu;
+
+initRadialMenu();

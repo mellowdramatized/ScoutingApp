@@ -20,4 +20,7 @@ export const State = {
     returnScrollPos: 0,
     currentScheduleMatches: [],
     currentLiveMatch: "TBD",
+    dnpList: [],
+    currentPitMap: [],
+    currentNavContext: 'root',
 };
