@@ -1,0 +1,328 @@
+/* ==========================================================================
+           1. RESET
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            line-height: 1.6;
+            font-size: var(--font-base);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ==========================================================================
+           2. LAYOUT CONTAINERS
+           ========================================================================== */
+        #app-container {
+            padding: 30px 50px;
+            max-width: var(--container-max);
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(400px, 35%) 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .match-alliance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-grey);
+            padding: 35px;
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-grey);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-float);
+            transition: var(--transition-smooth);
+        }
+
+        #main-table {
+            min-height: 400px;
+            background: var(--card-grey);
+            border-radius: var(--border-radius-md);
+            padding: 5px;
+            border: 1px solid var(--border-grey);
+        }
+
+        #match-history-table {
+            min-height: 250px;
+            background: var(--field-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-grey);
+        }
+
+        /* MOBILE RESPONSIVE TABLE FIXES */
+        .tabulator {
+            font-size: 14px !important;
+        }
+
+        .tabulator-cell {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            min-width: 40px !important;
+        }
+
+        /* ==========================================================================
+           3. TYPOGRAPHY
+           ========================================================================== */
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 4px solid var(--primary-color);
+            padding-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: var(--font-h1);
+            font-weight: 900;
+            margin-bottom: 40px;
+            text-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.2);
+        }
+
+        h2 {
+            font-size: var(--font-h2);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        h2.sub-title {
+            font-size: var(--font-h3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--text-white);
+            border: none;
+        }
+
+/* RESPONSIVE QUERIES */
+        @media (min-width: 2560px) {
+            #app-container {
+                max-width: 2000px;
+                padding: 50px 100px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 600px 1fr;
+                gap: 80px;
+            }
+
+            .scout-form {
+                max-width: 1200px;
+                padding: 60px;
+            }
+        }
+
+        @media (min-width: 1600px) and (max-width: 2559px) {
+            .dashboard-grid {
+                grid-template-columns: 500px 1fr;
+                gap: 60px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            #app-container {
+                padding: 25px 30px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 400px 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-container {
+                height: 500px;
+            }
+
+            .scout-form {
+                padding: 40px;
+            }
+
+            .match-detail-body {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .compare-sidebar {
+                flex: none;
+                height: 300px;
+            }
+
+            .pick-list-sidebar {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .user-info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .nav-tabs {
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 14px 20px;
+                font-size: 0.85rem;
+            }
+
+            .compare-slots {
+                grid-template-columns: 1fr;
+            }
+
+            .match-alliance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #app-container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.9rem;
+            }
+
+            .image-container {
+                height: 350px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 12px;
+            }
+        }
+
+        /* NATIVE MOBILE BOTTOM NAV INJECTION */
+        @media (max-width: 600px) {
+            .nav-tabs {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: var(--bg-black);
+                border-top: 1px solid var(--border-grey);
+                margin: 0;
+                padding: 10px 5px 25px 5px;
+                display: flex;
+                justify-content: space-around;
+                z-index: 10000;
+                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+                border-bottom: none;
+            }
+
+            .nav-btn {
+                flex: 1;
+                background: transparent;
+                border: none;
+                padding: 8px 4px;
+                font-size: 0.65rem;
+                border-radius: 8px;
+                color: var(--text-muted);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+                letter-spacing: 0.5px;
+                white-space: normal;
+                text-align: center;
+            }
+
+            .nav-btn span.icon {
+                display: block;
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+
+            .nav-btn.active {
+                background: rgba(230, 32, 32, 0.1);
+                color: var(--primary-color);
+                box-shadow: none;
+                transform: none;
+            }
+
+            #app-container {
+                padding: 15px 15px 90px 15px;
+            }
+
+            .tabulator-row {
+                margin-bottom: 8px;
+                border-radius: 8px;
+                border: 1px solid var(--border-grey) !important;
+            }
+
+            .tabulator-responsive-collapse {
+                background: #111 !important;
+            }
+
+            .submit-btn {
+                padding: 18px;
+                font-size: 0.9rem;
+            }
+
+            .scout-form label {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (pointer: fine) {
+            ::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--bg-black);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--border-light);
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--primary-color);
+            }
+        }
