@@ -63,4 +63,52 @@ export function initRadialMenu() {
             if (existing) existing.remove();
         }
     });
+
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    if (isTouchDevice) {
+        const fab = document.createElement('div');
+        fab.id = 'mobile-radial-trigger';
+        fab.innerHTML = '🎡';
+        fab.style.position = 'fixed';
+        fab.style.bottom = '25px';
+        fab.style.right = '25px';
+        fab.style.zIndex = '9998';
+        fab.style.width = '60px';
+        fab.style.height = '60px';
+        fab.style.borderRadius = '50%';
+        fab.style.backgroundColor = 'var(--accent-color)';
+        fab.style.display = 'flex';
+        fab.style.alignItems = 'center';
+        fab.style.justifyContent = 'center';
+        fab.style.fontSize = '24px';
+        fab.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.3)';
+        fab.style.cursor = 'pointer';
+        fab.style.userSelect = 'none';
+        fab.style.transform = 'translateZ(0)'; // Force hardware acceleration
+        fab.style.touchAction = 'none';
+        
+        document.body.appendChild(fab);
+
+        fab.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+            
+            const syntheticEvent = new MouseEvent('contextmenu', {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+                clientX: Math.round(window.innerWidth / 2),
+                clientY: Math.round(window.innerHeight / 2)
+            });
+            
+            document.dispatchEvent(syntheticEvent);
+        }, { passive: false });
+    }
+
+    document.addEventListener('touchmove', (e) => {
+        if (document.getElementById('radial-menu-overlay')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 }
