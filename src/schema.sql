@@ -106,7 +106,46 @@ CREATE POLICY "Allow authenticated full access to api_keys" ON public.api_keys F
 CREATE POLICY "Allow authenticated full access to scout_assignments" ON public.scout_assignments FOR ALL TO authenticated USING (true);
 CREATE POLICY "Allow authenticated full access to pit_scouting" ON public.pit_scouting FOR ALL TO authenticated USING (true);
 
+-- Allow public read access for alliance partner dashboards
+CREATE POLICY "Allow public read access to api_keys" ON public.api_keys FOR SELECT USING (true);
+CREATE POLICY "Allow public read access to scout_assignments" ON public.scout_assignments FOR SELECT USING (true);
+CREATE POLICY "Allow public read access to pit_scouting" ON public.pit_scouting FOR SELECT USING (true);
+
 -- Storage Policies
 CREATE POLICY "Allow public viewing of scouting data" ON storage.objects FOR SELECT TO public USING (bucket_id = 'scouting-data');
 CREATE POLICY "Allow authenticated uploads to scouting data" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'scouting-data');
 CREATE POLICY "Allow authenticated updates to scouting data" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'scouting-data');
+
+-- 5. USER SESSIONS (Telemetry Dashboard)
+CREATE TABLE IF NOT EXISTS public.user_sessions (
+    session_id uuid PRIMARY KEY,
+    user_id uuid REFERENCES auth.users ON DELETE CASCADE,
+    user_name text NOT NULL,
+    current_view text NOT NULL,
+    start_time timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    last_heartbeat timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    status text DEFAULT 'online'::text NOT NULL
+);
+
+-- 6. PARTNER TOKENS (Secure Alliance Sharing)
+CREATE TABLE IF NOT EXISTS public.partner_tokens (
+    token_string text PRIMARY KEY,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL
+);
+
+-- Enable Supabase Realtime for user_sessions
+ALTER PUBLICATION supabase_realtime ADD TABLE public.user_sessions;
+
+-- RLS policies for user_sessions
+ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can only insert/update their own uid" ON public.user_sessions FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Only users with the 'Admin' role can select/read" ON public.user_sessions FOR SELECT TO authenticated USING (
+    (SELECT role FROM public.profiles WHERE profiles.id = auth.uid()) IN ('admin', 'owner')
+);
+
+-- RLS policies for partner_tokens
+ALTER TABLE public.partner_tokens ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access to partner_tokens" ON public.partner_tokens FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert to partner_tokens" ON public.partner_tokens FOR INSERT TO authenticated WITH CHECK (true);

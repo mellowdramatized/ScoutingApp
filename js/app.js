@@ -7,7 +7,7 @@ import { getPitFormData, saveDraft, handleScoutSubmit, getMatchFormData, resetMa
 import { toggleCompareFilter, renderCompareSidebar, setCompareSlot, renderCompareSlot, checkAutonSynergy, getNormalizeValue, updateRadarChart, allowDrop, dragLeave, drag, drop, addToPickList, removeFromPickList, savePickListsToStorage, loadPickListsFromStorage, clearPicklists, renderPickLists, exportPicklists } from './draft.js';
 import { renderMasterRoster, launchDrillDownProfile, triggerScheduleDrillDown, handleProfileReturn, exportMergedStatboticsData } from './roster.js';
 import { predictAllianceScore, loadTeamSchedule, jumpToNextMatch, openMatchVideo, closeMatchVideo, loadLiveStream } from './schedule.js';
-import { loadAdminTelemetry, wipeAssignments, autoAssign, manualAssign, populateManualDispatchDropdowns, loadUserAdminTable, assignAllToScouter, setGlobalEvent, runAutoDNP } from './admin.js';
+import { loadAdminTelemetry, wipeAssignments, autoAssign, manualAssign, populateManualDispatchDropdowns, loadUserAdminTable, assignAllToScouter, setGlobalEvent, runAutoDNP, subscribeToLiveTelemetry, generatePartnerLink } from './admin.js';
 import { renderPitMap } from './pitmap.js';
 import { initRadialMenu } from './radial.js';
 
@@ -279,11 +279,60 @@ export function loadCachesFromStorage() {
             }
         }
 
+export async function checkPartnerMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const view = urlParams.get('view');
+    const token = urlParams.get('token');
+    
+    if (view === 'partner' && token) {
+        const { data, error } = await sbClient.from('partner_tokens')
+            .select('*')
+            .eq('token_string', token)
+            .eq('status', 'active')
+            .single();
+            
+        if (data && new Date(data.expires_at) > new Date()) {
+            const authScreen = document.getElementById('auth-screen');
+            const appContainer = document.getElementById('app-container');
+            const navTabs = document.querySelector('.nav-tabs');
+            const userInfoBar = document.querySelector('.user-info-bar');
+            
+            if (authScreen) authScreen.classList.add('hidden');
+            if (appContainer) appContainer.classList.remove('hidden');
+            if (navTabs) navTabs.classList.add('hidden');
+            if (userInfoBar) userInfoBar.classList.add('hidden');
+            
+            State.currentUserRole = 'strategist';
+            State.currentUser = 'Alliance Partner';
+            
+            fetchGlobalEventKey().then(() => {
+                refreshApplicationData();
+                switchView('view-compare');
+            });
+            
+            return true;
+        } else {
+            alert('Invalid or expired partner token.');
+            urlParams.delete('view');
+            urlParams.delete('token');
+            const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+            return false;
+        }
+    }
+    return false;
+}
+
 applyTeamBranding();
 if (localStorage.getItem('wobot_theme') === 'light') toggleTheme();
 loadCachesFromStorage();
 setInterval(checkConnection, 7000);
-bootApplication();
+
+checkPartnerMode().then((isPartner) => {
+    if (!isPartner) {
+        bootApplication();
+    }
+});
 sbClient.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT') showAuthScreen();
         });

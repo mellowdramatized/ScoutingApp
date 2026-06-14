@@ -1,5 +1,6 @@
 import { APP_CONFIG } from './config.js';
 import { State } from './state.js';
+import { updateTelemetryView } from './api.js';
 import { renderCompareSidebar, updateRadarChart } from './draft.js';
 import { renderMasterRoster } from './roster.js';
 import { loadTeamSchedule } from './schedule.js';
@@ -76,6 +77,8 @@ export function switchView(targetId) {
             State.currentNavContext = targetId;
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            updateTelemetryView(targetId);
 
             const activeView = document.getElementById(targetId);
             if (activeView) activeView.classList.remove('hidden');

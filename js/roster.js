@@ -49,6 +49,15 @@ export function renderMasterRoster() {
         }
 
 export async function launchDrillDownProfile(teamData) {
+            if (!State.returnViewOverride) {
+                State.returnViewOverride = State.currentNavContext;
+                if (State.currentNavContext === 'view-compare') {
+                    const sbList = document.getElementById('compare-sidebar-list');
+                    State.returnScrollPos = sbList ? sbList.scrollTop : 0;
+                } else {
+                    State.returnScrollPos = window.scrollY;
+                }
+            }
             var feulAccuracy = teamData.feulaccuracy;
             if (feulAccuracy == null) {
                 feulAccuracy = 0
@@ -270,7 +279,21 @@ export function triggerScheduleDrillDown(teamData) {
         }
 
 export function handleProfileReturn() {
-            switchView('view-roster');
+            const returnTo = State.returnViewOverride || 'view-roster';
+            State.returnViewOverride = null;
+            switchView(returnTo);
+            
+            if (State.returnScrollPos) {
+                setTimeout(() => {
+                    if (returnTo === 'view-compare') {
+                        const sbList = document.getElementById('compare-sidebar-list');
+                        if (sbList) sbList.scrollTop = State.returnScrollPos;
+                    } else {
+                        window.scrollTo(0, State.returnScrollPos);
+                    }
+                    State.returnScrollPos = 0;
+                }, 100);
+            }
         }
 
 export async function exportMergedStatboticsData() {

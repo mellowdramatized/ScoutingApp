@@ -1,6 +1,23 @@
 import { STRATEGIC_TAGS } from './config.js';
 import { State } from './state.js';
 import { launchDrillDownProfile } from './roster.js';
+import { sbClient } from './api.js';
+
+let draftChannel = null;
+
+export function setupDraftRealtime() {
+    if (draftChannel) {
+        sbClient.removeChannel(draftChannel);
+    }
+    draftChannel = sbClient.channel(`draft_room_${State.activeEventKey}`);
+    draftChannel.on('broadcast', { event: 'update_picklists' }, (payload) => {
+        if (payload.payload) {
+            State.pickLists = payload.payload;
+            localStorage.setItem(`wobot_picklists_${State.activeEventKey}`, JSON.stringify(State.pickLists));
+            renderPickLists();
+        }
+    }).subscribe();
+}
 
 export function toggleCompareFilter(tagId) {
             if (State.activeCompareFilters.includes(tagId)) {
@@ -287,15 +304,48 @@ export function removeFromPickList(tier, teamNum) {
             renderPickLists();
         }
 
-export function savePickListsToStorage() {
-            localStorage.setItem(`wobot_picklists_${State.activeEventKey}`, JSON.stringify(State.pickLists));
+export async function savePickListsToStorage() {
+            const listStr = JSON.stringify(State.pickLists);
+            localStorage.setItem(`wobot_picklists_${State.activeEventKey}`, listStr);
+
+            try {
+                await sbClient.from('api_keys').upsert({
+                    name: `picklists_${State.activeEventKey}`,
+                    key_value: listStr
+                }, { onConflict: 'name' });
+            } catch (e) {
+                console.error("Failed to save picklists to DB", e);
+            }
+
+            if (draftChannel) {
+                draftChannel.send({
+                    type: 'broadcast',
+                    event: 'update_picklists',
+                    payload: State.pickLists
+                });
+            }
         }
 
-export function loadPickListsFromStorage() {
+export async function loadPickListsFromStorage() {
+            setupDraftRealtime();
+            
             const saved = localStorage.getItem(`wobot_picklists_${State.activeEventKey}`);
             if (saved) {
-                State.pickLists = JSON.parse(saved);
-                renderPickLists();
+                try {
+                    State.pickLists = JSON.parse(saved);
+                    renderPickLists();
+                } catch(e) {}
+            }
+
+            try {
+                const { data, error } = await sbClient.from('api_keys').select('key_value').eq('name', `picklists_${State.activeEventKey}`).maybeSingle();
+                if (data && data.key_value) {
+                    State.pickLists = JSON.parse(data.key_value);
+                    localStorage.setItem(`wobot_picklists_${State.activeEventKey}`, data.key_value);
+                    renderPickLists();
+                }
+            } catch (e) {
+                console.error("Failed to load picklists from DB", e);
             }
         }
 

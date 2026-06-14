@@ -701,6 +701,11 @@
 
             <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
                 <div class="card">
+                    <h2 class="sub-title">Generate Alliance Partner Link</h2>
+                    <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Generate a secure, temporary link (valid for 4 hours) to share your dashboard with alliance partners.</p>
+                    <button onclick="generatePartnerLink().then(url => { if(url) { navigator.clipboard.writeText(url); alert('Partner link copied to clipboard!'); } })" class="submit-btn" style="background:var(--success-color); width:100%; padding:18px 25px; font-size: 0.9rem;">GENERATE & COPY LINK</button>
+                </div>
+                <div class="card">
                     <h2 class="sub-title">Auto-Assign Teams</h2>
                     <p style="color:var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">Automatically balance
                         un-scouted teams from the current event across all Scouters.</p>
