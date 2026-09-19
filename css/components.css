@@ -524,6 +524,7 @@
     height: 100vh;
     z-index: 999999;
     pointer-events: auto;
+    touch-action: none;
 }
 
 .radial-menu-item {

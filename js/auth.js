@@ -1,6 +1,6 @@
 import { APP_CONFIG } from './config.js';
 import { State } from './state.js';
-import { sbClient, apiFetchTBA } from './api.js';
+import { sbClient, apiFetchTBA, startTelemetrySession } from './api.js';
 import { showToast } from './ui.js';
 import { refreshApplicationData, performBackgroundSync, fetchGlobalEventKey, initPermissionsUI } from './app.js';
 

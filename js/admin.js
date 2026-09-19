@@ -6,6 +6,7 @@ import { setSyncState } from './auth.js';
 import { refreshApplicationData, fetchStatboticsRoster, fetchGlobalEventKey } from './app.js';
 
 export async function loadAdminTelemetry(pitData) {
+            subscribeToLiveTelemetry();
             const scouterCounts = {};
             pitData.forEach(report => {
                 const name = report.scouter_name || 'Unknown';
@@ -271,3 +272,39 @@ export function runAutoDNP() {
     }
     showToast(`Auto DNP applied: ${blacklistedCount} teams blacklisted.`);
 }
+
+export function subscribeToLiveTelemetry() {
+    sbClient.channel('schema-db-changes')
+        .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'user_sessions' },
+            (payload) => {
+                console.log(`Telemetry Update: ${payload.new.user_name} changed view to ${payload.new.current_view}`);
+            }
+        )
+        .subscribe();
+}
+
+export async function generatePartnerLink() {
+    const token = Math.random().toString(36).substring(2, 10);
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 4);
+    
+    const { error } = await sbClient.from('partner_tokens').insert({
+        token_string: token,
+        expires_at: expiresAt.toISOString(),
+        status: 'active'
+    });
+    
+    if (error) {
+        console.error("Error generating partner link:", error);
+        return null;
+    }
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', 'partner');
+    url.searchParams.set('token', token);
+    return url.toString();
+}
+
+window.generatePartnerLink = generatePartnerLink;

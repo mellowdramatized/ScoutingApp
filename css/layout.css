@@ -238,53 +238,11 @@
         /* NATIVE MOBILE BOTTOM NAV INJECTION */
         @media (max-width: 600px) {
             .nav-tabs {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: var(--bg-black);
-                border-top: 1px solid var(--border-grey);
-                margin: 0;
-                padding: 10px 5px 25px 5px;
-                display: flex;
-                justify-content: space-around;
-                z-index: 10000;
-                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
-                border-bottom: none;
-            }
-
-            .nav-btn {
-                flex: 1;
-                background: transparent;
-                border: none;
-                padding: 8px 4px;
-                font-size: 0.65rem;
-                border-radius: 8px;
-                color: var(--text-muted);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-                letter-spacing: 0.5px;
-                white-space: normal;
-                text-align: center;
-            }
-
-            .nav-btn span.icon {
-                display: block;
-                font-size: 1.5rem;
-                margin-bottom: 2px;
-            }
-
-            .nav-btn.active {
-                background: rgba(230, 32, 32, 0.1);
-                color: var(--primary-color);
-                box-shadow: none;
-                transform: none;
+                display: none;
             }
 
             #app-container {
-                padding: 15px 15px 90px 15px;
+                padding: 15px;
             }
 
             .tabulator-row {

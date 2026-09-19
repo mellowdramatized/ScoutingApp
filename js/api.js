@@ -47,3 +47,45 @@ export async function getNexusPitLayout(eventKey) {
         return null;
     }
 }
+
+let activeSessionId = null;
+let heartbeatInterval = null;
+
+export async function startTelemetrySession(userId, userName) {
+    activeSessionId = crypto.randomUUID();
+    
+    const { error } = await sbClient.from('user_sessions').insert({
+        session_id: activeSessionId,
+        user_id: userId,
+        user_name: userName,
+        current_view: 'Dashboard',
+        status: 'online'
+    });
+
+    if (!error) {
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+        heartbeatInterval = setInterval(async () => {
+            if (activeSessionId) {
+                await sbClient.from('user_sessions').update({
+                    last_heartbeat: new Date().toISOString()
+                }).eq('session_id', activeSessionId);
+            }
+        }, 120000);
+
+        window.addEventListener('beforeunload', () => {
+            if (activeSessionId) {
+                const url = `${APP_CONFIG.supabaseUrl}/rest/v1/user_sessions?session_id=eq.${activeSessionId}&apikey=${APP_CONFIG.supabaseAnonKey}`;
+                const blob = new Blob([JSON.stringify({ status: 'offline' })], { type: 'application/json' });
+                navigator.sendBeacon(url, blob);
+            }
+        });
+    }
+}
+
+export async function updateTelemetryView(viewName) {
+    if (!activeSessionId) return;
+    await sbClient.from('user_sessions').update({
+        current_view: viewName,
+        last_heartbeat: new Date().toISOString()
+    }).eq('session_id', activeSessionId);
+}
