@@ -135,6 +135,25 @@ CREATE TABLE IF NOT EXISTS public.partner_tokens (
     status text DEFAULT 'active'::text NOT NULL
 );
 
+-- 7. MATCH SCOUTING TABLE (To resolve the 404 Error)
+CREATE TABLE IF NOT EXISTS public.match_scouting (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    team_number integer NOT NULL,
+    event_key text NOT NULL,
+    match_number integer NOT NULL,
+    scouter_name text,
+    auto_points integer DEFAULT 0,
+    teleop_points integer DEFAULT 0,
+    endgame_status text,
+    notes text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS and Mirror the Pit Scouting Policies
+ALTER TABLE public.match_scouting ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow authenticated full access to match_scouting" ON public.match_scouting FOR ALL TO authenticated USING (true);
+CREATE POLICY "Allow public read access to match_scouting" ON public.match_scouting FOR SELECT USING (true);
+
 -- Enable Supabase Realtime for user_sessions
 ALTER PUBLICATION supabase_realtime ADD TABLE public.user_sessions;
 
