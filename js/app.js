@@ -145,11 +145,7 @@ export async function renderActiveAssignments() {
             const myAssignments = assignments ? assignments.filter(a => a.scouter_email === State.currentUser) : [];
             const myCompleted = myAssignments.filter(a => a.completed).length;
             const myTotal = myAssignments.length;
-            const perc = myTotal === 0 ? 100 : Math.round((myCompleted / myTotal) * 100);
-
-            let title = "ROOKIE SCOUT";
-            if (myCompleted >= 11 && myCompleted <= 24) title = "DATA ANALYST";
-            else if (myCompleted >= 25) title = "MASTER SCOUT";
+            const perc = myTotal === 0 ? 100 : Math.round((myCompleted / myTotal) * 100)
 
             const userDisplay = document.getElementById('user-display');
             if (userDisplay && State.currentUser) {

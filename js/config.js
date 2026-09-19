@@ -6,9 +6,9 @@ if (!localStorage.getItem('wobot_has_visited')) {
 export const APP_CONFIG = {
             teamNumber: "141",
             teamName: "WOBOT",
-            appTitle: "Scouting Dashboard v8.0",
-            supabaseUrl: 'https://gtmyuivkjtfxbswecrhz.supabase.co',
-            supabaseAnonKey: 'sb_publishable_h6UZTcvyYUhJ6x4OeNwk8Q_ML3lPmRw',
+            appTitle: "Scouting Dashboard ",
+            supabaseUrl: 'https://hlhvcmoanvpkpamjsxqx.supabase.co',
+            supabaseAnonKey: 'sb_publishable_hhr8x0eI5dWTpgqmBFKafA_GjhjKeeJ',
             ownerEmailLock: "carmelokyles@gmail.com",
             defaultEventYear: "2026",
             teamSignupCode: "wobot2026"
