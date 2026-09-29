@@ -273,8 +273,12 @@ export function runAutoDNP() {
     showToast(`Auto DNP applied: ${blacklistedCount} teams blacklisted.`);
 }
 
-export function subscribeToLiveTelemetry() {
-    sbClient.channel('schema-db-changes')
+export async function subscribeToLiveTelemetry() {
+    if (window.telemetryChannel) {
+        await sbClient.removeChannel(window.telemetryChannel);
+    }
+
+    window.telemetryChannel = sbClient.channel('schema-db-changes')
         .on(
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'user_sessions' },

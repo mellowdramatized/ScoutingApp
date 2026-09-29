@@ -1,6 +1,6 @@
 import { APP_CONFIG } from './config.js';
 import { State } from './state.js';
-import { sbClient, apiFetchStatbotics, apiFetchTBA, getNexusPitLayout } from './api.js';
+import { sbClient, apiFetchStatbotics, apiFetchTBA, getNexusPitLayout} from './api.js';
 import { applyTeamBranding, showToast, toggleTheme, togglePasswordVisibility, switchView, switchDetailTab } from './ui.js';
 import { setSyncState, updateConnectionUI, checkConnection, handleAuth, handleLogout, bootApplication, showAuthScreen, launchSecureSession } from './auth.js';
 import { getPitFormData, saveDraft, handleScoutSubmit, getMatchFormData, resetMatchForm, handleMatchScoutSubmit, compressImage, previewRobotImage, saveToOfflineQueue, dataURItoBlob, processPayloadUpload, uploadOfflineData, startDictation, resetDictationBtn } from './forms.js';
@@ -181,12 +181,14 @@ export async function renderActiveAssignments() {
 }
 export async function fetchStatboticsRoster() {
     if (!State.activeEventKey || State.activeEventKey === "Pending...") return;
+
     try {
         const res = await apiFetchStatbotics(`https://api.statbotics.io/v3/team_events?event=${State.activeEventKey}`);
         if (!res.ok) throw new Error("Statbotics fetch failed");
-        const statboticsData = await res.json();
 
+        const statboticsData = await res.json();
         let fastEpaDict = {};
+
         statboticsData.forEach(team => {
             fastEpaDict[team.team] = {
                 team_name: team.team_name,
@@ -198,11 +200,51 @@ export async function fetchStatboticsRoster() {
 
         localStorage.setItem('statbotics_event_cache', JSON.stringify(fastEpaDict));
         State.statboticsCache = fastEpaDict;
+
     } catch (err) {
-        console.warn("Could not reach Statbotics API. Using offline cache if available.");
+        console.warn(`Statbotics API unreachable (${err.message}). Attempting TBA fallback...`);
+
+try {
+    const { data: keyData, error: keyError } = await sbClient
+        .from('api_keys')
+        .select('key_value')
+        .eq('name', 'tba')
+        .single();
+
+    if (keyError || !keyData) {
+        throw new Error("Could not retrieve TBA API key from database.");
+    }
+
+    // Moved the Auth Key to the URL query parameters to avoid browser CORS preflight issues
+    const tbaUrl = `https://www.thebluealliance.com/api/v3/event/${State.activeEventKey}/teams?X-TBA-Auth-Key=${keyData.key_value}`;
+    const tbaRes = await fetch(tbaUrl);
+    
+    if (!tbaRes.ok) {
+        // Extract the exact reason TBA rejected the request
+        const tbaErrorText = await tbaRes.text();
+        throw new Error(`TBA fetch failed with status ${tbaRes.status}. Response: ${tbaErrorText}`);
+    }
+    
+    const tbaData = await tbaRes.json();
+    let fastEpaDict = {};
+    
+    tbaData.forEach(team => {
+        fastEpaDict[team.team_number] = {
+            team_name: team.nickname, 
+            epa_total: 0,             
+            epa_auto: 0,              
+            rank: '-'                 
+        };
+    });
+
+    localStorage.setItem('statbotics_event_cache', JSON.stringify(fastEpaDict));
+    State.statboticsCache = fastEpaDict;
+    
+} catch (tbaErr) {
+    console.warn("Both Statbotics and TBA fallback failed. Resorting to local cache.", tbaErr);
+} 
     }
 }
-
 export async function performBackgroundSync() {
     if (!State.activeEventKey || State.activeEventKey === "Pending...") return;
 
