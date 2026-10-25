@@ -9,7 +9,21 @@ export function initRadialMenu() {
         if (existing) existing.remove();
 
         let context = State.currentNavContext || 'root';
-        let menuItems = RADIAL_MENU_CONFIG[context] || RADIAL_MENU_CONFIG['root'];
+        
+        // Clone the config array so we can safely inject the Admin button without permanent mutation
+        let menuItems = [...(RADIAL_MENU_CONFIG[context] || RADIAL_MENU_CONFIG['root'])];
+
+        // Dynamically inject the Admin button if the user has permission
+        const isAdmin = ['admin', 'owner'].includes(State.currentUserRole);
+        if (isAdmin && context === 'root') {
+            if (!menuItems.some(item => item.label === 'Admin' || item.label === 'Admin Panel')) {
+                menuItems.push({
+                    icon: '⚙️',
+                    label: 'Admin',
+                    action: "switchView('view-admin')"
+                });
+            }
+        }
 
         let overlay = document.createElement('div');
         overlay.id = 'radial-menu-overlay';
@@ -35,6 +49,12 @@ export function initRadialMenu() {
             btn.className = 'radial-menu-item';
             if (item.label === 'Return to Dashboard' || item.label === 'Dashboard') {
                 btn.classList.add('radial-return');
+            }
+
+            // Highlight the Admin button
+            if (item.label === 'Admin') {
+                btn.style.border = '2px solid var(--primary-color, #ff4444)';
+                btn.style.color = 'var(--primary-color, #ff4444)';
             }
 
             btn.style.left = `${x}px`;

@@ -35,7 +35,7 @@ const {
 const loadPickListsFromStorage =
     DraftModule.loadPickListsFromStorage ||
     DraftModule.loadPickListsToStorage ||
-    (() => {});
+    (() => { });
 
 const TEMP_SCOUTER_STORAGE_KEY = 'wobot_temp_scouter_pass';
 
@@ -209,17 +209,19 @@ export async function fetchStatboticsRoster() {
     const yearMatch = eventKey.match(/^(\d{4})/);
     const eventYear = yearMatch ? parseInt(yearMatch[1], 10) : (APP_CONFIG.defaultEventYear || 2026);
 
+    const SB_MIRROR = 'https://api-statbotics.iterativerefinement.com/v3';
+
     try {
-        const res = await apiFetchStatbotics(`https://api.statbotics.io/v3/team_events?event=${encodeURIComponent(eventKey)}`);
-        if (!res.ok) throw new Error(`Statbotics fetch failed (${res.status})`);
+        // Tier 1: Try the specific event on the mirror
+        const res = await apiFetchStatbotics(`${SB_MIRROR}/team_events?event=${encodeURIComponent(eventKey)}`);
+        if (!res.ok) throw new Error(`Mirror returned ${res.status}`);
 
         const statboticsData = await res.json();
         if (!Array.isArray(statboticsData) || statboticsData.length === 0) {
-            throw new Error("Statbotics returned empty event roster");
+            throw new Error("Mirror returned empty event roster");
         }
 
         let fastEpaDict = {};
-
         statboticsData.forEach(team => {
             fastEpaDict[team.team] = {
                 team_name: team.team_name,
@@ -233,70 +235,89 @@ export async function fetchStatboticsRoster() {
         State.statboticsCache = fastEpaDict;
 
     } catch (err) {
-        console.warn(`Statbotics API unreachable for ${eventKey} (${err.message}). Attempting TBA + Season EPA fallback...`);
+        console.warn(`[Sync] Statbotics mirror event API failed for ${eventKey} (${err.message}). Pulling TBA roster...`);
 
         try {
-            const seasonEpaMap = {};
-            const seasonRes = await apiFetchStatbotics(`https://api.statbotics.io/v3/team_years?year=${eventYear}&district=fim&limit=1000`);
-            if (seasonRes.ok) {
-                const seasonTeams = await seasonRes.json();
-                if (Array.isArray(seasonTeams)) {
-                    seasonTeams.forEach(t => {
-                        seasonEpaMap[t.team] = {
-                            team_name: t.name || t.team_name || `Team ${t.team}`,
-                            epa_total: t.epa?.breakdown?.total_points ?? t.epa?.total_points?.mean ?? 0,
-                            epa_auto: t.epa?.breakdown?.auto_points ?? t.epa?.auto_points?.mean ?? 0
-                        };
-                    });
-                }
-            }
-            localStorage.setItem('statbotics_season_cache', JSON.stringify(seasonEpaMap));
-
             const { data: keyData, error: keyError } = await sbClient
                 .from('api_keys')
                 .select('key_value')
                 .eq('name', 'tba')
                 .maybeSingle();
 
-            if (keyError || !keyData || !keyData.key_value) {
-                throw new Error("Could not retrieve TBA API key from database.");
-            }
+            if (keyError || !keyData || !keyData.key_value) throw new Error("Missing TBA API key.");
 
+            // 1. Get exact team list from TBA
             const tbaUrl = `https://www.thebluealliance.com/api/v3/event/${encodeURIComponent(eventKey)}/teams?X-TBA-Auth-Key=${encodeURIComponent(keyData.key_value)}`;
             const tbaRes = await fetch(tbaUrl);
-
-            if (!tbaRes.ok) {
-                const tbaErrorText = await tbaRes.text();
-                throw new Error(`TBA fetch failed with status ${tbaRes.status}. Response: ${tbaErrorText}`);
-            }
+            if (!tbaRes.ok) throw new Error(`TBA fetch failed: ${tbaRes.status}`);
 
             const tbaData = await tbaRes.json();
+
+            // 2. Bulk fetch helper using the Mirror
+            const fetchPage = async (year, offset) => {
+                try {
+                    const r = await apiFetchStatbotics(`${SB_MIRROR}/team_years?year=${year}&limit=1000&offset=${offset}`);
+                    return r.ok ? await r.json() : [];
+                } catch (e) {
+                    return [];
+                }
+            };
+
+            // 3. Attempt current year fetch
+            const [p1, p2, p3, p4] = await Promise.all([
+                fetchPage(eventYear, 0), fetchPage(eventYear, 1000), fetchPage(eventYear, 2000), fetchPage(eventYear, 3000)
+            ]);
+            let allSeasonTeams = [...p1, ...p2, ...p3, ...p4];
+
+            // 4. Fallback to previous year if the mirror also lacks current year data
+            if (allSeasonTeams.length === 0) {
+                console.warn(`[Sync] Mirror lacks ${eventYear} season data. Falling back to ${eventYear - 1} end-of-year EPAs...`);
+                const lastYear = eventYear - 1;
+                const [old1, old2, old3, old4] = await Promise.all([
+                    fetchPage(lastYear, 0), fetchPage(lastYear, 1000), fetchPage(lastYear, 2000), fetchPage(lastYear, 3000)
+                ]);
+                allSeasonTeams = [...old1, ...old2, ...old3, ...old4];
+            }
+
+            const seasonEpaMap = {};
+            allSeasonTeams.forEach(sbData => {
+                if (sbData && sbData.team) {
+                    seasonEpaMap[sbData.team] = {
+                        team_name: sbData.name || sbData.team_name || `Team ${sbData.team}`,
+                        epa_total: sbData.epa?.breakdown?.total_points ?? sbData.epa?.total_points?.mean ?? 0,
+                        epa_auto: sbData.epa?.breakdown?.auto_points ?? sbData.epa?.auto_points?.mean ?? 0
+                    };
+                }
+            });
+
+            // 5. Map the TBA roster directly against our bulk dictionary
             let fastEpaDict = {};
             const tbaNameCache = JSON.parse(localStorage.getItem('tbaCache') || '{}');
 
             tbaData.forEach(team => {
                 const tNum = parseInt(team.team_number, 10);
-                const seasonStats = seasonEpaMap[tNum] || {};
                 tbaNameCache[tNum] = team.nickname || team.name || `Team ${tNum}`;
 
+                const cachedStats = seasonEpaMap[tNum] || {};
+
                 fastEpaDict[tNum] = {
-                    team_name: team.nickname || seasonStats.team_name || `Team ${tNum}`,
-                    epa_total: seasonStats.epa_total || 0,
-                    epa_auto: seasonStats.epa_auto || 0,
+                    team_name: tbaNameCache[tNum],
+                    epa_total: cachedStats.epa_total || 0,
+                    epa_auto: cachedStats.epa_auto || 0,
                     rank: '-'
                 };
             });
 
             localStorage.setItem('tbaCache', JSON.stringify(tbaNameCache));
+            localStorage.setItem('statbotics_season_cache', JSON.stringify(seasonEpaMap));
             localStorage.setItem('statbotics_event_cache', JSON.stringify(fastEpaDict));
             State.statboticsCache = fastEpaDict;
 
         } catch (tbaErr) {
-            console.warn("Both Statbotics and TBA fallback failed. Resorting to local cache.", tbaErr);
+            console.warn("[Sync] TBA/Season fallback also failed:", tbaErr);
         }
     }
 }
-
 export async function performBackgroundSync() {
     if (!State.activeEventKey || State.activeEventKey === "Pending...") return;
 

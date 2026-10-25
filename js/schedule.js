@@ -7,15 +7,36 @@ import { triggerScheduleDrillDown } from './roster.js';
 
 export function predictAllianceScore(allianceTeamKeys) {
     let score = 0; let auto = 0; let tele = 0;
+    
+    // Pull both event and season caches dynamically
+    const eventCache = State.statboticsCache || {};
+    let seasonCache = {};
+    try {
+        seasonCache = JSON.parse(localStorage.getItem('statbotics_season_cache') || '{}');
+    } catch (e) {
+        console.warn("Failed to load season cache for predictor", e);
+    }
+
     allianceTeamKeys.forEach(teamKey => {
         let tNum = parseInt(teamKey.replace('frc', ''));
-        let stData = State.statboticsCache[tNum];
-        if (stData) {
-            score += parseFloat(stData.epa_total || 0);
-            auto += parseFloat(stData.epa_auto || 0);
-            tele += (parseFloat(stData.epa_total || 0) - parseFloat(stData.epa_auto || 0));
+        
+        let stData = eventCache[tNum] || {};
+        let sData = seasonCache[tNum] || {};
+
+        let epaTotal = parseFloat(stData.epa_total || 0);
+        let epaAuto = parseFloat(stData.epa_auto || 0);
+
+        // Fallback to Season EPA if Event EPA is 0 or missing
+        if (epaTotal === 0 && sData.epa_total) {
+            epaTotal = parseFloat(sData.epa_total || 0);
+            epaAuto = parseFloat(sData.epa_auto || 0);
         }
+
+        score += epaTotal;
+        auto += epaAuto;
+        tele += (epaTotal - epaAuto);
     });
+    
     return { score: score.toFixed(1), auto: auto.toFixed(1), tele: tele.toFixed(1) };
 }
 
@@ -51,6 +72,12 @@ export async function loadTeamSchedule() {
         let minDiff = 9999; let hardestMatch = "None";
 
         let html = '';
+        
+        let seasonCache = {};
+        try {
+            seasonCache = JSON.parse(localStorage.getItem('statbotics_season_cache') || '{}');
+        } catch (e) {}
+
         matches.forEach(m => {
             let redTeams = m.alliances.red.team_keys;
             let blueTeams = m.alliances.blue.team_keys;
@@ -86,7 +113,12 @@ export async function loadTeamSchedule() {
 
             const getContribStr = (keys) => keys.map(t => {
                 let num = t.replace('frc', '');
-                let pts = State.statboticsCache[num] ? Number(State.statboticsCache[num].epa_total || 0).toFixed(1) : '-';
+                
+                let eventEpa = State.statboticsCache[num] ? parseFloat(State.statboticsCache[num].epa_total || 0) : 0;
+                let seasonEpa = seasonCache[num] ? parseFloat(seasonCache[num].epa_total || 0) : 0;
+                let effectiveEpa = eventEpa > 0 ? eventEpa : seasonEpa;
+                let pts = effectiveEpa > 0 ? effectiveEpa.toFixed(1) : '-';
+                
                 let isTarget = num === targetTeam.toString();
 
                 let cachedTeam = State.globalDataCache.find(d => d.team_number === parseInt(num));
@@ -99,11 +131,11 @@ export async function loadTeamSchedule() {
                 }
 
                 return `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--border-grey); padding-bottom:6px; ${isTarget ? 'color:var(--text-white); font-weight:900;' : 'color:var(--text-muted);'}">
-                            <a href="javascript:void(0)" onclick="triggerScheduleDrillDown(${teamObjStr})" style="color: inherit; text-decoration: none; border-bottom: 1px dashed currentColor; padding-bottom: 2px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-color)'" onmouseout="this.style.color='${isTarget ? 'var(--text-white)' : 'var(--text-muted)'}'">
-                                ${isTarget ? '► ' : ''}Team ${num}
-                            </a>
-                            <span style="color:var(--accent-color); font-weight:bold; font-size: 0.9rem;">${pts} pts</span>
-                        </div>`;
+                            <a href="javascript:void(0)" onclick="triggerScheduleDrillDown(${teamObjStr})" style="color: inherit; text-decoration: none; border-bottom: 1px dashed currentColor; padding-bottom: 2px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-color)'" onmouseout="this.style.color='${isTarget ? 'var(--text-white)' : 'var(--text-muted)'}'">
+                                ${isTarget ? '► ' : ''}Team ${num}
+                            </a>
+                            <span style="color:var(--accent-color); font-weight:bold; font-size: 0.9rem;">${pts} pts</span>
+                        </div>`;
             }).join('');
 
             let rStr = getContribStr(redTeams);
@@ -112,44 +144,44 @@ export async function loadTeamSchedule() {
             let actualScoreBanner = matchPlayed ? `<div style="background:var(--field-bg); padding:10px; border-radius:8px; text-align:center; font-weight:900; margin-bottom:15px; color:var(--text-white); border: 1px solid var(--border-grey); display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:15px;"><span>ACTUAL SCORE: <span style="color:var(--primary-color);">RED ${redScore}</span> - <span style="color:var(--blue-alliance);">BLUE ${blueScore}</span></span><button onclick="openMatchVideo('${m.key}')" style="background:var(--primary-color); border:none; padding:6px 15px; border-radius:4px; color:white; font-weight:bold; cursor:pointer; font-size:0.85rem;">🎥 WATCH</button></div>` : '';
 
             html += `<div id="match-card-${m.key}" class="card" style="padding:20px; display:flex; flex-direction:column; gap:15px; border-left: 6px solid var(--border-light);">
-                                <div style="font-size:1.2rem; font-weight:900; color:var(--text-white); border-bottom:1px solid var(--border-grey); padding-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                    <span>${matchName} <span style="font-size:0.9rem; color:var(--text-muted); margin-left: 10px; white-space:nowrap;">🕒 ${timeString}</span></span>
-                                    <span style="font-size:0.8rem; color:var(--text-muted); background: var(--bg-black); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-grey);">${matchPlayed ? '✅ COMPLETED' : '🕒 UPCOMING'}</span>
-                                </div>
-                                ${actualScoreBanner}
-                                <div class="match-alliance-grid">
-                                    <div style="background:rgba(230, 32, 32, 0.05); border: 2px solid ${redWinProj ? 'var(--primary-color)' : 'var(--border-light)'}; border-radius:8px; padding:15px;">
-                                        <h2 class="sub-title" style="color:var(--primary-color); margin-bottom:15px;">RED ALLIANCE ${redWinProj ? ' (FAVORED)' : ''}</h2><div style="margin-bottom:15px;">${rStr}</div>
-                                        <div style="font-size:0.9rem; color:var(--text-muted); border-top: 2px dashed var(--border-light); padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
-                                            <span>Auto: ${redPred.auto} | Tele: ${redPred.tele}</span>
-                                            <span style="text-align:right;">Proj: <strong style="color:var(--text-white); font-size:1.2rem;">${redPred.score}</strong></span>
-                                        </div>
-                                    </div>
-                                    <div style="background:rgba(59, 130, 246, 0.05); border: 2px solid ${blueWinProj ? 'var(--blue-alliance)' : 'var(--border-light)'}; border-radius:8px; padding:15px;">
-                                        <h2 class="sub-title" style="color:var(--blue-alliance); margin-bottom:15px;">BLUE ALLIANCE ${blueWinProj ? ' (FAVORED)' : ''}</h2><div style="margin-bottom:15px;">${bStr}</div>
-                                        <div style="font-size:0.9rem; color:var(--text-muted); border-top: 2px dashed var(--border-light); padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
-                                            <span>Auto: ${bluePred.auto} | Tele: ${bluePred.tele}</span>
-                                            <span style="text-align:right;">Proj: <strong style="color:var(--text-white); font-size:1.2rem;">${bluePred.score}</strong></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
+                                <div style="font-size:1.2rem; font-weight:900; color:var(--text-white); border-bottom:1px solid var(--border-grey); padding-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                    <span>${matchName} <span style="font-size:0.9rem; color:var(--text-muted); margin-left: 10px; white-space:nowrap;">🕒 ${timeString}</span></span>
+                                    <span style="font-size:0.8rem; color:var(--text-muted); background: var(--bg-black); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-grey);">${matchPlayed ? '✅ COMPLETED' : '🕒 UPCOMING'}</span>
+                                </div>
+                                ${actualScoreBanner}
+                                <div class="match-alliance-grid">
+                                    <div style="background:rgba(230, 32, 32, 0.05); border: 2px solid ${redWinProj ? 'var(--primary-color)' : 'var(--border-light)'}; border-radius:8px; padding:15px;">
+                                        <h2 class="sub-title" style="color:var(--primary-color); margin-bottom:15px;">RED ALLIANCE ${redWinProj ? ' (FAVORED)' : ''}</h2><div style="margin-bottom:15px;">${rStr}</div>
+                                        <div style="font-size:0.9rem; color:var(--text-muted); border-top: 2px dashed var(--border-light); padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
+                                            <span>Auto: ${redPred.auto} | Tele: ${redPred.tele}</span>
+                                            <span style="text-align:right;">Proj: <strong style="color:var(--text-white); font-size:1.2rem;">${redPred.score}</strong></span>
+                                        </div>
+                                    </div>
+                                    <div style="background:rgba(59, 130, 246, 0.05); border: 2px solid ${blueWinProj ? 'var(--blue-alliance)' : 'var(--border-light)'}; border-radius:8px; padding:15px;">
+                                        <h2 class="sub-title" style="color:var(--blue-alliance); margin-bottom:15px;">BLUE ALLIANCE ${blueWinProj ? ' (FAVORED)' : ''}</h2><div style="margin-bottom:15px;">${bStr}</div>
+                                        <div style="font-size:0.9rem; color:var(--text-muted); border-top: 2px dashed var(--border-light); padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
+                                            <span>Auto: ${bluePred.auto} | Tele: ${bluePred.tele}</span>
+                                            <span style="text-align:right;">Proj: <strong style="color:var(--text-white); font-size:1.2rem;">${bluePred.score}</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
         });
 
         let statsHtml = `
-                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                        <div class="card" style="margin-bottom:0; padding: 20px; border-top: 4px solid var(--accent-color);">
-                            <h2 class="sub-title" style="color:var(--accent-color); font-size:1rem; margin-bottom:5px;">WIN / LOSS RECORD</h2>
-                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Projected Record:</span><span style="color:var(--text-white);">${projW} - ${projL} - ${projT}</span></div>
-                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Actual Record:</span><span style="color:var(--text-white);">${actW} - ${actL} - ${actT}</span></div>
-                        </div>
-                        <div class="card" style="margin-bottom:0; padding: 20px; border-top: 4px solid var(--success-color);">
-                            <h2 class="sub-title" style="color:var(--success-color); font-size:1rem; margin-bottom:5px;">SCHEDULE DIFFICULTY</h2>
-                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Easiest Match:</span><span style="color:var(--success-color);">${easiestMatch} (+${maxDiff > 0 ? maxDiff.toFixed(1) : maxDiff.toFixed(1)})</span></div>
-                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Hardest Match:</span><span style="color:var(--danger-color);">${hardestMatch} (${minDiff > 0 ? '+' + minDiff.toFixed(1) : minDiff.toFixed(1)})</span></div>
-                        </div>
-                    </div>
-                `;
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div class="card" style="margin-bottom:0; padding: 20px; border-top: 4px solid var(--accent-color);">
+                            <h2 class="sub-title" style="color:var(--accent-color); font-size:1rem; margin-bottom:5px;">WIN / LOSS RECORD</h2>
+                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Projected Record:</span><span style="color:var(--text-white);">${projW} - ${projL} - ${projT}</span></div>
+                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Actual Record:</span><span style="color:var(--text-white);">${actW} - ${actL} - ${actT}</span></div>
+                        </div>
+                        <div class="card" style="margin-bottom:0; padding: 20px; border-top: 4px solid var(--success-color);">
+                            <h2 class="sub-title" style="color:var(--success-color); font-size:1rem; margin-bottom:5px;">SCHEDULE DIFFICULTY</h2>
+                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Easiest Match:</span><span style="color:var(--success-color);">${easiestMatch} (+${maxDiff > 0 ? maxDiff.toFixed(1) : maxDiff.toFixed(1)})</span></div>
+                            <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:bold;"><span style="color:var(--text-muted);">Hardest Match:</span><span style="color:var(--danger-color);">${hardestMatch} (${minDiff > 0 ? '+' + minDiff.toFixed(1) : minDiff.toFixed(1)})</span></div>
+                        </div>
+                    </div>
+                `;
         container.innerHTML = statsHtml + html;
         showToast("Schedule and predictions loaded.");
     } catch (err) {
@@ -211,34 +243,34 @@ export async function openMatchVideo(matchKey) {
         const blueWin = matchPlayed && blueScore > redScore;
 
         statsContainer.innerHTML = `
-                    <div class="match-alliance-grid">
-                        <div style="background: ${redWin ? 'rgba(230, 32, 32, 0.15)' : 'var(--bg-black)'}; border: 1px solid ${redWin ? 'var(--primary-color)' : 'var(--border-grey)'}; border-radius: 8px; padding: 20px; border-left: 6px solid var(--primary-color);">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                                <span style="color:var(--primary-color); font-weight:900; font-size:1.1rem; letter-spacing:1px;">RED ALLIANCE</span>
-                                ${redWin ? '<span style="background:var(--primary-color); color:white; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold; letter-spacing:1px;">WINNER</span>' : ''}
-                            </div>
-                            <div style="font-size:1.2rem; font-weight:bold; color:var(--text-white); margin-bottom: 15px;">
-                                ${redTeamsHTML}
-                            </div>
-                            <div style="font-size:3rem; font-weight:900; line-height:1; color:${redWin ? 'var(--text-white)' : 'var(--text-muted)'};">
-                                ${matchPlayed ? redScore : '--'}
-                            </div>
-                        </div>
+                    <div class="match-alliance-grid">
+                        <div style="background: ${redWin ? 'rgba(230, 32, 32, 0.15)' : 'var(--bg-black)'}; border: 1px solid ${redWin ? 'var(--primary-color)' : 'var(--border-grey)'}; border-radius: 8px; padding: 20px; border-left: 6px solid var(--primary-color);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                                <span style="color:var(--primary-color); font-weight:900; font-size:1.1rem; letter-spacing:1px;">RED ALLIANCE</span>
+                                ${redWin ? '<span style="background:var(--primary-color); color:white; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold; letter-spacing:1px;">WINNER</span>' : ''}
+                            </div>
+                            <div style="font-size:1.2rem; font-weight:bold; color:var(--text-white); margin-bottom: 15px;">
+                                ${redTeamsHTML}
+                            </div>
+                            <div style="font-size:3rem; font-weight:900; line-height:1; color:${redWin ? 'var(--text-white)' : 'var(--text-muted)'};">
+                                ${matchPlayed ? redScore : '--'}
+                            </div>
+                        </div>
 
-                        <div style="background: ${blueWin ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-black)'}; border: 1px solid ${blueWin ? 'var(--blue-alliance)' : 'var(--border-grey)'}; border-radius: 8px; padding: 20px; border-left: 6px solid var(--blue-alliance);">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                                <span style="color:var(--blue-alliance); font-weight:900; font-size:1.1rem; letter-spacing:1px;">BLUE ALLIANCE</span>
-                                ${blueWin ? '<span style="background:var(--blue-alliance); color:white; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold; letter-spacing:1px;">WINNER</span>' : ''}
-                            </div>
-                            <div style="font-size:1.2rem; font-weight:bold; color:var(--text-white); margin-bottom: 15px;">
-                                ${blueTeamsHTML}
-                            </div>
-                            <div style="font-size:3rem; font-weight:900; line-height:1; color:${blueWin ? 'var(--text-white)' : 'var(--text-muted)'};">
-                                ${matchPlayed ? blueScore : '--'}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                        <div style="background: ${blueWin ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-black)'}; border: 1px solid ${blueWin ? 'var(--blue-alliance)' : 'var(--border-grey)'}; border-radius: 8px; padding: 20px; border-left: 6px solid var(--blue-alliance);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                                <span style="color:var(--blue-alliance); font-weight:900; font-size:1.1rem; letter-spacing:1px;">BLUE ALLIANCE</span>
+                                ${blueWin ? '<span style="background:var(--blue-alliance); color:white; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold; letter-spacing:1px;">WINNER</span>' : ''}
+                            </div>
+                            <div style="font-size:1.2rem; font-weight:bold; color:var(--text-white); margin-bottom: 15px;">
+                                ${blueTeamsHTML}
+                            </div>
+                            <div style="font-size:3rem; font-weight:900; line-height:1; color:${blueWin ? 'var(--text-white)' : 'var(--text-muted)'};">
+                                ${matchPlayed ? blueScore : '--'}
+                            </div>
+                        </div>
+                    </div>
+                `;
 
         const videoContainer = document.getElementById('video-frame-container');
 
